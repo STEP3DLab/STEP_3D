@@ -1,3 +1,6 @@
 python-telegram-bot==20.7
 openai==1.16.1
 python-dotenv
+
+gspread==5.11.0
+google-auth==2.21.0
