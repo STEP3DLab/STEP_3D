@@ -4,7 +4,6 @@ from typing import List, Dict, Any
 import gspread
 from google.oauth2.service_account import Credentials
 
-
 class SheetsService:
     """
     Сервис для работы с Google Sheets через gspread и сервисный аккаунт.
