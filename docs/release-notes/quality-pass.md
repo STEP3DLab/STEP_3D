@@ -12,7 +12,7 @@
   - added `defer` for the Three.js dependency;
   - reduced Google Fonts weights/families to the minimum used set while preserving `display=swap`.
 - Added root-level `robots.txt` and `sitemap.xml` configured for GitHub Pages base URL:
-  - `https://step3dlab.github.io/Step3D/`.
+  - `https://step3dlab.github.io/STEP_3D/`.
 
 ## Regression risks
 - **Low:** mobile menu behavior changed to centralized state setter; verify open/close on tap and link click.
