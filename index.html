@@ -1,697 +1,1438 @@
 <!DOCTYPE html>
-<html lang="ru" class="scroll-smooth">
+<html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Step3D — 3D-печать, моделирование, сканирование и реверсивный инжиниринг</title>
-  <meta name="description" content="Step3D — сервис 3D-услуг: 3D-печать, моделирование, 3D-сканирование, реверсивный инжиниринг, прототипирование и малые серии. Отправьте задачу на расчет." />
-  <meta name="robots" content="index,follow" />
-  <link rel="canonical" href="https://step3dlab.github.io/STEP_3D/" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>МастерИИ - мастер-класс по ИИ для 3D</title>
+  <meta name="description" content="МастерИИ - мастер-класс по использованию ИИ для 3D-моделирования и 3D-печати. Ведущий - Ганьшин. Начало в 14:00, длительность 2 часа, стоимость 2500 рублей." />
+  <style>
+    /*
+      Однофайловый сайт без внешних зависимостей.
+      Его можно открыть локально или сразу загрузить на GitHub Pages.
+    */
 
-  <meta property="og:locale" content="ru_RU" />
-  <meta property="og:type" content="website" />
-  <meta property="og:site_name" content="Step3D" />
-  <meta property="og:url" content="https://step3dlab.github.io/STEP_3D/" />
-  <meta property="og:title" content="Step3D — сервис 3D-услуг" />
-  <meta property="og:description" content="3D-печать, моделирование, сканирование и реверсивный инжиниринг. Отправьте задачу на расчет." />
-  <meta property="og:image" content="https://step3dlab.github.io/STEP_3D/og-cover.jpg" />
-  <meta name="theme-color" content="#050505" />
+    :root {
+      color-scheme: dark;
+      --bg: #07090d;
+      --bg-2: #0c1017;
+      --surface: rgba(255, 255, 255, 0.055);
+      --surface-2: rgba(255, 255, 255, 0.09);
+      --stroke: rgba(255, 255, 255, 0.11);
+      --text: #f5f7fb;
+      --text-soft: rgba(245, 247, 251, 0.74);
+      --text-muted: rgba(245, 247, 251, 0.54);
+      --accent: #7cb3ff;
+      --accent-2: #8af3d3;
+      --accent-3: #c7d8ff;
+      --shadow: 0 30px 90px rgba(0, 0, 0, 0.34);
+      --radius-xl: 34px;
+      --radius-lg: 24px;
+      --radius-md: 18px;
+      --container: 1220px;
+      --transition: 260ms cubic-bezier(.2,.8,.2,1);
+      --hero-orb-1: rgba(124, 179, 255, 0.24);
+      --hero-orb-2: rgba(138, 243, 211, 0.12);
+      --grid: rgba(255,255,255,0.05);
+      --button-text: #08111c;
+      --header-bg: rgba(7, 9, 13, 0.62);
+      --success-bg: rgba(138, 243, 211, 0.08);
+      --success-stroke: rgba(138, 243, 211, 0.18);
+      --success-text: #9af0d8;
+      --input-bg: rgba(255,255,255,0.05);
+    }
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    body.light-theme {
+      color-scheme: light;
+      --bg: #f4f7fb;
+      --bg-2: #ffffff;
+      --surface: rgba(10, 20, 36, 0.04);
+      --surface-2: rgba(10, 20, 36, 0.07);
+      --stroke: rgba(10, 20, 36, 0.1);
+      --text: #111826;
+      --text-soft: rgba(17, 24, 38, 0.78);
+      --text-muted: rgba(17, 24, 38, 0.56);
+      --accent: #2a72ff;
+      --accent-2: #18c8a0;
+      --accent-3: #dfe9ff;
+      --shadow: 0 26px 70px rgba(18, 35, 68, 0.09);
+      --hero-orb-1: rgba(42, 114, 255, 0.12);
+      --hero-orb-2: rgba(24, 200, 160, 0.08);
+      --grid: rgba(12, 18, 29, 0.045);
+      --button-text: #ffffff;
+      --header-bg: rgba(244, 247, 251, 0.7);
+      --success-bg: rgba(24, 200, 160, 0.08);
+      --success-stroke: rgba(24, 200, 160, 0.18);
+      --success-text: #0d8a6d;
+      --input-bg: rgba(10,20,36,0.035);
+    }
 
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "LocalBusiness",
-    "name": "Step3D",
-    "url": "https://step3dlab.github.io/STEP_3D/",
-    "email": "projects.step3d@gmail.com",
-    "telephone": "+79959009141",
-    "image": "https://step3dlab.github.io/STEP_3D/og-cover.jpg",
-    "sameAs": [
-      "https://t.me/STEP_3D_Lab",
-      "https://t.me/step_3d_mngr"
-    ],
-    "address": {
-      "@type": "PostalAddress",
-      "addressCountry": "RU",
-      "addressLocality": "Москва"
-    },
-    "areaServed": "RU",
-    "description": "Сервис 3D-печати, моделирования, 3D-сканирования, реверсивного инжиниринга и изготовления малых серий."
-  }
-  </script>
+    * {
+      box-sizing: border-box;
+    }
 
-  
-  <link rel="stylesheet" href="assets/css/main.css" />
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 12% 10%, var(--hero-orb-1), transparent 24%),
+        radial-gradient(circle at 88% 15%, var(--hero-orb-2), transparent 18%),
+        linear-gradient(180deg, var(--bg) 0%, var(--bg) 100%);
+      color: var(--text);
+      min-height: 100vh;
+      transition: background var(--transition), color var(--transition);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      /* Фоновая сетка для ощущения точности и технологичности */
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(var(--grid) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+      background-size: 34px 34px;
+      mask-image: linear-gradient(180deg, rgba(0,0,0,0.62), transparent 88%);
+      opacity: .7;
+    }
+
+    body::after {
+      /* Мягкая световая виньетка вокруг первого экрана */
+      content: "";
+      position: fixed;
+      inset: -20%;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,0.04), transparent 30%),
+        radial-gradient(circle at 50% 100%, rgba(255,255,255,0.02), transparent 34%);
+      opacity: .95;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    img,
+    svg {
+      display: block;
+      max-width: 100%;
+    }
+
+    button,
+    input,
+    textarea {
+      font: inherit;
+    }
+
+    .container {
+      width: min(var(--container), calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      backdrop-filter: blur(18px);
+      background: var(--header-bg);
+      border-bottom: 1px solid var(--stroke);
+    }
+
+    .header-row {
+      min-height: 78px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-mark {
+      width: 44px;
+      height: 44px;
+      border-radius: 15px;
+      background: linear-gradient(135deg, rgba(124, 179, 255, 0.22), rgba(138, 243, 211, 0.1));
+      border: 1px solid var(--stroke);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+
+    body.light-theme .brand-mark {
+      background: linear-gradient(135deg, rgba(42, 114, 255, 0.14), rgba(24, 200, 160, 0.08));
+    }
+
+    .brand-title {
+      font-size: 17px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .mini-link {
+      font-size: 14px;
+      color: var(--text-muted);
+      transition: color var(--transition);
+    }
+
+    .mini-link:hover {
+      color: var(--text);
+    }
+
+    .theme-toggle {
+      width: 66px;
+      height: 38px;
+      border: 1px solid var(--stroke);
+      background: var(--surface);
+      border-radius: 999px;
+      position: relative;
+      cursor: pointer;
+      transition: background var(--transition), border-color var(--transition), transform var(--transition);
+      padding: 0;
+      flex-shrink: 0;
+    }
+
+    .theme-toggle:hover {
+      transform: translateY(-1px);
+    }
+
+    .theme-toggle-track {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 10px;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .theme-icon {
+      width: 15px;
+      height: 15px;
+      transition: opacity var(--transition), transform var(--transition), color var(--transition);
+    }
+
+    .theme-thumb {
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent-2), var(--accent));
+      box-shadow: 0 8px 22px rgba(0,0,0,0.18);
+      transition: transform var(--transition), background var(--transition);
+      display: grid;
+      place-items: center;
+      color: #08111c;
+    }
+
+    body.light-theme .theme-thumb {
+      transform: translateX(28px);
+      color: #ffffff;
+      background: linear-gradient(135deg, var(--accent), #7ba8ff);
+    }
+
+    body.light-theme .theme-icon.sun {
+      opacity: 1;
+      color: var(--accent);
+      transform: scale(1.04);
+    }
+
+    body.light-theme .theme-icon.moon {
+      opacity: .42;
+      transform: scale(.9);
+    }
+
+    body:not(.light-theme) .theme-icon.sun {
+      opacity: .42;
+      transform: scale(.9);
+    }
+
+    body:not(.light-theme) .theme-icon.moon {
+      opacity: 1;
+      color: var(--accent-2);
+      transform: scale(1.04);
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      min-height: 52px;
+      padding: 0 22px;
+      border-radius: 999px;
+      border: 0;
+      cursor: pointer;
+      font-weight: 600;
+      transition: transform var(--transition), box-shadow var(--transition), background var(--transition), color var(--transition);
+      white-space: nowrap;
+    }
+
+    .button:hover {
+      transform: translateY(-2px);
+    }
+
+    .button-primary {
+      color: var(--button-text);
+      background: linear-gradient(135deg, var(--accent-2), var(--accent));
+      box-shadow: 0 12px 30px rgba(124, 179, 255, 0.22);
+    }
+
+    .button-secondary {
+      color: var(--text);
+      background: var(--surface);
+      border: 1px solid var(--stroke);
+    }
+
+    .hero {
+      padding: 56px 0 26px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-shell {
+      padding: 22px;
+      border-radius: 38px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border: 1px solid var(--stroke);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.02fr) minmax(0, 0.98fr);
+      gap: 24px;
+      align-items: stretch;
+    }
+
+    .hero-copy,
+    .hero-visual,
+    .section-card,
+    .signup-card,
+    .timeline-card,
+    .about-card {
+      border-radius: var(--radius-xl);
+      background: var(--surface);
+      border: 1px solid var(--stroke);
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(16px);
+    }
+
+    .hero-copy {
+      padding: 34px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 640px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 14px;
+      width: fit-content;
+      border-radius: 999px;
+      background: var(--surface-2);
+      border: 1px solid var(--stroke);
+      color: var(--text-soft);
+      font-size: 13px;
+      letter-spacing: 0.01em;
+      margin-bottom: 22px;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent-2), var(--accent));
+      box-shadow: 0 0 18px rgba(124, 179, 255, 0.55);
+      flex-shrink: 0;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(40px, 6vw, 88px);
+      line-height: .94;
+      letter-spacing: -0.055em;
+      max-width: 8.5ch;
+    }
+
+    .hero-subtitle {
+      margin: 20px 0 0;
+      font-size: 20px;
+      line-height: 1.45;
+      max-width: 38ch;
+      color: var(--text-soft);
+    }
+
+    .hero-text {
+      margin: 18px 0 0;
+      max-width: 62ch;
+      font-size: 16px;
+      line-height: 1.7;
+      color: var(--text-muted);
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 28px;
+    }
+
+    .meta-card {
+      padding: 16px 16px 18px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.045);
+      border: 1px solid var(--stroke);
+      min-height: 108px;
+    }
+
+    body.light-theme .meta-card {
+      background: rgba(10,20,36,0.03);
+    }
+
+    .meta-label {
+      display: block;
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .meta-value {
+      display: block;
+      font-size: 24px;
+      line-height: 1.15;
+      letter-spacing: -0.04em;
+      margin-bottom: 6px;
+    }
+
+    .meta-note {
+      font-size: 14px;
+      color: var(--text-soft);
+      line-height: 1.5;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 30px;
+    }
+
+    .hero-visual {
+      min-height: 640px;
+      padding: 26px;
+      display: grid;
+      align-items: stretch;
+    }
+
+    .hero-visual::before,
+    .hero-visual::after {
+      content: "";
+      position: absolute;
+      border-radius: 999px;
+      filter: blur(38px);
+      opacity: .72;
+      pointer-events: none;
+    }
+
+    .hero-visual::before {
+      width: 220px;
+      height: 220px;
+      right: 8%;
+      top: 7%;
+      background: var(--hero-orb-1);
+    }
+
+    .hero-visual::after {
+      width: 180px;
+      height: 180px;
+      left: 8%;
+      bottom: 10%;
+      background: var(--hero-orb-2);
+    }
+
+    .visual-stage {
+      position: relative;
+      border-radius: 28px;
+      height: 100%;
+      background:
+        radial-gradient(circle at 50% 14%, rgba(255,255,255,0.06), transparent 30%),
+        linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+      border: 1px solid rgba(255,255,255,0.08);
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+
+    body.light-theme .visual-stage {
+      background:
+        radial-gradient(circle at 50% 14%, rgba(42,114,255,0.06), transparent 30%),
+        linear-gradient(180deg, rgba(255,255,255,0.78), rgba(255,255,255,0.48));
+      border-color: rgba(10,20,36,0.08);
+    }
+
+    .visual-badge {
+      position: absolute;
+      padding: 12px 14px;
+      border-radius: 18px;
+      background: rgba(8, 14, 24, 0.66);
+      border: 1px solid rgba(255,255,255,0.08);
+      backdrop-filter: blur(14px);
+      color: #dbe7f8;
+      font-size: 13px;
+      line-height: 1.45;
+      box-shadow: 0 12px 28px rgba(0,0,0,0.2);
+    }
+
+    body.light-theme .visual-badge {
+      background: rgba(255,255,255,0.78);
+      color: #172034;
+      border-color: rgba(10,20,36,0.08);
+      box-shadow: 0 14px 30px rgba(20, 34, 60, 0.08);
+    }
+
+    .badge-top {
+      top: 18px;
+      left: 18px;
+    }
+
+    .badge-bottom {
+      right: 18px;
+      bottom: 18px;
+    }
+
+    .visual-caption {
+      position: absolute;
+      left: 24px;
+      bottom: 26px;
+      z-index: 2;
+      color: var(--text-soft);
+      font-size: 14px;
+      line-height: 1.6;
+      max-width: 26ch;
+    }
+
+    .visual-svg {
+      width: min(100%, 600px);
+      height: auto;
+      filter: drop-shadow(0 24px 50px rgba(0,0,0,0.24));
+    }
+
+    .section {
+      padding: 18px 0 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 24px;
+    }
+
+    .section-card,
+    .signup-card,
+    .timeline-card,
+    .about-card {
+      padding: 30px;
+      box-shadow: var(--shadow);
+    }
+
+    .section-title {
+      margin: 0 0 10px;
+      font-size: clamp(28px, 4vw, 44px);
+      line-height: 1.02;
+      letter-spacing: -0.045em;
+    }
+
+    .section-text {
+      margin: 0 0 24px;
+      font-size: 16px;
+      line-height: 1.75;
+      color: var(--text-muted);
+      max-width: 62ch;
+    }
+
+    .feature-list {
+      display: grid;
+      gap: 14px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .feature-item {
+      display: grid;
+      grid-template-columns: 46px 1fr;
+      gap: 14px;
+      padding: 16px;
+      border-radius: 22px;
+      background: rgba(255,255,255,0.045);
+      border: 1px solid var(--stroke);
+      align-items: start;
+    }
+
+    body.light-theme .feature-item {
+      background: rgba(10,20,36,0.03);
+    }
+
+    .feature-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(124,179,255,0.18), rgba(138,243,211,0.1));
+      border: 1px solid var(--stroke);
+      display: grid;
+      place-items: center;
+      color: var(--text);
+      flex-shrink: 0;
+    }
+
+    body.light-theme .feature-icon {
+      background: linear-gradient(135deg, rgba(42,114,255,0.12), rgba(24,200,160,0.06));
+    }
+
+    .feature-title {
+      margin: 0 0 4px;
+      font-size: 16px;
+      letter-spacing: -0.02em;
+    }
+
+    .feature-text {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.65;
+      color: var(--text-soft);
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .chip {
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: var(--surface);
+      border: 1px solid var(--stroke);
+      color: var(--text-soft);
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .timeline {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 18px;
+    }
+
+    .timeline-item {
+      display: grid;
+      grid-template-columns: 84px 1fr;
+      gap: 14px;
+      align-items: start;
+    }
+
+    .timeline-time {
+      padding: 12px 10px;
+      text-align: center;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--stroke);
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--text-soft);
+    }
+
+    body.light-theme .timeline-time {
+      background: rgba(10,20,36,0.03);
+    }
+
+    .timeline-content {
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.045);
+      border: 1px solid var(--stroke);
+    }
+
+    body.light-theme .timeline-content {
+      background: rgba(10,20,36,0.03);
+    }
+
+    .timeline-content strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 16px;
+      letter-spacing: -0.02em;
+    }
+
+    .timeline-content p {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.65;
+      color: var(--text-soft);
+    }
+
+    .about-card {
+      margin-top: 24px;
+      display: grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap: 24px;
+      align-items: center;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .stat-card {
+      min-height: 132px;
+      padding: 16px;
+      border-radius: 22px;
+      background: rgba(255,255,255,0.045);
+      border: 1px solid var(--stroke);
+    }
+
+    body.light-theme .stat-card {
+      background: rgba(10,20,36,0.03);
+    }
+
+    .stat-value {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 34px;
+      line-height: 1;
+      letter-spacing: -0.05em;
+    }
+
+    .stat-label {
+      display: block;
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--text-soft);
+    }
+
+    .signup-card {
+      margin-top: 24px;
+    }
+
+    form {
+      display: grid;
+      gap: 14px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+    }
+
+    .field-wide {
+      grid-column: 1 / -1;
+    }
+
+    .label {
+      font-size: 14px;
+      color: var(--text-soft);
+    }
+
+    .input,
+    .textarea {
+      width: 100%;
+      border: 1px solid var(--stroke);
+      background: var(--input-bg);
+      color: var(--text);
+      border-radius: 18px;
+      padding: 15px 16px;
+      outline: none;
+      transition: border-color var(--transition), background var(--transition), transform var(--transition), box-shadow var(--transition);
+    }
+
+    .input::placeholder,
+    .textarea::placeholder {
+      color: var(--text-muted);
+    }
+
+    .input:focus,
+    .textarea:focus {
+      border-color: rgba(124, 179, 255, 0.42);
+      background: rgba(255,255,255,0.08);
+      transform: translateY(-1px);
+      box-shadow: 0 0 0 4px rgba(124, 179, 255, 0.08);
+    }
+
+    body.light-theme .input:focus,
+    body.light-theme .textarea:focus {
+      background: rgba(255,255,255,0.82);
+    }
+
+    .textarea {
+      resize: vertical;
+      min-height: 118px;
+    }
+
+    .submit-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 4px;
+    }
+
+    .form-note {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--text-muted);
+      max-width: 48ch;
+    }
+
+    .success-box {
+      display: none;
+      margin-top: 6px;
+      padding: 16px 18px;
+      border-radius: 18px;
+      background: var(--success-bg);
+      border: 1px solid var(--success-stroke);
+      color: var(--success-text);
+      line-height: 1.6;
+      font-size: 14px;
+    }
+
+    .success-box.show {
+      display: block;
+    }
+
+    .footer {
+      padding: 24px 0 34px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .footer-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 20px 22px;
+      border-radius: 24px;
+      background: var(--surface);
+      border: 1px solid var(--stroke);
+      box-shadow: var(--shadow);
+      color: var(--text-muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 700ms ease, transform 700ms ease;
+    }
+
+    .reveal.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .anchor-offset {
+      position: relative;
+      top: -90px;
+    }
+
+    @media (max-width: 1100px) {
+      .hero-grid,
+      .grid-2,
+      .about-card {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-copy,
+      .hero-visual {
+        min-height: auto;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 780px) {
+      .container {
+        width: min(var(--container), calc(100% - 20px));
+      }
+
+      .hero {
+        padding-top: 22px;
+      }
+
+      .hero-shell,
+      .hero-copy,
+      .hero-visual,
+      .section-card,
+      .signup-card,
+      .timeline-card,
+      .about-card {
+        border-radius: 26px;
+      }
+
+      .hero-shell {
+        padding: 12px;
+      }
+
+      .hero-copy,
+      .hero-visual,
+      .section-card,
+      .signup-card,
+      .timeline-card,
+      .about-card {
+        padding: 22px;
+      }
+
+      .header-row {
+        min-height: 70px;
+      }
+
+      .mini-link {
+        display: none;
+      }
+
+      h1 {
+        max-width: 100%;
+      }
+
+      .hero-subtitle {
+        font-size: 18px;
+      }
+
+      .meta-grid,
+      .form-grid,
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .timeline-item {
+        grid-template-columns: 1fr;
+      }
+
+      .timeline-time {
+        width: fit-content;
+        min-width: 84px;
+      }
+
+      .submit-row,
+      .footer-box {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .visual-caption {
+        position: static;
+        padding: 0 18px 20px;
+        max-width: none;
+      }
+
+      .badge-bottom {
+        right: 14px;
+        bottom: 14px;
+      }
+
+      .badge-top {
+        left: 14px;
+        top: 14px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+        scroll-behavior: auto !important;
+      }
+
+      .reveal {
+        opacity: 1 !important;
+        transform: none !important;
+      }
+    }
+  </style>
 </head>
-<body class="selection:bg-blue-500/30 bg-radial">
-  <div id="scroll-progress"></div>
-
-  <noscript>
-    <div class="mx-5 sm:mx-6 my-4 rounded-2xl border border-white/20 bg-black/80 px-4 py-3 text-sm leading-relaxed">
-      JavaScript отключен. Связь: <a href="mailto:projects.step3d@gmail.com" class="underline">projects.step3d@gmail.com</a>,
-      <a href="tel:+79959009141" class="underline">+7 (995) 900-91-41</a>,
-      Telegram: <a href="https://t.me/step_3d_mngr" class="underline">@step_3d_mngr</a>.
-    </div>
-  </noscript>
-
-
-  <header id="site-header" class="site-header fixed top-0 inset-x-0 z-[100] glass border-b border-white/12">
-    <div class="max-w-7xl mx-auto px-5 sm:px-6 py-4 flex items-center justify-between gap-4">
-      <a href="#top" class="flex items-center gap-3 group min-w-0">
-        <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center font-black tracking-tight transition-transform group-hover:rotate-12">S3D</div>
-        <div class="min-w-0">
-          <div class="text-lg font-extrabold tracking-tight">Step3D</div>
-          <div class="text-[9px] uppercase tracking-[0.28em] text-blue-400 mono">Сервис / производство</div>
-        </div>
+<body>
+  <header class="site-header" id="top">
+    <div class="container header-row">
+      <a class="brand" href="#top" aria-label="МастерИИ - наверх страницы">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3 5 7v10l7 4 7-4V7l-7-4Z"></path>
+            <path d="M12 12 5 7"></path>
+            <path d="M12 12l7-5"></path>
+            <path d="M12 12v9"></path>
+          </svg>
+        </span>
+        <span class="brand-title">МастерИИ</span>
       </a>
-      <nav class="hidden lg:flex items-center gap-8 text-[11px] uppercase tracking-[0.18em] font-bold text-slate-100">
-        <a href="#services" class="hover:text-blue-400 transition">Услуги</a>
-        <a href="#brief" class="hover:text-blue-400 transition">Расчет</a>
-        <a href="#process" class="hover:text-blue-400 transition">Процесс</a>
-        <a href="#cases" class="hover:text-blue-400 transition">Проекты</a>
-        <a href="#faq" class="hover:text-blue-400 transition">Вопросы</a>
-      </nav>
-      <div class="hidden sm:flex items-center gap-3">
-        <a href="#brief" class="bg-blue-600 hover:bg-blue-700 px-5 py-2.5 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] transition">Отправить задачу</a>
+
+      <div class="header-actions">
+        <a class="mini-link" href="#program">Программа</a>
+        <a class="mini-link" href="#signup">Запись</a>
+
+        <!-- Переключатель темы с иконками солнца и полумесяца -->
+        <button class="theme-toggle" id="themeToggle" type="button" aria-label="Переключить светлую и тёмную тему" aria-pressed="false">
+          <span class="theme-toggle-track" aria-hidden="true">
+            <svg class="theme-icon sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+              <circle cx="12" cy="12" r="4.2"></circle>
+              <path d="M12 2.5v2.2M12 19.3v2.2M21.5 12h-2.2M4.7 12H2.5M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6M18.7 18.7l-1.6-1.6M6.9 6.9 5.3 5.3"></path>
+            </svg>
+            <svg class="theme-icon moon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M14.7 2.9a1 1 0 0 0-.94 1.36 8.2 8.2 0 0 1-10.5 10.5 1 1 0 0 0-1.36.94c.28 3.62 3.59 6.4 7.67 6.4 5.1 0 9.24-4.14 9.24-9.24 0-4.08-2.78-7.39-6.4-7.67Z"></path>
+            </svg>
+          </span>
+          <span class="theme-thumb" aria-hidden="true"></span>
+        </button>
       </div>
-      <button id="menu-open" type="button" class="lg:hidden text-white p-2 rounded-xl border border-white/12" aria-label="Открыть мобильное меню" aria-controls="mobile-nav" aria-expanded="false"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 6h16M4 12h16m-7 6h7"/></svg></button>
     </div>
   </header>
 
-  <div id="mobile-nav" class="fixed inset-0 bg-black/95 backdrop-blur-xl z-[200] translate-x-full transition-transform duration-500 flex flex-col items-center justify-center gap-8 text-2xl font-bold" role="dialog" aria-modal="true" aria-label="Мобильная навигация" aria-hidden="true">
-    <button id="menu-close" type="button" class="absolute top-8 right-8 text-sm mono opacity-75 uppercase tracking-widest" aria-label="Закрыть мобильное меню">[ Закрыть ]</button>
-    <a href="#services" class="mob-link">Услуги</a>
-    <a href="#brief" class="mob-link">Расчет</a>
-    <a href="#process" class="mob-link">Процесс</a>
-    <a href="#cases" class="mob-link">Проекты</a>
-    <a href="#faq" class="mob-link">Вопросы</a>
-    <a href="#contact" class="mob-link bg-blue-600 px-10 py-4 rounded-2xl text-base">Контакты</a>
-  </div>
+  <main>
+    <section class="hero">
+      <div class="container hero-shell reveal">
+        <div class="hero-grid">
+          <article class="hero-copy">
+            <span class="eyebrow">Практический мастер-класс по ИИ</span>
+            <h1>ИИ для 3D-моделирования и 3D-печати</h1>
+            <p class="hero-subtitle">Компактный мастер-класс о том, как использовать современные ИИ-инструменты для ускорения работы с идеями, моделями и производственными задачами.</p>
+            <p class="hero-text">На занятии разберём, где искусственный интеллект реально помогает в 3D-процессах: от поиска решений и подготовки концепции до поддержки моделирования, визуализации и подготовки к печати.</p>
 
-  <main id="top">
-    <!-- HERO -->
-    <section class="relative min-h-screen flex items-center overflow-hidden">
-      <div id="hero-canvas"></div>
-      <div class="max-w-7xl mx-auto px-5 sm:px-6 relative z-10 pt-28 pb-20 w-full">
-        <div class="grid lg:grid-cols-[1.05fr_.95fr] gap-10 items-center">
-          <div class="max-w-4xl">
-            <div class="mono text-blue-400 text-xs mb-6 reveal uppercase tracking-[0.42em]">[ Step3D ]</div>
-            <h1 class="text-5xl sm:text-7xl lg:text-8xl font-black leading-[0.92] tracking-tight mb-7 reveal" style="transition-delay:.08s">
-              3D-услуги <br><span class="text-blue-600 italic">для реальных задач</span>
-            </h1>
-            <p class="text-lg sm:text-2xl text-slate-200 mb-10 max-w-2xl leading-relaxed reveal" style="transition-delay:.14s">
-              3D-печать, моделирование, сканирование и реверсивный инжиниринг. От единичной детали до малой серии — с понятным расчетом и сопровождением проекта.
-            </p>
-            <div class="flex flex-wrap gap-4 reveal" style="transition-delay:.2s">
-              <a href="#brief" class="bg-blue-600 hover:bg-blue-700 text-white px-8 sm:px-10 py-4 sm:py-5 rounded-2xl font-bold text-base sm:text-lg transition shadow-glow active:scale-[0.98]">Отправить задачу на расчет</a>
-              <a href="https://t.me/step_3d_mngr" target="_blank" rel="noopener noreferrer" class="glass hover:bg-white/12 px-8 sm:px-10 py-4 sm:py-5 rounded-2xl font-bold text-base sm:text-lg transition">Написать в Telegram</a>
-            </div>
-            <div class="grid sm:grid-cols-3 gap-3 mt-10 reveal" style="transition-delay:.28s">
-              <div class="glass rounded-2xl px-4 py-4"><div class="mono text-[10px] uppercase tracking-[0.22em] text-slate-100 mb-1">Формат</div><div class="font-bold">От одной детали до серии</div></div>
-              <div class="glass rounded-2xl px-4 py-4"><div class="mono text-[10px] uppercase tracking-[0.22em] text-slate-100 mb-1">Вход</div><div class="font-bold">Фото, эскиз, образец или 3D-файл</div></div>
-              <div class="glass rounded-2xl px-4 py-4"><div class="mono text-[10px] uppercase tracking-[0.22em] text-slate-100 mb-1">Контакт</div><div class="font-bold">Почта, Telegram, звонок</div></div>
-            </div>
-          </div>
-
-          <div class="reveal lg:justify-self-end" style="transition-delay:.22s">
-            <div class="glass-strong readable-card rounded-[34px] p-5 sm:p-6 border-white/12 shadow-soft max-w-xl ml-auto">
-              <div class="flex items-center justify-between gap-4 mb-5">
-                <div>
-                  <div class="mono text-[10px] uppercase tracking-[0.3em] text-blue-400 mb-1">Кратко</div>
-                  <div class="text-2xl font-extrabold tracking-tight">Быстрый старт проекта</div>
-                </div>
-                <div class="text-right">
-                  <div class="text-[10px] uppercase tracking-[0.22em] text-slate-100 mono">ответ</div>
-                  <div class="font-bold">в день обращения</div>
-                </div>
+            <div class="meta-grid" aria-label="Основная информация о мастер-классе">
+              <div class="meta-card">
+                <span class="meta-label">Ведущий</span>
+                <span class="meta-value">Ганьшин</span>
+                <span class="meta-note">Практикующий специалист и ведущий мастер-класса.</span>
               </div>
-              <div id="quick-services" class="grid grid-cols-2 gap-3 mb-5 text-sm"></div>
-              <div class="rounded-[28px] bg-white/[0.08] border border-white/14 p-5">
-                <div class="flex justify-between gap-4 items-start mb-3">
-                  <div>
-                    <div id="hero-card-title" class="font-bold text-lg">3D-печать</div>
-                    <div id="hero-card-text" class="text-slate-200 text-sm leading-relaxed">Подходит, если у вас уже есть модель, чертеж или понятная форма детали.</div>
-                  </div>
-                  <span id="hero-card-chip" class="mono text-[10px] uppercase tracking-[0.24em] text-blue-400">FDM / SLA</span>
-                </div>
-                <div id="hero-card-points" class="flex flex-wrap gap-2"></div>
-                <a href="#brief" class="mt-5 inline-flex items-center gap-2 text-blue-400 font-bold">Перейти к заявке <span aria-hidden="true">→</span></a>
+              <div class="meta-card">
+                <span class="meta-label">Начало</span>
+                <span class="meta-value">14:00</span>
+                <span class="meta-note">Удобный дневной формат без перегруза.</span>
+              </div>
+              <div class="meta-card">
+                <span class="meta-label">Длительность</span>
+                <span class="meta-value">2 часа</span>
+                <span class="meta-note">Только ключевые инструменты и практика.</span>
+              </div>
+              <div class="meta-card">
+                <span class="meta-label">Стоимость</span>
+                <span class="meta-value">2500 ₽</span>
+                <span class="meta-note">Одна встреча с концентрированным содержанием.</span>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
-    </section>
 
-    <!-- SERVICES -->
-    <section id="services" class="py-24 sm:py-32 relative">
-      <div class="max-w-7xl mx-auto px-5 sm:px-6">
-        <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-14 sm:mb-20 reveal">
-          <div>
-            <h2 class="text-4xl sm:text-5xl font-bold mb-4 italic">Направления работы</h2>
-            <p class="text-slate-300 max-w-xl">Четыре основные услуги. Выберите направление — и сразу увидите, как мы подходим к задаче и что нужно для расчета.</p>
-          </div>
-          <div class="text-blue-400 mono text-sm font-bold uppercase tracking-[0.22em] border-b border-blue-500/35 pb-2">Основные услуги / 2026</div>
-        </div>
-
-        <div class="grid lg:grid-cols-[1.1fr_.9fr] gap-6 items-start">
-          <div id="services-list" class="grid sm:grid-cols-2 gap-4"></div>
-
-          <aside class="glass-strong rounded-[34px] p-6 sm:p-8 reveal sticky top-28">
-            <div class="flex items-start justify-between gap-4 mb-6">
-              <div>
-                <div class="mono text-[10px] uppercase tracking-[0.28em] text-blue-400 mb-2">Подробно</div>
-                <h3 id="service-panel-title" class="text-3xl font-black tracking-tight">3D-печать</h3>
-              </div>
-              <span id="service-panel-badge" class="text-[10px] uppercase tracking-[0.22em] mono text-slate-300">быстрый расчет</span>
+            <div class="hero-actions">
+              <a class="button button-primary" href="#signup">Записаться</a>
+              <a class="button button-secondary" href="#program">Смотреть программу</a>
             </div>
-            <p id="service-panel-text" class="text-slate-200 leading-relaxed mb-6">Если у вас есть готовая модель или понятная форма изделия, подберем технологию, материал и ориентировочный срок.</p>
-            <div id="service-panel-list" class="space-y-3 mb-7"></div>
-            <div class="rounded-[24px] bg-white/[0.06] border border-white/12 p-5 mb-7">
-              <div class="mono text-[10px] uppercase tracking-[0.22em] text-slate-100 mb-3">Что можно прислать</div>
-              <div id="service-panel-inputs" class="flex flex-wrap gap-2"></div>
-            </div>
-            <div class="flex flex-wrap gap-3">
-              <a href="#brief" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3.5 rounded-2xl font-bold transition">Перейти к заявке</a>
-              <a href="https://t.me/step_3d_mngr" target="_blank" rel="noopener noreferrer" class="glass px-6 py-3.5 rounded-2xl font-bold transition hover:bg-white/12">Уточнить в Telegram</a>
+          </article>
+
+          <aside class="hero-visual" aria-label="Иллюстрация к мастер-классу">
+            <div class="visual-stage">
+              <div class="visual-badge badge-top">МастерИИ<br />Практика без лишней теории</div>
+              <div class="visual-badge badge-bottom">AI + 3D<br />От идеи к модели</div>
+
+              <!-- SVG-иллюстрация в технологичном стиле -->
+              <svg class="visual-svg" viewBox="0 0 700 700" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <defs>
+                  <linearGradient id="cubeStroke" x1="130" y1="120" x2="560" y2="560" gradientUnits="userSpaceOnUse">
+                    <stop offset="0" stop-color="var(--accent-2)" />
+                    <stop offset="1" stop-color="var(--accent)" />
+                  </linearGradient>
+                  <linearGradient id="panelFill" x1="220" y1="150" x2="470" y2="520" gradientUnits="userSpaceOnUse">
+                    <stop offset="0" stop-color="rgba(255,255,255,0.24)" />
+                    <stop offset="1" stop-color="rgba(255,255,255,0.04)" />
+                  </linearGradient>
+                  <radialGradient id="glowA" cx="50%" cy="50%" r="50%">
+                    <stop offset="0" stop-color="var(--accent-2)" stop-opacity="0.48" />
+                    <stop offset="1" stop-color="var(--accent-2)" stop-opacity="0" />
+                  </radialGradient>
+                  <radialGradient id="glowB" cx="50%" cy="50%" r="50%">
+                    <stop offset="0" stop-color="var(--accent)" stop-opacity="0.44" />
+                    <stop offset="1" stop-color="var(--accent)" stop-opacity="0" />
+                  </radialGradient>
+                </defs>
+
+                <g opacity="0.88">
+                  <circle cx="208" cy="215" r="115" fill="url(#glowA)" />
+                  <circle cx="496" cy="448" r="140" fill="url(#glowB)" />
+                </g>
+
+                <g opacity="0.42" stroke="url(#cubeStroke)" stroke-width="1.4" fill="none">
+                  <path d="M102 540 350 150 598 540" />
+                  <path d="M180 540 350 274 520 540" />
+                  <path d="M250 540 350 384 450 540" />
+                  <path d="M140 470h420" />
+                  <path d="M180 400h340" />
+                  <path d="M220 330h260" />
+                </g>
+
+                <g>
+                  <path d="M350 108 548 223v231L350 569 152 454V223L350 108Z" fill="rgba(255,255,255,0.02)" stroke="url(#cubeStroke)" stroke-width="2.2" />
+                  <path d="M350 108v461" stroke="url(#cubeStroke)" stroke-width="2.2" />
+                  <path d="M152 223 350 339l198-116" fill="none" stroke="url(#cubeStroke)" stroke-width="2.2" />
+                </g>
+
+                <g>
+                  <rect x="225" y="184" width="250" height="330" rx="34" fill="url(#panelFill)" stroke="rgba(255,255,255,0.14)" />
+                  <rect x="247" y="206" width="206" height="286" rx="28" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.1)" />
+                </g>
+
+                <g fill="none" stroke="url(#cubeStroke)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M287 280c0-38 30-68 68-68 29 0 54 18 64 44 25 4 44 25 44 52 0 30-24 54-54 54H300c-29 0-52-23-52-52 0-28 22-50 49-52 8-17 24-29 42-29" />
+                  <path d="M306 407h88" />
+                  <path d="M306 433h58" />
+                  <path d="M404 407h30" />
+                </g>
+
+                <g>
+                  <circle cx="293" cy="274" r="8" fill="var(--accent-2)" />
+                  <circle cx="354" cy="233" r="8" fill="var(--accent)" />
+                  <circle cx="417" cy="274" r="8" fill="var(--accent-2)" />
+                  <circle cx="450" cy="332" r="8" fill="var(--accent)" />
+                  <circle cx="249" cy="332" r="8" fill="var(--accent)" />
+                  <circle cx="287" cy="352" r="7" fill="var(--accent-2)" />
+                  <circle cx="418" cy="351" r="7" fill="var(--accent-2)" />
+                </g>
+
+                <g stroke="rgba(255,255,255,0.12)" stroke-width="1.3">
+                  <path d="M293 274 354 233 417 274 450 332 418 351 287 352 249 332 293 274Z" fill="none" />
+                  <path d="M287 352 354 290 418 351" fill="none" />
+                </g>
+
+                <g fill="none" stroke="url(#cubeStroke)" stroke-width="2">
+                  <path d="M276 458c52-16 99-18 148-4" />
+                  <path d="M292 475c39-8 76-8 116 0" opacity="0.7" />
+                </g>
+              </svg>
+
+              <div class="visual-caption">Минималистичный визуал собран так, чтобы сайт ощущался как страница продукта: чисто, технологично и без визуального шума.</div>
             </div>
           </aside>
         </div>
       </div>
     </section>
 
-    <!-- BRIEF -->
-    <section id="brief" class="py-24 sm:py-32 bg-[#07090d]">
-      <div class="max-w-7xl mx-auto px-5 sm:px-6">
-        <div class="grid xl:grid-cols-[.9fr_1.1fr] gap-8 items-start">
-          <div class="reveal">
-            <div class="mono text-blue-400 text-xs mb-4 uppercase tracking-[0.38em]">[ Заявка ]</div>
-            <h2 class="text-4xl sm:text-5xl font-black leading-tight mb-5">Отправьте задачу на расчет</h2>
-            <p class="text-slate-200 text-lg leading-relaxed mb-8 max-w-xl">Короткая заявка без перегруза. Сначала понимаем тип задачи, затем получаем контакты и материалы. После отправки связываемся и уточняем детали.</p>
-            <div class="grid sm:grid-cols-3 gap-3">
-              <div class="glass rounded-2xl p-4"><div class="mono text-[10px] uppercase tracking-[0.2em] text-slate-500 mb-1">Шаг 1</div><div class="font-bold">Тип задачи</div></div>
-              <div class="glass rounded-2xl p-4"><div class="mono text-[10px] uppercase tracking-[0.2em] text-slate-500 mb-1">Шаг 2</div><div class="font-bold">Контакты и файлы</div></div>
-              <div class="glass rounded-2xl p-4"><div class="mono text-[10px] uppercase tracking-[0.2em] text-slate-500 mb-1">Дальше</div><div class="font-bold">Уточнение и расчет</div></div>
-            </div>
-          </div>
+    <div class="anchor-offset" id="program"></div>
+    <section class="section">
+      <div class="container grid-2">
+        <article class="section-card reveal">
+          <h2 class="section-title">Что будет на мастер-классе</h2>
+          <p class="section-text">Программа собрана для тех, кто хочет не просто услышать про ИИ, а понять, как использовать его в задачах 3D-моделирования и 3D-печати на практике.</p>
 
-          <div class="glass-strong rounded-[36px] p-5 sm:p-8 reveal" style="transition-delay:.08s">
-            <div class="flex flex-wrap items-center gap-3 justify-between mb-6">
-              <div>
-                <div class="mono text-[10px] uppercase tracking-[0.3em] text-blue-400 mb-2">Заявка</div>
-                <div class="text-2xl font-extrabold">Заявка на расчет</div>
-              </div>
-              <div class="flex items-center gap-2 text-xs font-bold text-slate-400">
-                <span id="step-indicator-1" class="px-3 py-2 rounded-full bg-white text-black">1</span>
-                <span class="w-8 h-px bg-white/10"></span>
-                <span id="step-indicator-2" class="px-3 py-2 rounded-full glass">2</span>
-              </div>
-            </div>
-
-            <form id="brief-form" class="space-y-6">
-              <div id="brief-step-1" class="space-y-6">
-                <div>
-                  <label class="block text-sm font-bold mb-3">Направление</label>
-                  <div class="grid sm:grid-cols-2 gap-3" id="brief-services"></div>
-                </div>
-                <div class="grid sm:grid-cols-2 gap-4">
-                  <div>
-                    <label for="brief-deadline" class="block text-sm font-bold mb-3">Срок</label>
-                    <select id="brief-deadline" class="w-full rounded-2xl px-4 py-4">
-                      <option>Можно без спешки</option>
-                      <option>Нужен расчет сегодня</option>
-                      <option>Срочно, нужен быстрый запуск</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label for="brief-quantity" class="block text-sm font-bold mb-3">Количество</label>
-                    <select id="brief-quantity" class="w-full rounded-2xl px-4 py-4">
-                      <option>1 изделие</option>
-                      <option>2–10 штук</option>
-                      <option>Малая серия</option>
-                    </select>
-                  </div>
-                </div>
-                <button type="button" id="to-step-2" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-2xl transition uppercase tracking-[0.18em] text-sm">Продолжить</button>
-              </div>
-
-              <div id="brief-step-2" class="space-y-5 hidden">
-                <div class="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <label for="brief-name" class="block text-sm font-bold mb-3">Имя</label>
-                    <input id="brief-name" type="text" class="w-full rounded-2xl px-4 py-4" placeholder="Как к вам обращаться" required>
-                  </div>
-                  <div>
-                    <label for="brief-contact" class="block text-sm font-bold mb-3">Контакт</label>
-                    <input id="brief-contact" type="text" class="w-full rounded-2xl px-4 py-4" placeholder="Почта или телефон" required>
-                  </div>
-                </div>
-                <div>
-                  <label for="brief-comment" class="block text-sm font-bold mb-3">Комментарий</label>
-                  <textarea id="brief-comment" rows="5" class="w-full rounded-2xl px-4 py-4" placeholder="Что нужно сделать, какие размеры, материал, среда работы детали, что уже есть"></textarea>
-                </div>
-                <div>
-                  <label class="block text-sm font-bold mb-3">Файл или ссылка</label>
-                  <label id="drop-zone" class="drop-zone block rounded-[28px] border border-dashed border-white/15 bg-white/[0.02] p-6 sm:p-8 text-center cursor-pointer transition">
-                    <input id="brief-file" type="file" class="hidden" multiple>
-                    <div class="text-lg font-bold mb-2">Перетащите файл сюда или нажмите для загрузки</div>
-                    <div class="text-slate-300 text-sm">STL, STEP, OBJ, PDF, JPG, PNG или другие материалы проекта</div>
-                    <div id="file-list" class="mt-4 text-sm text-blue-400 font-bold"></div><p class="mt-3 text-xs text-slate-400">Если файл не прикрепляется, можно отправить заявку сейчас, а модель дослать позже в Telegram или на почту.</p>
-                  </label>
-                </div>
-                <div class="rounded-[24px] bg-white/[0.06] border border-white/12 p-5 text-sm text-slate-400 leading-relaxed">
-                  После отправки мы смотрим задачу, при необходимости уточняем детали и возвращаемся с расчетом или следующим шагом.
-                </div>
-                <div class="grid sm:grid-cols-2 gap-3">
-                  <button type="button" id="back-step-1" class="glass rounded-2xl py-4 font-bold">Назад</button>
-                  <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-2xl transition uppercase tracking-[0.18em] text-sm">Отправить задачу</button>
-                </div>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="process" class="py-24 sm:py-32">
-      <div class="max-w-7xl mx-auto px-5 sm:px-6">
-        <div class="flex flex-col md:flex-row justify-between items-end gap-6 mb-14 reveal">
-          <div>
-            <h2 class="text-4xl sm:text-5xl font-bold mb-4 italic">Как проходит работа</h2>
-            <p class="text-slate-300 max-w-xl">Понятный путь от входной информации до готового изделия. Без лишних шагов и без перегруза объяснениями.</p>
-          </div>
-          <div class="mono text-blue-400 text-sm uppercase tracking-[0.22em]">4 шага / понятный путь</div>
-        </div>
-        <div class="grid md:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5">
-          <div class="glass p-7 rounded-[30px] reveal bento-card">
-            <div class="w-14 h-14 mb-6 rounded-2xl bg-blue-600/10 flex items-center justify-center text-blue-500">
-              <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
-            </div>
-            <h3 class="text-2xl font-bold mb-3">Анализ задачи</h3>
-            <p class="text-slate-300 text-sm leading-relaxed">Смотрим материалы, понимаем цель изделия, уточняем ограничения и формат результата.</p>
-          </div>
-          <div class="glass p-7 rounded-[30px] reveal bento-card" style="transition-delay:.06s">
-            <div class="w-14 h-14 mb-6 rounded-2xl bg-blue-600/10 flex items-center justify-center text-blue-500">
-              <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6"/></svg>
-            </div>
-            <h3 class="text-2xl font-bold mb-3">Подготовка модели</h3>
-            <p class="text-slate-300 text-sm leading-relaxed">Если нужно, создаем или дорабатываем модель, приводим геометрию к рабочему виду.</p>
-          </div>
-          <div class="glass p-7 rounded-[30px] reveal bento-card" style="transition-delay:.12s">
-            <div class="w-14 h-14 mb-6 rounded-2xl bg-blue-600/10 flex items-center justify-center text-blue-500">
-              <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M7 8h10M7 12h10M7 16h6M5 4h14v16H5z"/></svg>
-            </div>
-            <h3 class="text-2xl font-bold mb-3">Печать и проверка</h3>
-            <p class="text-slate-300 text-sm leading-relaxed">Подбираем технологию, материал и режим. Проверяем результат перед выдачей.</p>
-          </div>
-          <div class="glass p-7 rounded-[30px] reveal bento-card" style="transition-delay:.18s">
-            <div class="w-14 h-14 mb-6 rounded-2xl bg-blue-600/10 flex items-center justify-center text-blue-500">
-              <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7"/></svg>
-            </div>
-            <h3 class="text-2xl font-bold mb-3">Доводка и выдача</h3>
-            <p class="text-slate-300 text-sm leading-relaxed">Финишная обработка, передача изделия и рекомендации по дальнейшему использованию.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="cases" class="py-24 sm:py-32 bg-[#07090d]/80">
-      <div class="max-w-7xl mx-auto px-5 sm:px-6">
-        <div class="flex flex-col lg:flex-row justify-between gap-6 items-end mb-12 reveal">
-          <div>
-            <h2 class="text-4xl sm:text-5xl font-bold mb-4 italic">Примеры работ</h2>
-            <p class="text-slate-300 max-w-xl">Компактная витрина реальных сценариев. Выберите тип задачи и откройте один проект подробнее.</p>
-          </div>
-          <div id="case-filters" class="flex flex-wrap gap-2"></div>
-        </div>
-        <div class="grid lg:grid-cols-[1.05fr_.95fr] gap-6 items-start">
-          <div id="case-grid" class="grid md:grid-cols-2 gap-5"></div>
-          <aside class="glass-strong rounded-[34px] p-6 sm:p-8 sticky top-28 reveal" style="transition-delay:.08s">
-            <div class="mono text-[10px] uppercase tracking-[0.28em] text-blue-400 mb-3">Разбор проекта</div>
-            <div id="case-detail"></div>
-          </aside>
-        </div>
-      </div>
-    </section>
-
-    <section id="gallery" class="py-24 sm:py-32">
-      <div class="max-w-7xl mx-auto px-5 sm:px-6">
-        <div class="flex flex-col md:flex-row justify-between items-end gap-6 mb-14 reveal">
-          <div>
-            <h2 class="text-4xl sm:text-5xl font-bold mb-4 italic">Галерея работ</h2>
-            <p class="text-slate-300 max-w-2xl">Оптимальное место для реальных примеров. Ниже подготовлена карусель на 20 изображений — просто замените временные подписи своими фотографиями работ.</p>
-          </div>
-          <div class="mono text-blue-400 text-sm uppercase tracking-[0.22em]">20 изображений / карусель</div>
-        </div>
-
-        <div class="glass-strong rounded-[34px] p-4 sm:p-6 reveal">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
-            <div class="mono text-[10px] uppercase tracking-[0.28em] text-blue-400">Примеры выполненных работ</div>
-            <div class="flex items-center gap-3">
-              <button type="button" id="gallery-prev" class="glass rounded-full w-11 h-11 flex items-center justify-center hover:bg-white/12 transition" aria-label="Предыдущие изображения">
-                <span aria-hidden="true">←</span>
-              </button>
-              <button type="button" id="gallery-next" class="glass rounded-full w-11 h-11 flex items-center justify-center hover:bg-white/12 transition" aria-label="Следующие изображения">
-                <span aria-hidden="true">→</span>
-              </button>
-            </div>
-          </div>
-
-          <div id="gallery-track" class="gallery-track flex gap-4 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-2">
-            <article class="gallery-slide shrink-0 w-[82%] sm:w-[46%] lg:w-[24%] rounded-[28px] overflow-hidden border border-white/12 bg-white/[0.04]">
-              <div class="aspect-[4/5] bg-gradient-to-br from-blue-600/20 via-white/5 to-slate-900/70 flex items-end p-5">
-                <div>
-                  <div class="mono text-[10px] uppercase tracking-[0.22em] text-blue-400 mb-2">Изображение 01</div>
-                  <div class="text-xl font-bold">Место для вашей работы</div>
-                  <div class="text-slate-300 text-sm mt-2">Замените этот блок на фотографию или рендер проекта.</div>
-                </div>
-              </div>
-            </article>
-            <article class="gallery-slide shrink-0 w-[82%] sm:w-[46%] lg:w-[24%] rounded-[28px] overflow-hidden border border-white/12 bg-white/[0.04]">
-              <div class="aspect-[4/5] bg-gradient-to-br from-blue-600/20 via-white/5 to-slate-900/70 flex items-end p-5">
-                <div>
-                  <div class="mono text-[10px] uppercase tracking-[0.22em] text-blue-400 mb-2">Изображение 02</div>
-                  <div class="text-xl font-bold">Место для вашей работы</div>
-                  <div class="text-slate-300 text-sm mt-2">Замените этот блок на фотографию или рендер проекта.</div>
-                </div>
-              </div>
-            </article>
-            <article class="gallery-slide shrink-0 w-[82%] sm:w-[46%] lg:w-[24%] rounded-[28px] overflow-hidden border border-white/12 bg-white/[0.04]">
-              <div class="aspect-[4/5] bg-gradient-to-br from-blue-600/20 via-white/5 to-slate-900/70 flex items-end p-5">
-                <div>
-                  <div class="mono text-[10px] uppercase tracking-[0.22em] text-blue-400 mb-2">Изображение 03</div>
-                  <div class="text-xl font-bold">Место для вашей работы</div>
-                  <div class="text-slate-300 text-sm mt-2">Замените этот блок на фотографию или рендер проекта.</div>
-                </div>
-              </div>
-            </article>
-            <article class="gallery-slide shrink-0 w-[82%] sm:w-[46%] lg:w-[24%] rounded-[28px] overflow-hidden border border-white/12 bg-white/[0.04]">
-              <div class="aspect-[4/5] bg-gradient-to-br from-blue-600/20 via-white/5 to-slate-900/70 flex items-end p-5">
-                <div>
-                  <div class="mono text-[10px] uppercase tracking-[0.22em] text-blue-400 mb-2">Изображение 04</div>
-                  <div class="text-xl font-bold">Место для вашей работы</div>
-                  <div class="text-slate-300 text-sm mt-2">Замените этот блок на фотографию или рендер проекта.</div>
-                </div>
-              </div>
-            </article>
-            <article class="gallery-slide shrink-0 w-[82%] sm:w-[46%] lg:w-[24%] rounded-[28px] overflow-hidden border border-white/12 bg-white/[0.04]">
-              <div class="aspect-[4/5] bg-gradient-to-br from-blue-600/20 via-white/5 to-slate-900/70 flex items-end p-5">
-                <div>
-                  <div class="mono text-[10px] uppercase tracking-[0.22em] text-blue-400 mb-2">Изображение 05</div>
-                  <div class="text-xl font-bold">Место для вашей работы</div>
-                  <div class="text-slate-300 text-sm mt-2">Замените этот блок на фотографию или рендер проекта.</div>
-                </div>
-              </div>
-            </article>
-            <article class="gallery-slide shrink-0 w-[82%] sm:w-[46%] lg:w-[24%] rounded-[28px] overflow-hidden border border-white/12 bg-white/[0.04]">
-              <div class="aspect-[4/5] bg-gradient-to-br from-blue-600/20 via-white/5 to-slate-900/70 flex items-end p-5">
-                <div>
-                  <div class="mono text-[10px] uppercase tracking-[0.22em] text-blue-400 mb-2">Изображение 06</div>
-                  <div class="text-xl font-bold">Место для вашей работы</div>
-                  <div class="text-slate-300 text-sm mt-2">Замените этот блок на фотографию или рендер проекта.</div>
-                </div>
-              </div>
-            </article>
-            <article class="gallery-slide shrink-0 w-[82%] sm:w-[46%] lg:w-[24%] rounded-[28px] overflow-hidden border border-white/12 bg-white/[0.04]">
-              <div class="aspect-[4/5] bg-gradient-to-br from-blue-600/20 via-white/5 to-slate-900/70 flex items-end p-5">
-                <div>
-                  <div class="mono text-[10px] uppercase tracking-[0.22em] text-blue-400 mb-2">Изображение 07</div>
-                  <div class="text-xl font-bold">Место для вашей работы</div>
-                  <div class="text-slate-300 text-sm mt-2">Замените этот блок на фотографию или рендер проекта.</div>
-                </div>
-              </div>
-            </article>
-            <article class="gallery-slide shrink-0 w-[82%] sm:w-[46%] lg:w-[24%] rounded-[28px] overflow-hidden border border-white/12 bg-white/[0.04]">
-              <div class="aspect-[4/5] bg-gradient-to-br from-blue-600/20 via-white/5 to-slate-900/70 flex items-end p-5">
-                <div>
-                  <div class="mono text-[10px] uppercase tracking-[0.22em] text-blue-400 mb-2">Изображение 08</div>
-                  <div class="text-xl font-bold">Место для вашей работы</div>
-                  <div class="text-slate-300 text-sm mt-2">Замените этот блок на фотографию или рендер проекта.</div>
-                </div>
-              </div>
-            </article>
-            <article class="gallery-slide shrink-0 w-[82%] sm:w-[46%] lg:w-[24%] rounded-[28px] overflow-hidden border border-white/12 bg-white/[0.04]">
-              <div class="aspect-[4/5] bg-gradient-to-br from-blue-600/20 via-white/5 to-slate-900/70 flex items-end p-5">
-                <div>
-                  <div class="mono text-[10px] uppercase tracking-[0.22em] text-blue-400 mb-2">Изображение 09</div>
-                  <div class="text-xl font-bold">Место для вашей работы</div>
-                  <div class="text-slate-300 text-sm mt-2">Замените этот блок на фотографию или рендер проекта.</div>
-                </div>
-              </div>
-            </article>
-            <article class="gallery-slide shrink-0 w-[82%] sm:w-[46%] lg:w-[24%] rounded-[28px] overflow-hidden border border-white/12 bg-white/[0.04]">
-              <div class="aspect-[4/5] bg-gradient-to-br from-blue-600/20 via-white/5 to-slate-900/70 flex items-end p-5">
-                <div>
-                  <div class="mono text-[10px] uppercase tracking-[0.22em] text-blue-400 mb-2">Изображение 10</div>
-                  <div class="text-xl font-bold">Место для вашей работы</div>
-                  <div class="text-slate-300 text-sm mt-2">Замените этот блок на фотографию или рендер проекта.</div>
-                </div>
-              </div>
-            </article>
-            <article class="gallery-slide shrink-0 w-[82%] sm:w-[46%] lg:w-[24%] rounded-[28px] overflow-hidden border border-white/12 bg-white/[0.04]">
-              <div class="aspect-[4/5] bg-gradient-to-br from-blue-600/20 via-white/5 to-slate-900/70 flex items-end p-5">
-                <div>
-                  <div class="mono text-[10px] uppercase tracking-[0.22em] text-blue-400 mb-2">Изображение 11</div>
-                  <div class="text-xl font-bold">Место для вашей работы</div>
-                  <div class="text-slate-300 text-sm mt-2">Замените этот блок на фотографию или рендер проекта.</div>
-                </div>
-              </div>
-            </article>
-            <article class="gallery-slide shrink-0 w-[82%] sm:w-[46%] lg:w-[24%] rounded-[28px] overflow-hidden border border-white/12 bg-white/[0.04]">
-              <div class="aspect-[4/5] bg-gradient-to-br from-blue-600/20 via-white/5 to-slate-900/70 flex items-end p-5">
-                <div>
-                  <div class="mono text-[10px] uppercase tracking-[0.22em] text-blue-400 mb-2">Изображение 12</div>
-                  <div class="text-xl font-bold">Место для вашей работы</div>
-                  <div class="text-slate-300 text-sm mt-2">Замените этот блок на фотографию или рендер проекта.</div>
-                </div>
-              </div>
-            </article>
-            <article class="gallery-slide shrink-0 w-[82%] sm:w-[46%] lg:w-[24%] rounded-[28px] overflow-hidden border border-white/12 bg-white/[0.04]">
-              <div class="aspect-[4/5] bg-gradient-to-br from-blue-600/20 via-white/5 to-slate-900/70 flex items-end p-5">
-                <div>
-                  <div class="mono text-[10px] uppercase tracking-[0.22em] text-blue-400 mb-2">Изображение 13</div>
-                  <div class="text-xl font-bold">Место для вашей работы</div>
-                  <div class="text-slate-300 text-sm mt-2">Замените этот блок на фотографию или рендер проекта.</div>
-                </div>
-              </div>
-            </article>
-            <article class="gallery-slide shrink-0 w-[82%] sm:w-[46%] lg:w-[24%] rounded-[28px] overflow-hidden border border-white/12 bg-white/[0.04]">
-              <div class="aspect-[4/5] bg-gradient-to-br from-blue-600/20 via-white/5 to-slate-900/70 flex items-end p-5">
-                <div>
-                  <div class="mono text-[10px] uppercase tracking-[0.22em] text-blue-400 mb-2">Изображение 14</div>
-                  <div class="text-xl font-bold">Место для вашей работы</div>
-                  <div class="text-slate-300 text-sm mt-2">Замените этот блок на фотографию или рендер проекта.</div>
-                </div>
-              </div>
-            </article>
-            <article class="gallery-slide shrink-0 w-[82%] sm:w-[46%] lg:w-[24%] rounded-[28px] overflow-hidden border border-white/12 bg-white/[0.04]">
-              <div class="aspect-[4/5] bg-gradient-to-br from-blue-600/20 via-white/5 to-slate-900/70 flex items-end p-5">
-                <div>
-                  <div class="mono text-[10px] uppercase tracking-[0.22em] text-blue-400 mb-2">Изображение 15</div>
-                  <div class="text-xl font-bold">Место для вашей работы</div>
-                  <div class="text-slate-300 text-sm mt-2">Замените этот блок на фотографию или рендер проекта.</div>
-                </div>
-              </div>
-            </article>
-            <article class="gallery-slide shrink-0 w-[82%] sm:w-[46%] lg:w-[24%] rounded-[28px] overflow-hidden border border-white/12 bg-white/[0.04]">
-              <div class="aspect-[4/5] bg-gradient-to-br from-blue-600/20 via-white/5 to-slate-900/70 flex items-end p-5">
-                <div>
-                  <div class="mono text-[10px] uppercase tracking-[0.22em] text-blue-400 mb-2">Изображение 16</div>
-                  <div class="text-xl font-bold">Место для вашей работы</div>
-                  <div class="text-slate-300 text-sm mt-2">Замените этот блок на фотографию или рендер проекта.</div>
-                </div>
-              </div>
-            </article>
-            <article class="gallery-slide shrink-0 w-[82%] sm:w-[46%] lg:w-[24%] rounded-[28px] overflow-hidden border border-white/12 bg-white/[0.04]">
-              <div class="aspect-[4/5] bg-gradient-to-br from-blue-600/20 via-white/5 to-slate-900/70 flex items-end p-5">
-                <div>
-                  <div class="mono text-[10px] uppercase tracking-[0.22em] text-blue-400 mb-2">Изображение 17</div>
-                  <div class="text-xl font-bold">Место для вашей работы</div>
-                  <div class="text-slate-300 text-sm mt-2">Замените этот блок на фотографию или рендер проекта.</div>
-                </div>
-              </div>
-            </article>
-            <article class="gallery-slide shrink-0 w-[82%] sm:w-[46%] lg:w-[24%] rounded-[28px] overflow-hidden border border-white/12 bg-white/[0.04]">
-              <div class="aspect-[4/5] bg-gradient-to-br from-blue-600/20 via-white/5 to-slate-900/70 flex items-end p-5">
-                <div>
-                  <div class="mono text-[10px] uppercase tracking-[0.22em] text-blue-400 mb-2">Изображение 18</div>
-                  <div class="text-xl font-bold">Место для вашей работы</div>
-                  <div class="text-slate-300 text-sm mt-2">Замените этот блок на фотографию или рендер проекта.</div>
-                </div>
-              </div>
-            </article>
-            <article class="gallery-slide shrink-0 w-[82%] sm:w-[46%] lg:w-[24%] rounded-[28px] overflow-hidden border border-white/12 bg-white/[0.04]">
-              <div class="aspect-[4/5] bg-gradient-to-br from-blue-600/20 via-white/5 to-slate-900/70 flex items-end p-5">
-                <div>
-                  <div class="mono text-[10px] uppercase tracking-[0.22em] text-blue-400 mb-2">Изображение 19</div>
-                  <div class="text-xl font-bold">Место для вашей работы</div>
-                  <div class="text-slate-300 text-sm mt-2">Замените этот блок на фотографию или рендер проекта.</div>
-                </div>
-              </div>
-            </article>
-            <article class="gallery-slide shrink-0 w-[82%] sm:w-[46%] lg:w-[24%] rounded-[28px] overflow-hidden border border-white/12 bg-white/[0.04]">
-              <div class="aspect-[4/5] bg-gradient-to-br from-blue-600/20 via-white/5 to-slate-900/70 flex items-end p-5">
-                <div>
-                  <div class="mono text-[10px] uppercase tracking-[0.22em] text-blue-400 mb-2">Изображение 20</div>
-                  <div class="text-xl font-bold">Место для вашей работы</div>
-                  <div class="text-slate-300 text-sm mt-2">Замените этот блок на фотографию или рендер проекта.</div>
-                </div>
-              </div>
-            </article>
-          </div>
-
-          <div id="gallery-dots" class="flex flex-wrap justify-center gap-2 mt-5"></div>
-        </div>
-      </div>
-    </section>
-
-    <section id="materials" class="py-24 sm:py-32">
-      <div class="max-w-7xl mx-auto px-5 sm:px-6">
-        <div class="flex flex-col md:flex-row justify-between items-end gap-6 mb-14 reveal">
-          <div>
-            <h2 class="text-4xl sm:text-5xl font-bold mb-4 italic">Материалы и возможности</h2>
-            <p class="text-slate-300 max-w-2xl">Объясняем по-человечески: какой вариант подходит под задачу, какие есть ограничения и с чем можно к нам прийти на старт.</p>
-          </div>
-          <div class="mono text-blue-400 text-sm uppercase tracking-[0.22em]">Материалы / выбор / ограничения</div>
-        </div>
-        <div class="grid lg:grid-cols-3 gap-5">
-          <div class="glass p-7 rounded-[30px] reveal bento-card">
-            <h3 class="text-2xl font-bold mb-3">Что используем</h3>
-            <p class="text-slate-300 text-sm leading-relaxed mb-5">Пластики для функциональных и презентационных деталей, фотополимеры для высокой детализации, а также решения под инженерные задачи.</p>
-            <div class="flex flex-wrap gap-2 text-xs font-bold">
-              <span class="px-3 py-2 rounded-full bg-white/10 border border-white/15">PLA</span>
-              <span class="px-3 py-2 rounded-full bg-white/10 border border-white/15">PETG</span>
-              <span class="px-3 py-2 rounded-full bg-white/10 border border-white/15">ABS</span>
-              <span class="px-3 py-2 rounded-full bg-white/10 border border-white/15">Фотополимер</span>
-            </div>
-          </div>
-          <div class="glass p-7 rounded-[30px] reveal bento-card" style="transition-delay:.06s">
-            <h3 class="text-2xl font-bold mb-3">Когда что подходит</h3>
-            <div class="space-y-3 text-sm">
-              <div class="rounded-2xl border border-white/12 bg-white/[0.02] p-4"><span class="font-bold block mb-1">Функциональная деталь</span><span class="text-slate-300">Когда важны прочность, посадка и повторяемость.</span></div>
-              <div class="rounded-2xl border border-white/12 bg-white/[0.02] p-4"><span class="font-bold block mb-1">Демонстрационный прототип</span><span class="text-slate-300">Когда нужно быстро показать форму, размер и общую идею.</span></div>
-              <div class="rounded-2xl border border-white/12 bg-white/[0.02] p-4"><span class="font-bold block mb-1">Точная малая деталь</span><span class="text-slate-300">Когда важны мелкие элементы и аккуратная геометрия.</span></div>
-            </div>
-          </div>
-          <div class="glass p-7 rounded-[30px] reveal bento-card" style="transition-delay:.12s">
-            <h3 class="text-2xl font-bold mb-3">Ограничения и старт</h3>
-            <p class="text-slate-300 text-sm leading-relaxed mb-5">На старт можно прийти даже без идеальной модели. Подойдут фото, образец, эскиз, сломанная деталь, чертеж или просто понятное описание задачи.</p>
-            <div class="space-y-3 text-sm text-slate-100">
-              <div>• Очень тонкие элементы могут потребовать доработки.</div>
-              <div>• Для точной посадки иногда нужен тестовый образец.</div>
-              <div>• При неизвестном материале образца сначала уточняем условия работы детали.</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="trust" class="py-24 sm:py-32 bg-[#07090d]">
-      <div class="max-w-7xl mx-auto px-5 sm:px-6">
-        <div class="flex flex-col md:flex-row justify-between items-end gap-6 mb-14 reveal">
-          <div>
-            <h2 class="text-4xl sm:text-5xl font-bold mb-4 italic">Почему с нами удобно</h2>
-            <p class="text-slate-300 max-w-xl">Не длинная история компании, а короткие сигналы, которые помогают понять, как устроена работа и чего ждать.</p>
-          </div>
-          <div class="mono text-blue-400 text-sm uppercase tracking-[0.22em]">Доверие / качество / сопровождение</div>
-        </div>
-        <div class="grid md:grid-cols-2 xl:grid-cols-4 gap-4">
-          <div class="glass p-6 rounded-[28px] reveal bento-card"><div class="mono text-[10px] uppercase tracking-[0.22em] text-blue-400 mb-3">Опыт</div><div class="text-2xl font-bold mb-2">Разные типы задач</div><p class="text-slate-300 text-sm">От единичных деталей и ремонта узлов до прототипов и малых серий.</p></div>
-          <div class="glass p-6 rounded-[28px] reveal bento-card" style="transition-delay:.05s"><div class="mono text-[10px] uppercase tracking-[0.22em] text-blue-400 mb-3">Контроль</div><div class="text-2xl font-bold mb-2">Проверка перед выдачей</div><p class="text-slate-300 text-sm">Смотрим результат и сверяем его с задачей, а не просто печатаем файл.</p></div>
-          <div class="glass p-6 rounded-[28px] reveal bento-card" style="transition-delay:.1s"><div class="mono text-[10px] uppercase tracking-[0.22em] text-blue-400 mb-3">Сопровождение</div><div class="text-2xl font-bold mb-2">Помогаем разобраться</div><p class="text-slate-300 text-sm">Если модель неидеальна или задача сформулирована не до конца, доводим вход до рабочего вида.</p></div>
-          <div class="glass p-6 rounded-[28px] reveal bento-card" style="transition-delay:.15s"><div class="mono text-[10px] uppercase tracking-[0.22em] text-blue-400 mb-3">Коммуникация</div><div class="text-2xl font-bold mb-2">Несколько каналов связи</div><p class="text-slate-300 text-sm">Главный путь — заявка на расчет. Дополнительно доступны Telegram, почта и звонок.</p></div>
-        </div>
-      </div>
-    </section>
-
-    <section id="faq" class="py-24 sm:py-32">
-      <div class="max-w-4xl mx-auto px-5 sm:px-6">
-        <h2 class="text-4xl sm:text-5xl font-bold mb-12 text-center reveal italic">Вопросы</h2>
-        <div id="faq-list" class="space-y-4"></div>
-      </div>
-    </section>
-
-    <section id="contact" class="py-24 sm:py-32 relative overflow-hidden">
-      <div class="max-w-7xl mx-auto px-5 sm:px-6 relative z-10">
-        <div class="glass-strong rounded-[40px] sm:rounded-[56px] p-6 sm:p-10 lg:p-16 grid lg:grid-cols-[1fr_.95fr] gap-10 lg:gap-16">
-          <div>
-            <div class="mono text-blue-400 text-xs mb-4 uppercase tracking-[0.38em]">[ Контакты ]</div>
-            <h2 class="text-4xl sm:text-6xl font-black mb-6 italic text-blue-600">Обсудим задачу</h2>
-            <p class="text-lg sm:text-xl text-slate-200 mb-10 max-w-xl">Главный путь — отправить задачу на расчет. Если удобнее, можно написать в Telegram, на почту или позвонить.</p>
-            <div class="flex flex-wrap gap-4 mb-10">
-              <a href="#brief" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-2xl font-bold transition shadow-glow">Отправить задачу на расчет</a>
-              <a href="https://t.me/step_3d_mngr" target="_blank" rel="noopener noreferrer" class="glass px-8 py-4 rounded-2xl font-bold transition hover:bg-white/12">Написать в Telegram</a>
-            </div>
-            <div class="grid sm:grid-cols-3 gap-4 text-sm">
-              <a href="mailto:projects.step3d@gmail.com" class="glass rounded-[24px] p-5 block hover:bg-white/[0.04] transition">
-                <div class="mono text-[10px] uppercase tracking-[0.22em] text-slate-500 mb-2">Почта</div>
-                <div class="font-bold break-all">projects.step3d@gmail.com</div>
-                <div class="text-slate-300 mt-2">Для заявок и материалов</div>
-              </a>
-              <a href="tel:+79959009141" class="glass rounded-[24px] p-5 block hover:bg-white/[0.04] transition">
-                <div class="mono text-[10px] uppercase tracking-[0.22em] text-slate-500 mb-2">Телефон</div>
-                <div class="font-bold">+7 (995) 900-91-41</div>
-                <div class="text-slate-300 mt-2">Когда нужен быстрый контакт</div>
-              </a>
-              <a href="https://t.me/STEP_3D_Lab" target="_blank" rel="noopener noreferrer" class="glass rounded-[24px] p-5 block hover:bg-white/[0.04] transition">
-                <div class="mono text-[10px] uppercase tracking-[0.22em] text-slate-500 mb-2">Telegram-канал</div>
-                <div class="font-bold">STEP_3D_Lab</div>
-                <div class="text-slate-300 mt-2">Примеры работ, новости и обновления</div>
-              </a>
-            </div>
-          </div>
-
-          <div class="glass rounded-[32px] p-6 sm:p-8 self-start">
-            <div class="mono text-[10px] uppercase tracking-[0.28em] text-blue-400 mb-3">Короткая форма</div>
-            <h3 class="text-2xl font-black mb-5">Быстрый запрос</h3>
-            <form id="contact-form" class="space-y-4">
-              <div>
-                <label for="contact-name" class="block text-sm font-bold mb-3">Имя</label>
-                <input id="contact-name" type="text" class="w-full rounded-2xl px-4 py-4" placeholder="Как к вам обращаться" required>
+          <ul class="feature-list">
+            <li class="feature-item">
+              <div class="feature-icon" aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="3"></circle>
+                  <path d="M19.4 15a1.6 1.6 0 0 0 .33 1.76l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.6 1.6 0 0 0-1.76-.33 1.6 1.6 0 0 0-.97 1.46V21a2 2 0 1 1-4 0v-.09a1.6 1.6 0 0 0-.97-1.46 1.6 1.6 0 0 0-1.76.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.6 1.6 0 0 0 4.6 15a1.6 1.6 0 0 0-1.46-.97H3a2 2 0 1 1 0-4h.09A1.6 1.6 0 0 0 4.6 8.57a1.6 1.6 0 0 0-.33-1.76l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.6 1.6 0 0 0 1.76.33H9a1.6 1.6 0 0 0 .97-1.46V3a2 2 0 1 1 4 0v.09a1.6 1.6 0 0 0 .97 1.46 1.6 1.6 0 0 0 1.76-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.6 1.6 0 0 0-.33 1.76V9c0 .66.39 1.26 1 1.51.15.06.31.09.47.09H21a2 2 0 1 1 0 4h-.09c-.16 0-.32.03-.47.09-.61.25-1 .85-1 1.51V15Z"></path>
+                </svg>
               </div>
               <div>
-                <label for="contact-value" class="block text-sm font-bold mb-3">Контакт</label>
-                <input id="contact-value" type="text" class="w-full rounded-2xl px-4 py-4" placeholder="Телефон или почта" required>
+                <h3 class="feature-title">Где ИИ реально помогает</h3>
+                <p class="feature-text">Разберём, какие задачи в 3D-процессе ИИ ускоряет уже сегодня, а где лучше не ждать от него чудес.</p>
+              </div>
+            </li>
+            <li class="feature-item">
+              <div class="feature-icon" aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 2 4 7l8 5 8-5-8-5Z"></path>
+                  <path d="M4 17l8 5 8-5"></path>
+                  <path d="M4 12l8 5 8-5"></path>
+                </svg>
               </div>
               <div>
-                <label for="contact-message" class="block text-sm font-bold mb-3">Комментарий</label>
-                <textarea id="contact-message" rows="4" class="w-full rounded-2xl px-4 py-4" placeholder="Коротко опишите задачу"></textarea>
+                <h3 class="feature-title">3D-моделирование с поддержкой ИИ</h3>
+                <p class="feature-text">Покажем, как использовать ИИ для генерации идей, описаний, уточнения форм и ускорения подготовительных этапов.</p>
               </div>
-              <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-2xl transition uppercase tracking-[0.18em] text-sm">Открыть письмо</button>
-              <p class="text-slate-100 text-sm leading-relaxed">Форма открывает черновик письма. Файлы можно приложить вручную или отправить в Telegram.</p>
-            </form>
+            </li>
+            <li class="feature-item">
+              <div class="feature-icon" aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6 19h12"></path>
+                  <path d="M8 3h8l2 6H6l2-6Z"></path>
+                  <path d="M7 9v7a5 5 0 0 0 10 0V9"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="feature-title">Подготовка к 3D-печати</h3>
+                <p class="feature-text">Обсудим, как ИИ помогает быстрее принимать решения перед печатью: от выбора подхода до анализа ограничений.</p>
+              </div>
+            </li>
+            <li class="feature-item">
+              <div class="feature-icon" aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 12h7"></path>
+                  <path d="M14 12h7"></path>
+                  <path d="M12 3v7"></path>
+                  <path d="M12 14v7"></path>
+                  <circle cx="12" cy="12" r="2.5"></circle>
+                </svg>
+              </div>
+              <div>
+                <h3 class="feature-title">Практическая логика применения</h3>
+                <p class="feature-text">Главная цель встречи — чтобы участник ушёл с понятной схемой: что, где и в какой последовательности использовать.</p>
+              </div>
+            </li>
+          </ul>
+
+          <div class="chips" aria-label="Ключевые темы мастер-класса">
+            <span class="chip">ИИ в инженерных задачах</span>
+            <span class="chip">Поддержка моделирования</span>
+            <span class="chip">Подготовка к печати</span>
+            <span class="chip">Практические сценарии</span>
+          </div>
+        </article>
+
+        <article class="timeline-card reveal">
+          <h2 class="section-title">Как пройдёт встреча</h2>
+          <p class="section-text">Формат построен так, чтобы за 2 часа пройти путь от общего понимания темы до прикладной схемы использования ИИ в 3D-практике.</p>
+
+          <ol class="timeline">
+            <li class="timeline-item">
+              <div class="timeline-time">14:00</div>
+              <div class="timeline-content">
+                <strong>Введение в тему</strong>
+                <p>Коротко и по делу: что изменилось в сфере ИИ, какие инструменты уже влияют на работу специалистов и почему это важно сейчас.</p>
+              </div>
+            </li>
+            <li class="timeline-item">
+              <div class="timeline-time">14:25</div>
+              <div class="timeline-content">
+                <strong>ИИ и 3D-моделирование</strong>
+                <p>Рассмотрим сценарии, где ИИ помогает с идеями, текстовыми запросами, визуализацией и предварительной проработкой модели.</p>
+              </div>
+            </li>
+            <li class="timeline-item">
+              <div class="timeline-time">15:00</div>
+              <div class="timeline-content">
+                <strong>ИИ и 3D-печать</strong>
+                <p>Разберём, как ИИ может поддерживать принятие решений при подготовке изделия, выборе подхода и анализе ограничений печати.</p>
+              </div>
+            </li>
+            <li class="timeline-item">
+              <div class="timeline-time">15:35</div>
+              <div class="timeline-content">
+                <strong>Итог и вопросы</strong>
+                <p>Соберём все инструменты в понятную схему применения и ответим на вопросы участников по их реальным задачам.</p>
+              </div>
+            </li>
+          </ol>
+        </article>
+      </div>
+
+      <div class="container about-card reveal">
+        <div>
+          <h2 class="section-title">Для кого этот мастер-класс</h2>
+          <p class="section-text">Страница намеренно сделана лаконичной, потому что сама тема уже сильная. Этот мастер-класс подойдёт тем, кто хочет увидеть не абстрактные разговоры об ИИ, а понятный маршрут его применения в сфере 3D.</p>
+          <ul class="feature-list">
+            <li class="feature-item">
+              <div class="feature-icon" aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"></path>
+                  <path d="M5 21a7 7 0 0 1 14 0"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="feature-title">Тем, кто работает с 3D</h3>
+                <p class="feature-text">Если вы моделируете, печатаете, визуализируете или только входите в эту сферу, встреча даст хорошую отправную точку.</p>
+              </div>
+            </li>
+            <li class="feature-item">
+              <div class="feature-icon" aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 19.5V6.8A1.8 1.8 0 0 1 5.8 5h12.4A1.8 1.8 0 0 1 20 6.8v12.7"></path>
+                  <path d="M8 9h8"></path>
+                  <path d="M8 13h8"></path>
+                  <path d="M10 19.5h4"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="feature-title">Студентам и преподавателям</h3>
+                <p class="feature-text">Подойдёт тем, кто хочет быстрее ориентироваться в новых инструментах и понимать, как встроить их в учебную или проектную работу.</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <div class="stats-grid" aria-label="Ключевые параметры мастер-класса">
+          <div class="stat-card">
+            <span class="stat-value">2</span>
+            <span class="stat-label">часа концентрированного материала без перегруза</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-value">14:00</span>
+            <span class="stat-label">дневной старт, удобный для очной встречи</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-value">2500 ₽</span>
+            <span class="stat-label">стоимость участия в мастер-классе</span>
           </div>
         </div>
       </div>
-      <div class="absolute -bottom-40 -right-40 w-[620px] h-[620px] bg-blue-600/5 blur-[160px] rounded-full"></div>
+    </section>
+
+    <div class="anchor-offset" id="signup"></div>
+    <section class="section">
+      <div class="container signup-card reveal">
+        <h2 class="section-title">Запись на мастер-класс</h2>
+        <p class="section-text">Оставьте контактные данные, и с вами свяжутся для подтверждения участия. Форма демонстрационная, но интерфейс уже подготовлен так, чтобы его было легко подключить к почте, боту или CRM.</p>
+
+        <form id="signupForm">
+          <div class="form-grid">
+            <label class="field">
+              <span class="label">Имя</span>
+              <input class="input" type="text" name="name" placeholder="Как к вам обращаться" required />
+            </label>
+
+            <label class="field">
+              <span class="label">Телефон или Telegram</span>
+              <input class="input" type="text" name="contact" placeholder="Номер телефона или @username" required />
+            </label>
+
+            <label class="field field-wide">
+              <span class="label">Комментарий</span>
+              <textarea class="textarea" name="message" placeholder="Например: хочу записаться на мастер-класс"></textarea>
+            </label>
+          </div>
+
+          <div class="submit-row">
+            <button class="button button-primary" type="submit">Отправить заявку</button>
+            <p class="form-note">После отправки пользователь видит понятное подтверждение. Позже сюда можно подключить реальную обработку формы.</p>
+          </div>
+
+          <div class="success-box" id="successBox">Спасибо. Ваша заявка принята. В ближайшее время с вами свяжутся для подтверждения участия в мастер-классе «МастерИИ».</div>
+        </form>
+      </div>
     </section>
   </main>
 
-  <footer class="py-10 border-t border-white/12 opacity-80">
-    <div class="max-w-7xl mx-auto px-5 sm:px-6 flex flex-col md:flex-row justify-between items-center gap-5 text-[10px] uppercase tracking-[0.45em] font-bold">
-      <div>Step3D // Москва</div>
-      <div class="hidden md:block">3D-печать • сканирование • реверс</div>
-      <div>projects.step3d@gmail.com</div>
+  <footer class="footer">
+    <div class="container footer-box">
+      <span>МастерИИ - мастер-класс по использованию ИИ для 3D-моделирования и 3D-печати.</span>
+      <a href="#top">Наверх</a>
     </div>
   </footer>
-  <button id="to-top" type="button" class="top-btn fixed right-4 bottom-28 sm:bottom-6 z-[120] opacity-0 pointer-events-none translate-y-4 transition-all duration-300 glass-strong w-12 h-12 rounded-full flex items-center justify-center" aria-label="Наверх">
-    <span aria-hidden="true">↑</span>
-  </button>
 
-  <div class="sm:hidden fixed inset-x-3 bottom-3 z-[110] glass-strong rounded-[22px] p-3">
-    <div class="grid grid-cols-3 gap-2 text-center text-[11px] font-bold">
-      <a href="#brief" class="bg-blue-600 text-white rounded-2xl py-3 px-2">Заявка</a>
-      <a href="https://t.me/step_3d_mngr" target="_blank" rel="noopener noreferrer" class="glass rounded-2xl py-3 px-2">Telegram</a>
-      <a href="tel:+79959009141" class="glass rounded-2xl py-3 px-2">Позвонить</a>
-    </div>
-  </div>
+  <script>
+    /*
+      Переключение светлой и тёмной темы.
+      Выбор сохраняется в localStorage, чтобы сайт открывался в привычном режиме.
+    */
+    (function () {
+      const body = document.body;
+      const toggle = document.getElementById('themeToggle');
+      const storageKey = 'master-ai-theme-apple';
 
-  <div id="toast" class="toast fixed left-1/2 bottom-24 sm:bottom-6 z-[130] -translate-x-1/2 translate-y-6 opacity-0 transition-all duration-300 glass-strong rounded-full px-5 py-3 text-sm font-bold"></div>
+      function applyTheme(theme) {
+        body.classList.toggle('light-theme', theme === 'light');
+        toggle.setAttribute('aria-pressed', String(theme === 'light'));
+      }
 
+      function getInitialTheme() {
+        const saved = localStorage.getItem(storageKey);
+        if (saved === 'light' || saved === 'dark') {
+          return saved;
+        }
+        return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+      }
+
+      applyTheme(getInitialTheme());
+
+      toggle.addEventListener('click', function () {
+        const nextTheme = body.classList.contains('light-theme') ? 'dark' : 'light';
+        localStorage.setItem(storageKey, nextTheme);
+        applyTheme(nextTheme);
+      });
+    })();
+
+    /*
+      Аккуратное появление блоков при прокрутке.
+      Если браузер не поддерживает IntersectionObserver, блоки просто будут видны сразу.
+    */
+    (function () {
+      const items = document.querySelectorAll('.reveal');
+
+      if (!('IntersectionObserver' in window)) {
+        items.forEach(function (item) {
+          item.classList.add('is-visible');
+        });
+        return;
+      }
+
+      const observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, {
+        threshold: 0.16
+      });
+
+      items.forEach(function (item) {
+        observer.observe(item);
+      });
+    })();
+
+    /*
+      Демонстрационная отправка формы.
+      Здесь пока нет сервера, поэтому после отправки показывается красивое подтверждение.
+    */
+    (function () {
+      const form = document.getElementById('signupForm');
+      const successBox = document.getElementById('successBox');
+
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        successBox.classList.add('show');
+        form.reset();
+      });
+    })();
+  </script>
 </body>
 </html>
