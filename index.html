@@ -1,10 +1,1276 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="ru" class="scroll-smooth">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Index</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Step3D — 3D-печать, моделирование, сканирование и реверсивный инжиниринг</title>
+  <meta name="description" content="Step3D — сервис 3D-услуг: 3D-печать, моделирование, 3D-сканирование, реверсивный инжиниринг, прототипирование и малые серии. Отправьте задачу на расчет." />
+  <meta name="robots" content="index,follow" />
+  <link rel="canonical" href="https://step3dlab.github.io/Step3D/" />
+
+  <meta property="og:locale" content="ru_RU" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Step3D" />
+  <meta property="og:url" content="https://step3dlab.github.io/Step3D/" />
+  <meta property="og:title" content="Step3D — сервис 3D-услуг" />
+  <meta property="og:description" content="3D-печать, моделирование, сканирование и реверсивный инжиниринг. Отправьте задачу на расчет." />
+  <meta property="og:image" content="https://step3dlab.github.io/Step3D/og-cover.jpg" />
+  <meta name="theme-color" content="#050505" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "Step3D",
+    "url": "https://step3dlab.github.io/Step3D/",
+    "email": "projects.step3d@gmail.com",
+    "telephone": "+79959009141",
+    "image": "https://step3dlab.github.io/Step3D/og-cover.jpg",
+    "sameAs": [
+      "https://t.me/STEP_3D_Lab",
+      "https://t.me/step_3d_mngr"
+    ],
+    "address": {
+      "@type": "PostalAddress",
+      "addressCountry": "RU",
+      "addressLocality": "Москва"
+    },
+    "areaServed": "RU",
+    "description": "Сервис 3D-печати, моделирования, 3D-сканирования, реверсивного инжиниринга и изготовления малых серий."
+  }
+  </script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Manrope', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          },
+          colors: {
+            brand: '#3b82f6',
+            bg: '#050505',
+            panel: '#0b0b0d',
+            soft: '#94a3b8',
+            line: 'rgba(255,255,255,0.08)'
+          },
+          boxShadow: {
+            glow: '0 20px 60px rgba(59,130,246,0.18)',
+            soft: '0 12px 40px rgba(0,0,0,0.32)'
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    :root{--accent:#3b82f6;--bg:#050505;--surface:#0b0b0d;--text:#f8fafc;--muted:#94a3b8}
+    *{box-sizing:border-box}
+    html{color-scheme:dark}
+    body{font-family:"Manrope",sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased;line-height:1.58;text-rendering:optimizeLegibility}
+    .mono{font-family:"JetBrains Mono",monospace}
+    .glass{background:rgba(9,11,17,.86);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.12);box-shadow:0 16px 40px rgba(0,0,0,.24)}
+    .glass-strong{background:rgba(8,10,16,.94);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);border:1px solid rgba(255,255,255,.16);box-shadow:0 22px 56px rgba(0,0,0,.32)}
+    .reveal{opacity:0;transform:translateY(28px);transition:all .8s cubic-bezier(.16,1,.3,1)}
+    .reveal.active{opacity:1;transform:none}
+    .bento-card{transition:transform .35s ease,border-color .35s ease,background .35s ease,box-shadow .35s ease}
+    .bento-card:hover{transform:translateY(-6px);border-color:rgba(59,130,246,.42);background:rgba(59,130,246,.06);box-shadow:0 22px 48px rgba(0,0,0,.26)}
+    .service-card.active{border-color:rgba(59,130,246,.62);background:rgba(59,130,246,.11);box-shadow:0 18px 52px rgba(59,130,246,.16)}
+    .chip.active{background:#fff;color:#050505;border-color:#fff}
+    details summary::-webkit-details-marker{display:none}
+    details[open] summary svg{transform:rotate(180deg);color:var(--accent)}
+    input,textarea,select{background:rgba(255,255,255,.04)!important;border:1px solid rgba(255,255,255,.14)!important;outline:none;color:#fff}
+    input::placeholder,textarea::placeholder{color:rgba(226,232,240,.62)}
+    input:focus,textarea:focus,select:focus{border-color:var(--accent)!important;box-shadow:0 0 0 4px rgba(59,130,246,.12)}
+    .drop-zone.dragover{border-color:rgba(59,130,246,.9)!important;background:rgba(59,130,246,.08)}
+    #scroll-progress{position:fixed;top:0;left:0;height:3px;background:var(--accent);z-index:1000;width:0%;transition:width .1s ease}
+    #hero-canvas{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.09;filter:saturate(.9) contrast(.9)}
+    .bg-radial{background:radial-gradient(circle at top right, rgba(59,130,246,.08), transparent 24%),radial-gradient(circle at 20% 20%, rgba(59,130,246,.05), transparent 22%),linear-gradient(180deg,#050505 0%,#07090d 100%)}
+    ::-webkit-scrollbar{width:6px}
+    ::-webkit-scrollbar-track{background:var(--bg)}
+    ::-webkit-scrollbar-thumb{background:#202737;border-radius:10px}
+    ::-webkit-scrollbar-thumb:hover{background:var(--accent)}
+    h1,h2,h3{color:#fff;letter-spacing:-.02em}
+    p{color:rgba(226,232,240,.82)}
+    .section-kicker{color:rgba(96,165,250,.96)}
+    .readable-card{box-shadow:0 24px 60px rgba(0,0,0,.34)}
+    .muted-copy{color:rgba(226,232,240,.84)}
+    .soft-copy{color:rgba(248,250,252,.92)}
+    .dim-chip{color:rgba(248,250,252,.84)}
+    .shadow-soft{box-shadow:0 18px 40px rgba(0,0,0,.24)}
+    .shadow-glow{box-shadow:0 18px 44px rgba(59,130,246,.24)}
+    .text-balance{text-wrap:balance}
+    @media (max-width:768px){
+      .glass,.glass-strong{background:rgba(8,10,16,.94)}
+      .mono{letter-spacing:.16em}
+      h1{letter-spacing:-.03em}
+    }
+  </style>
 </head>
-<body>
+<body class="selection:bg-blue-500/30 bg-radial">
+  <div id="scroll-progress"></div>
+
+  <header id="site-header" class="site-header fixed top-0 inset-x-0 z-[100] glass border-b border-white/12">
+    <div class="max-w-7xl mx-auto px-5 sm:px-6 py-4 flex items-center justify-between gap-4">
+      <a href="#top" class="flex items-center gap-3 group min-w-0">
+        <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center font-black tracking-tight transition-transform group-hover:rotate-12">S3D</div>
+        <div class="min-w-0">
+          <div class="text-lg font-extrabold tracking-tight">Step3D</div>
+          <div class="text-[9px] uppercase tracking-[0.28em] text-blue-400 mono">Сервис / производство</div>
+        </div>
+      </a>
+      <nav class="hidden lg:flex items-center gap-8 text-[11px] uppercase tracking-[0.18em] font-bold text-slate-100">
+        <a href="#services" class="hover:text-blue-400 transition">Услуги</a>
+        <a href="#brief" class="hover:text-blue-400 transition">Расчет</a>
+        <a href="#process" class="hover:text-blue-400 transition">Процесс</a>
+        <a href="#cases" class="hover:text-blue-400 transition">Проекты</a>
+        <a href="#faq" class="hover:text-blue-400 transition">Вопросы</a>
+      </nav>
+      <div class="hidden sm:flex items-center gap-3">
+        <a href="#brief" class="bg-blue-600 hover:bg-blue-700 px-5 py-2.5 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] transition">Отправить задачу</a>
+      </div>
+      <button id="menu-open" class="lg:hidden text-white p-2 rounded-xl border border-white/12"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 6h16M4 12h16m-7 6h7"/></svg></button>
+    </div>
+  </header>
+
+  <div id="mobile-nav" class="fixed inset-0 bg-black/95 backdrop-blur-xl z-[200] translate-x-full transition-transform duration-500 flex flex-col items-center justify-center gap-8 text-2xl font-bold">
+    <button id="menu-close" class="absolute top-8 right-8 text-sm mono opacity-75 uppercase tracking-widest">[ Закрыть ]</button>
+    <a href="#services" class="mob-link">Услуги</a>
+    <a href="#brief" class="mob-link">Расчет</a>
+    <a href="#process" class="mob-link">Процесс</a>
+    <a href="#cases" class="mob-link">Проекты</a>
+    <a href="#faq" class="mob-link">Вопросы</a>
+    <a href="#contact" class="mob-link bg-blue-600 px-10 py-4 rounded-2xl text-base">Контакты</a>
+  </div>
+
+  <main id="top">
+    <section class="relative min-h-screen flex items-center overflow-hidden">
+      <div id="hero-canvas"></div>
+      <div class="max-w-7xl mx-auto px-5 sm:px-6 relative z-10 pt-28 pb-20 w-full">
+        <div class="grid lg:grid-cols-[1.05fr_.95fr] gap-10 items-center">
+          <div class="max-w-4xl">
+            <div class="mono text-blue-400 text-xs mb-6 reveal uppercase tracking-[0.42em]">[ Step3D ]</div>
+            <h1 class="text-5xl sm:text-7xl lg:text-8xl font-black leading-[0.92] tracking-tight mb-7 reveal" style="transition-delay:.08s">
+              3D-услуги <br><span class="text-blue-600 italic">для реальных задач</span>
+            </h1>
+            <p class="text-lg sm:text-2xl text-slate-200 mb-10 max-w-2xl leading-relaxed reveal" style="transition-delay:.14s">
+              3D-печать, моделирование, сканирование и реверсивный инжиниринг. От единичной детали до малой серии — с понятным расчетом и сопровождением проекта.
+            </p>
+            <div class="flex flex-wrap gap-4 reveal" style="transition-delay:.2s">
+              <a href="#brief" class="bg-blue-600 hover:bg-blue-700 text-white px-8 sm:px-10 py-4 sm:py-5 rounded-2xl font-bold text-base sm:text-lg transition shadow-glow active:scale-[0.98]">Отправить задачу на расчет</a>
+              <a href="https://t.me/step_3d_mngr" target="_blank" rel="noopener noreferrer" class="glass hover:bg-white/12 px-8 sm:px-10 py-4 sm:py-5 rounded-2xl font-bold text-base sm:text-lg transition">Написать в Telegram</a>
+            </div>
+            <div class="grid sm:grid-cols-3 gap-3 mt-10 reveal" style="transition-delay:.28s">
+              <div class="glass rounded-2xl px-4 py-4"><div class="mono text-[10px] uppercase tracking-[0.22em] text-slate-100 mb-1">Формат</div><div class="font-bold">От одной детали до серии</div></div>
+              <div class="glass rounded-2xl px-4 py-4"><div class="mono text-[10px] uppercase tracking-[0.22em] text-slate-100 mb-1">Вход</div><div class="font-bold">Фото, эскиз, образец или 3D-файл</div></div>
+              <div class="glass rounded-2xl px-4 py-4"><div class="mono text-[10px] uppercase tracking-[0.22em] text-slate-100 mb-1">Контакт</div><div class="font-bold">Почта, Telegram, звонок</div></div>
+            </div>
+          </div>
+
+          <div class="reveal lg:justify-self-end" style="transition-delay:.22s">
+            <div class="glass-strong readable-card rounded-[34px] p-5 sm:p-6 border-white/12 shadow-soft max-w-xl ml-auto">
+              <div class="flex items-center justify-between gap-4 mb-5">
+                <div>
+                  <div class="mono text-[10px] uppercase tracking-[0.3em] text-blue-400 mb-1">Кратко</div>
+                  <div class="text-2xl font-extrabold tracking-tight">Быстрый старт проекта</div>
+                </div>
+                <div class="text-right">
+                  <div class="text-[10px] uppercase tracking-[0.22em] text-slate-100 mono">ответ</div>
+                  <div class="font-bold">в день обращения</div>
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-3 mb-5 text-sm">
+                <button class="chip service-quick rounded-2xl border border-white/12 px-4 py-4 text-left active" data-service="print">
+                  <span class="block font-bold">3D-печать</span>
+                  <span class="text-slate-200 text-xs">Прототипы и партии</span>
+                </button>
+                <button class="chip service-quick rounded-2xl border border-white/12 px-4 py-4 text-left" data-service="modeling">
+                  <span class="block font-bold">Моделирование</span>
+                  <span class="text-slate-200 text-xs">Подготовка модели</span>
+                </button>
+                <button class="chip service-quick rounded-2xl border border-white/12 px-4 py-4 text-left" data-service="scan">
+                  <span class="block font-bold">3D-сканирование</span>
+                  <span class="text-slate-200 text-xs">Оцифровка объекта</span>
+                </button>
+                <button class="chip service-quick rounded-2xl border border-white/12 px-4 py-4 text-left" data-service="reverse">
+                  <span class="block font-bold">Реверс-инжиниринг</span>
+                  <span class="text-slate-200 text-xs">Восстановление детали</span>
+                </button>
+              </div>
+              <div class="rounded-[28px] bg-white/[0.08] border border-white/14 p-5">
+                <div class="flex justify-between gap-4 items-start mb-3">
+                  <div>
+                    <div id="hero-card-title" class="font-bold text-lg">3D-печать</div>
+                    <div id="hero-card-text" class="text-slate-200 text-sm leading-relaxed">Подходит, если у вас уже есть модель, чертеж или понятная форма детали.</div>
+                  </div>
+                  <span id="hero-card-chip" class="mono text-[10px] uppercase tracking-[0.24em] text-blue-400">FDM / SLA</span>
+                </div>
+                <div id="hero-card-points" class="flex flex-wrap gap-2"></div>
+                <a href="#brief" class="mt-5 inline-flex items-center gap-2 text-blue-400 font-bold">Перейти к заявке <span aria-hidden="true">→</span></a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="services" class="py-24 sm:py-32 relative">
+      <div class="max-w-7xl mx-auto px-5 sm:px-6">
+        <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-14 sm:mb-20 reveal">
+          <div>
+            <h2 class="text-4xl sm:text-5xl font-bold mb-4 italic">Направления работы</h2>
+            <p class="text-slate-300 max-w-xl">Четыре основные услуги. Выберите направление — и сразу увидите, как мы подходим к задаче и что нужно для расчета.</p>
+          </div>
+          <div class="text-blue-400 mono text-sm font-bold uppercase tracking-[0.22em] border-b border-blue-500/35 pb-2">Основные услуги / 2026</div>
+        </div>
+
+        <div class="grid lg:grid-cols-[1.1fr_.9fr] gap-6 items-start">
+          <div class="grid sm:grid-cols-2 gap-4">
+            <button class="service-card glass p-7 sm:p-8 rounded-[30px] bento-card reveal active text-left" data-service="print"><div class="service-active-badge mb-5 inline-flex rounded-full bg-blue-600 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-white">Выбрано</div>
+              <div class="w-12 h-12 bg-blue-600/10 rounded-xl flex items-center justify-center text-blue-500 mb-6">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+              </div>
+              <h3 class="text-2xl font-bold mb-3">3D-печать</h3>
+              <p class="text-slate-300 text-sm leading-relaxed mb-4">Прототипы, единичные изделия, оснастка и малые серии.</p>
+              <div class="flex flex-wrap gap-2 text-xs font-bold text-slate-100">
+                <span class="px-3 py-2 rounded-full bg-white/10 border border-white/15">FDM</span>
+                <span class="px-3 py-2 rounded-full bg-white/10 border border-white/15">SLA</span>
+              </div>
+            </button>
+
+            <button class="service-card glass p-7 sm:p-8 rounded-[30px] bento-card reveal text-left" data-service="modeling" style="transition-delay:.06s"><div class="service-active-badge mb-5 inline-flex rounded-full bg-blue-600 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-white">Выбрано</div>
+              <div class="w-12 h-12 bg-blue-600/10 rounded-xl flex items-center justify-center text-blue-500 mb-6">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6"/></svg>
+              </div>
+              <h3 class="text-2xl font-bold mb-3">3D-моделирование</h3>
+              <p class="text-slate-300 text-sm leading-relaxed mb-4">Подготовка модели под печать, производство или презентацию идеи.</p>
+              <div class="flex flex-wrap gap-2 text-xs font-bold text-slate-100">
+                <span class="px-3 py-2 rounded-full bg-white/10 border border-white/15">Подготовка модели</span>
+                <span class="px-3 py-2 rounded-full bg-white/10 border border-white/15">STL</span>
+              </div>
+            </button>
+
+            <button class="service-card glass p-7 sm:p-8 rounded-[30px] bento-card reveal text-left" data-service="scan" style="transition-delay:.12s"><div class="service-active-badge mb-5 inline-flex rounded-full bg-blue-600 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-white">Выбрано</div>
+              <div class="w-12 h-12 bg-blue-600/10 rounded-xl flex items-center justify-center text-blue-500 mb-6">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5v-4m0 4h-4m4 0l-5-5"/></svg>
+              </div>
+              <h3 class="text-2xl font-bold mb-3">3D-сканирование</h3>
+              <p class="text-slate-300 text-sm leading-relaxed mb-4">Оцифровка объекта для ремонта, копирования или дальнейшего проектирования.</p>
+              <div class="flex flex-wrap gap-2 text-xs font-bold text-slate-100">
+                <span class="px-3 py-2 rounded-full bg-white/10 border border-white/15">Скан</span>
+                <span class="px-3 py-2 rounded-full bg-white/10 border border-white/15">Облако точек</span>
+              </div>
+            </button>
+
+            <button class="service-card glass p-7 sm:p-8 rounded-[30px] bento-card reveal text-left" data-service="reverse" style="transition-delay:.18s"><div class="service-active-badge mb-5 inline-flex rounded-full bg-blue-600 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-white">Выбрано</div>
+              <div class="w-12 h-12 bg-blue-600/10 rounded-xl flex items-center justify-center text-blue-500 mb-6">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M9 14l6-6m0 0h-4m4 0v4M5 19c3-2 5-5 6-9"/></svg>
+              </div>
+              <h3 class="text-2xl font-bold mb-3">Реверсивный инжиниринг</h3>
+              <p class="text-slate-300 text-sm leading-relaxed mb-4">Восстановление геометрии и логики детали по образцу, фото или скану.</p>
+              <div class="flex flex-wrap gap-2 text-xs font-bold text-slate-100">
+                <span class="px-3 py-2 rounded-full bg-white/10 border border-white/15">Восстановление</span>
+                <span class="px-3 py-2 rounded-full bg-white/10 border border-white/15">Подготовка к производству</span>
+              </div>
+            </button>
+          </div>
+
+          <aside class="glass-strong rounded-[34px] p-6 sm:p-8 reveal sticky top-28">
+            <div class="flex items-start justify-between gap-4 mb-6">
+              <div>
+                <div class="mono text-[10px] uppercase tracking-[0.28em] text-blue-400 mb-2">Подробно</div>
+                <h3 id="service-panel-title" class="text-3xl font-black tracking-tight">3D-печать</h3>
+              </div>
+              <span id="service-panel-badge" class="text-[10px] uppercase tracking-[0.22em] mono text-slate-300">быстрый расчет</span>
+            </div>
+            <p id="service-panel-text" class="text-slate-200 leading-relaxed mb-6">Если у вас есть готовая модель или понятная форма изделия, подберем технологию, материал и ориентировочный срок.</p>
+            <div id="service-panel-list" class="space-y-3 mb-7"></div>
+            <div class="rounded-[24px] bg-white/[0.06] border border-white/12 p-5 mb-7">
+              <div class="mono text-[10px] uppercase tracking-[0.22em] text-slate-100 mb-3">Что можно прислать</div>
+              <div id="service-panel-inputs" class="flex flex-wrap gap-2"></div>
+            </div>
+            <div class="flex flex-wrap gap-3">
+              <a href="#brief" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3.5 rounded-2xl font-bold transition">Перейти к заявке</a>
+              <a href="https://t.me/step_3d_mngr" target="_blank" rel="noopener noreferrer" class="glass px-6 py-3.5 rounded-2xl font-bold transition hover:bg-white/12">Уточнить в Telegram</a>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section id="brief" class="py-24 sm:py-32 bg-[#07090d]">
+      <div class="max-w-7xl mx-auto px-5 sm:px-6">
+        <div class="grid xl:grid-cols-[.9fr_1.1fr] gap-8 items-start">
+          <div class="reveal">
+            <div class="mono text-blue-400 text-xs mb-4 uppercase tracking-[0.38em]">[ Заявка ]</div>
+            <h2 class="text-4xl sm:text-5xl font-black leading-tight mb-5">Отправьте задачу на расчет</h2>
+            <p class="text-slate-200 text-lg leading-relaxed mb-8 max-w-xl">Короткая заявка без перегруза. Сначала понимаем тип задачи, затем получаем контакты и материалы. После отправки связываемся и уточняем детали.</p>
+            <div class="grid sm:grid-cols-3 gap-3">
+              <div class="glass rounded-2xl p-4"><div class="mono text-[10px] uppercase tracking-[0.2em] text-slate-500 mb-1">Шаг 1</div><div class="font-bold">Тип задачи</div></div>
+              <div class="glass rounded-2xl p-4"><div class="mono text-[10px] uppercase tracking-[0.2em] text-slate-500 mb-1">Шаг 2</div><div class="font-bold">Контакты и файлы</div></div>
+              <div class="glass rounded-2xl p-4"><div class="mono text-[10px] uppercase tracking-[0.2em] text-slate-500 mb-1">Дальше</div><div class="font-bold">Уточнение и расчет</div></div>
+            </div>
+          </div>
+
+          <div class="glass-strong rounded-[36px] p-5 sm:p-8 reveal" style="transition-delay:.08s">
+            <div class="flex flex-wrap items-center gap-3 justify-between mb-6">
+              <div>
+                <div class="mono text-[10px] uppercase tracking-[0.3em] text-blue-400 mb-2">Заявка</div>
+                <div class="text-2xl font-extrabold">Заявка на расчет</div>
+              </div>
+              <div class="flex items-center gap-2 text-xs font-bold text-slate-400">
+                <span id="step-indicator-1" class="px-3 py-2 rounded-full bg-white text-black">1</span>
+                <span class="w-8 h-px bg-white/10"></span>
+                <span id="step-indicator-2" class="px-3 py-2 rounded-full glass">2</span>
+              </div>
+            </div>
+
+            <form id="brief-form" class="space-y-6">
+              <div id="brief-step-1" class="space-y-6">
+                <div>
+                  <label class="block text-sm font-bold mb-3">Направление</label>
+                  <div class="grid sm:grid-cols-2 gap-3" id="brief-services"></div>
+                </div>
+                <div class="grid sm:grid-cols-2 gap-4">
+                  <div>
+                    <label for="brief-deadline" class="block text-sm font-bold mb-3">Срок</label>
+                    <select id="brief-deadline" class="w-full rounded-2xl px-4 py-4">
+                      <option>Можно без спешки</option>
+                      <option>Нужен расчет сегодня</option>
+                      <option>Срочно, нужен быстрый запуск</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label for="brief-quantity" class="block text-sm font-bold mb-3">Количество</label>
+                    <select id="brief-quantity" class="w-full rounded-2xl px-4 py-4">
+                      <option>1 изделие</option>
+                      <option>2–10 штук</option>
+                      <option>Малая серия</option>
+                    </select>
+                  </div>
+                </div>
+                <button type="button" id="to-step-2" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-2xl transition uppercase tracking-[0.18em] text-sm">Продолжить</button>
+              </div>
+
+              <div id="brief-step-2" class="space-y-5 hidden">
+                <div class="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <label for="brief-name" class="block text-sm font-bold mb-3">Имя</label>
+                    <input id="brief-name" type="text" class="w-full rounded-2xl px-4 py-4" placeholder="Как к вам обращаться" required>
+                  </div>
+                  <div>
+                    <label for="brief-contact" class="block text-sm font-bold mb-3">Контакт</label>
+                    <input id="brief-contact" type="text" class="w-full rounded-2xl px-4 py-4" placeholder="Почта или телефон" required>
+                  </div>
+                </div>
+                <div>
+                  <label for="brief-comment" class="block text-sm font-bold mb-3">Комментарий</label>
+                  <textarea id="brief-comment" rows="5" class="w-full rounded-2xl px-4 py-4" placeholder="Что нужно сделать, какие размеры, материал, среда работы детали, что уже есть"></textarea>
+                </div>
+                <div>
+                  <label class="block text-sm font-bold mb-3">Файл или ссылка</label>
+                  <label id="drop-zone" class="drop-zone block rounded-[28px] border border-dashed border-white/15 bg-white/[0.02] p-6 sm:p-8 text-center cursor-pointer transition">
+                    <input id="brief-file" type="file" class="hidden" multiple>
+                    <div class="text-lg font-bold mb-2">Перетащите файл сюда или нажмите для загрузки</div>
+                    <div class="text-slate-300 text-sm">STL, STEP, OBJ, PDF, JPG, PNG или другие материалы проекта</div>
+                    <div id="file-list" class="mt-4 text-sm text-blue-400 font-bold"></div><p class="mt-3 text-xs text-slate-400">Если файл не прикрепляется, можно отправить заявку сейчас, а модель дослать позже в Telegram или на почту.</p>
+                  </label>
+                </div>
+                <div class="rounded-[24px] bg-white/[0.06] border border-white/12 p-5 text-sm text-slate-400 leading-relaxed">
+                  После отправки мы смотрим задачу, при необходимости уточняем детали и возвращаемся с расчетом или следующим шагом.
+                </div>
+                <div class="grid sm:grid-cols-2 gap-3">
+                  <button type="button" id="back-step-1" class="glass rounded-2xl py-4 font-bold">Назад</button>
+                  <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-2xl transition uppercase tracking-[0.18em] text-sm">Отправить задачу</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="process" class="py-24 sm:py-32">
+      <div class="max-w-7xl mx-auto px-5 sm:px-6">
+        <div class="flex flex-col md:flex-row justify-between items-end gap-6 mb-14 reveal">
+          <div>
+            <h2 class="text-4xl sm:text-5xl font-bold mb-4 italic">Как проходит работа</h2>
+            <p class="text-slate-300 max-w-xl">Понятный путь от входной информации до готового изделия. Без лишних шагов и без перегруза объяснениями.</p>
+          </div>
+          <div class="mono text-blue-400 text-sm uppercase tracking-[0.22em]">4 шага / понятный путь</div>
+        </div>
+        <div class="grid md:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5">
+          <div class="glass p-7 rounded-[30px] reveal bento-card">
+            <div class="w-14 h-14 mb-6 rounded-2xl bg-blue-600/10 flex items-center justify-center text-blue-500">
+              <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+            </div>
+            <h3 class="text-2xl font-bold mb-3">Анализ задачи</h3>
+            <p class="text-slate-300 text-sm leading-relaxed">Смотрим материалы, понимаем цель изделия, уточняем ограничения и формат результата.</p>
+          </div>
+          <div class="glass p-7 rounded-[30px] reveal bento-card" style="transition-delay:.06s">
+            <div class="w-14 h-14 mb-6 rounded-2xl bg-blue-600/10 flex items-center justify-center text-blue-500">
+              <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6"/></svg>
+            </div>
+            <h3 class="text-2xl font-bold mb-3">Подготовка модели</h3>
+            <p class="text-slate-300 text-sm leading-relaxed">Если нужно, создаем или дорабатываем модель, приводим геометрию к рабочему виду.</p>
+          </div>
+          <div class="glass p-7 rounded-[30px] reveal bento-card" style="transition-delay:.12s">
+            <div class="w-14 h-14 mb-6 rounded-2xl bg-blue-600/10 flex items-center justify-center text-blue-500">
+              <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M7 8h10M7 12h10M7 16h6M5 4h14v16H5z"/></svg>
+            </div>
+            <h3 class="text-2xl font-bold mb-3">Печать и проверка</h3>
+            <p class="text-slate-300 text-sm leading-relaxed">Подбираем технологию, материал и режим. Проверяем результат перед выдачей.</p>
+          </div>
+          <div class="glass p-7 rounded-[30px] reveal bento-card" style="transition-delay:.18s">
+            <div class="w-14 h-14 mb-6 rounded-2xl bg-blue-600/10 flex items-center justify-center text-blue-500">
+              <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </div>
+            <h3 class="text-2xl font-bold mb-3">Доводка и выдача</h3>
+            <p class="text-slate-300 text-sm leading-relaxed">Финишная обработка, передача изделия и рекомендации по дальнейшему использованию.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="cases" class="py-24 sm:py-32 bg-[#07090d]/80">
+      <div class="max-w-7xl mx-auto px-5 sm:px-6">
+        <div class="flex flex-col lg:flex-row justify-between gap-6 items-end mb-12 reveal">
+          <div>
+            <h2 class="text-4xl sm:text-5xl font-bold mb-4 italic">Примеры работ</h2>
+            <p class="text-slate-300 max-w-xl">Компактная витрина реальных сценариев. Выберите тип задачи и откройте один проект подробнее.</p>
+          </div>
+          <div id="case-filters" class="flex flex-wrap gap-2"></div>
+        </div>
+        <div class="grid lg:grid-cols-[1.05fr_.95fr] gap-6 items-start">
+          <div id="case-grid" class="grid md:grid-cols-2 gap-5"></div>
+          <aside class="glass-strong rounded-[34px] p-6 sm:p-8 sticky top-28 reveal" style="transition-delay:.08s">
+            <div class="mono text-[10px] uppercase tracking-[0.28em] text-blue-400 mb-3">Разбор проекта</div>
+            <div id="case-detail"></div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section id="gallery" class="py-24 sm:py-32">
+      <div class="max-w-7xl mx-auto px-5 sm:px-6">
+        <div class="flex flex-col md:flex-row justify-between items-end gap-6 mb-14 reveal">
+          <div>
+            <h2 class="text-4xl sm:text-5xl font-bold mb-4 italic">Галерея работ</h2>
+            <p class="text-slate-300 max-w-2xl">Оптимальное место для реальных примеров. Ниже подготовлена карусель на 20 изображений — просто замените временные подписи своими фотографиями работ.</p>
+          </div>
+          <div class="mono text-blue-400 text-sm uppercase tracking-[0.22em]">20 изображений / карусель</div>
+        </div>
+
+        <div class="glass-strong rounded-[34px] p-4 sm:p-6 reveal">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
+            <div class="mono text-[10px] uppercase tracking-[0.28em] text-blue-400">Примеры выполненных работ</div>
+            <div class="flex items-center gap-3">
+              <button type="button" id="gallery-prev" class="glass rounded-full w-11 h-11 flex items-center justify-center hover:bg-white/12 transition" aria-label="Предыдущие изображения">
+                <span aria-hidden="true">←</span>
+              </button>
+              <button type="button" id="gallery-next" class="glass rounded-full w-11 h-11 flex items-center justify-center hover:bg-white/12 transition" aria-label="Следующие изображения">
+                <span aria-hidden="true">→</span>
+              </button>
+            </div>
+          </div>
+
+          <div id="gallery-track" class="gallery-track flex gap-4 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-2">
+            <article class="gallery-slide shrink-0 w-[82%] sm:w-[46%] lg:w-[24%] rounded-[28px] overflow-hidden border border-white/12 bg-white/[0.04]">
+              <div class="aspect-[4/5] bg-gradient-to-br from-blue-600/20 via-white/5 to-slate-900/70 flex items-end p-5">
+                <div>
+                  <div class="mono text-[10px] uppercase tracking-[0.22em] text-blue-400 mb-2">Изображение 01</div>
+                  <div class="text-xl font-bold">Место для вашей работы</div>
+                  <div class="text-slate-300 text-sm mt-2">Замените этот блок на фотографию или рендер проекта.</div>
+                </div>
+              </div>
+            </article>
+            <article class="gallery-slide shrink-0 w-[82%] sm:w-[46%] lg:w-[24%] rounded-[28px] overflow-hidden border border-white/12 bg-white/[0.04]">
+              <div class="aspect-[4/5] bg-gradient-to-br from-blue-600/20 via-white/5 to-slate-900/70 flex items-end p-5">
+                <div>
+                  <div class="mono text-[10px] uppercase tracking-[0.22em] text-blue-400 mb-2">Изображение 02</div>
+                  <div class="text-xl font-bold">Место для вашей работы</div>
+                  <div class="text-slate-300 text-sm mt-2">Замените этот блок на фотографию или рендер проекта.</div>
+                </div>
+              </div>
+            </article>
+            <article class="gallery-slide shrink-0 w-[82%] sm:w-[46%] lg:w-[24%] rounded-[28px] overflow-hidden border border-white/12 bg-white/[0.04]">
+              <div class="aspect-[4/5] bg-gradient-to-br from-blue-600/20 via-white/5 to-slate-900/70 flex items-end p-5">
+                <div>
+                  <div class="mono text-[10px] uppercase tracking-[0.22em] text-blue-400 mb-2">Изображение 03</div>
+                  <div class="text-xl font-bold">Место для вашей работы</div>
+                  <div class="text-slate-300 text-sm mt-2">Замените этот блок на фотографию или рендер проекта.</div>
+                </div>
+              </div>
+            </article>
+            <article class="gallery-slide shrink-0 w-[82%] sm:w-[46%] lg:w-[24%] rounded-[28px] overflow-hidden border border-white/12 bg-white/[0.04]">
+              <div class="aspect-[4/5] bg-gradient-to-br from-blue-600/20 via-white/5 to-slate-900/70 flex items-end p-5">
+                <div>
+                  <div class="mono text-[10px] uppercase tracking-[0.22em] text-blue-400 mb-2">Изображение 04</div>
+                  <div class="text-xl font-bold">Место для вашей работы</div>
+                  <div class="text-slate-300 text-sm mt-2">Замените этот блок на фотографию или рендер проекта.</div>
+                </div>
+              </div>
+            </article>
+            <article class="gallery-slide shrink-0 w-[82%] sm:w-[46%] lg:w-[24%] rounded-[28px] overflow-hidden border border-white/12 bg-white/[0.04]">
+              <div class="aspect-[4/5] bg-gradient-to-br from-blue-600/20 via-white/5 to-slate-900/70 flex items-end p-5">
+                <div>
+                  <div class="mono text-[10px] uppercase tracking-[0.22em] text-blue-400 mb-2">Изображение 05</div>
+                  <div class="text-xl font-bold">Место для вашей работы</div>
+                  <div class="text-slate-300 text-sm mt-2">Замените этот блок на фотографию или рендер проекта.</div>
+                </div>
+              </div>
+            </article>
+            <article class="gallery-slide shrink-0 w-[82%] sm:w-[46%] lg:w-[24%] rounded-[28px] overflow-hidden border border-white/12 bg-white/[0.04]">
+              <div class="aspect-[4/5] bg-gradient-to-br from-blue-600/20 via-white/5 to-slate-900/70 flex items-end p-5">
+                <div>
+                  <div class="mono text-[10px] uppercase tracking-[0.22em] text-blue-400 mb-2">Изображение 06</div>
+                  <div class="text-xl font-bold">Место для вашей работы</div>
+                  <div class="text-slate-300 text-sm mt-2">Замените этот блок на фотографию или рендер проекта.</div>
+                </div>
+              </div>
+            </article>
+            <article class="gallery-slide shrink-0 w-[82%] sm:w-[46%] lg:w-[24%] rounded-[28px] overflow-hidden border border-white/12 bg-white/[0.04]">
+              <div class="aspect-[4/5] bg-gradient-to-br from-blue-600/20 via-white/5 to-slate-900/70 flex items-end p-5">
+                <div>
+                  <div class="mono text-[10px] uppercase tracking-[0.22em] text-blue-400 mb-2">Изображение 07</div>
+                  <div class="text-xl font-bold">Место для вашей работы</div>
+                  <div class="text-slate-300 text-sm mt-2">Замените этот блок на фотографию или рендер проекта.</div>
+                </div>
+              </div>
+            </article>
+            <article class="gallery-slide shrink-0 w-[82%] sm:w-[46%] lg:w-[24%] rounded-[28px] overflow-hidden border border-white/12 bg-white/[0.04]">
+              <div class="aspect-[4/5] bg-gradient-to-br from-blue-600/20 via-white/5 to-slate-900/70 flex items-end p-5">
+                <div>
+                  <div class="mono text-[10px] uppercase tracking-[0.22em] text-blue-400 mb-2">Изображение 08</div>
+                  <div class="text-xl font-bold">Место для вашей работы</div>
+                  <div class="text-slate-300 text-sm mt-2">Замените этот блок на фотографию или рендер проекта.</div>
+                </div>
+              </div>
+            </article>
+            <article class="gallery-slide shrink-0 w-[82%] sm:w-[46%] lg:w-[24%] rounded-[28px] overflow-hidden border border-white/12 bg-white/[0.04]">
+              <div class="aspect-[4/5] bg-gradient-to-br from-blue-600/20 via-white/5 to-slate-900/70 flex items-end p-5">
+                <div>
+                  <div class="mono text-[10px] uppercase tracking-[0.22em] text-blue-400 mb-2">Изображение 09</div>
+                  <div class="text-xl font-bold">Место для вашей работы</div>
+                  <div class="text-slate-300 text-sm mt-2">Замените этот блок на фотографию или рендер проекта.</div>
+                </div>
+              </div>
+            </article>
+            <article class="gallery-slide shrink-0 w-[82%] sm:w-[46%] lg:w-[24%] rounded-[28px] overflow-hidden border border-white/12 bg-white/[0.04]">
+              <div class="aspect-[4/5] bg-gradient-to-br from-blue-600/20 via-white/5 to-slate-900/70 flex items-end p-5">
+                <div>
+                  <div class="mono text-[10px] uppercase tracking-[0.22em] text-blue-400 mb-2">Изображение 10</div>
+                  <div class="text-xl font-bold">Место для вашей работы</div>
+                  <div class="text-slate-300 text-sm mt-2">Замените этот блок на фотографию или рендер проекта.</div>
+                </div>
+              </div>
+            </article>
+            <article class="gallery-slide shrink-0 w-[82%] sm:w-[46%] lg:w-[24%] rounded-[28px] overflow-hidden border border-white/12 bg-white/[0.04]">
+              <div class="aspect-[4/5] bg-gradient-to-br from-blue-600/20 via-white/5 to-slate-900/70 flex items-end p-5">
+                <div>
+                  <div class="mono text-[10px] uppercase tracking-[0.22em] text-blue-400 mb-2">Изображение 11</div>
+                  <div class="text-xl font-bold">Место для вашей работы</div>
+                  <div class="text-slate-300 text-sm mt-2">Замените этот блок на фотографию или рендер проекта.</div>
+                </div>
+              </div>
+            </article>
+            <article class="gallery-slide shrink-0 w-[82%] sm:w-[46%] lg:w-[24%] rounded-[28px] overflow-hidden border border-white/12 bg-white/[0.04]">
+              <div class="aspect-[4/5] bg-gradient-to-br from-blue-600/20 via-white/5 to-slate-900/70 flex items-end p-5">
+                <div>
+                  <div class="mono text-[10px] uppercase tracking-[0.22em] text-blue-400 mb-2">Изображение 12</div>
+                  <div class="text-xl font-bold">Место для вашей работы</div>
+                  <div class="text-slate-300 text-sm mt-2">Замените этот блок на фотографию или рендер проекта.</div>
+                </div>
+              </div>
+            </article>
+            <article class="gallery-slide shrink-0 w-[82%] sm:w-[46%] lg:w-[24%] rounded-[28px] overflow-hidden border border-white/12 bg-white/[0.04]">
+              <div class="aspect-[4/5] bg-gradient-to-br from-blue-600/20 via-white/5 to-slate-900/70 flex items-end p-5">
+                <div>
+                  <div class="mono text-[10px] uppercase tracking-[0.22em] text-blue-400 mb-2">Изображение 13</div>
+                  <div class="text-xl font-bold">Место для вашей работы</div>
+                  <div class="text-slate-300 text-sm mt-2">Замените этот блок на фотографию или рендер проекта.</div>
+                </div>
+              </div>
+            </article>
+            <article class="gallery-slide shrink-0 w-[82%] sm:w-[46%] lg:w-[24%] rounded-[28px] overflow-hidden border border-white/12 bg-white/[0.04]">
+              <div class="aspect-[4/5] bg-gradient-to-br from-blue-600/20 via-white/5 to-slate-900/70 flex items-end p-5">
+                <div>
+                  <div class="mono text-[10px] uppercase tracking-[0.22em] text-blue-400 mb-2">Изображение 14</div>
+                  <div class="text-xl font-bold">Место для вашей работы</div>
+                  <div class="text-slate-300 text-sm mt-2">Замените этот блок на фотографию или рендер проекта.</div>
+                </div>
+              </div>
+            </article>
+            <article class="gallery-slide shrink-0 w-[82%] sm:w-[46%] lg:w-[24%] rounded-[28px] overflow-hidden border border-white/12 bg-white/[0.04]">
+              <div class="aspect-[4/5] bg-gradient-to-br from-blue-600/20 via-white/5 to-slate-900/70 flex items-end p-5">
+                <div>
+                  <div class="mono text-[10px] uppercase tracking-[0.22em] text-blue-400 mb-2">Изображение 15</div>
+                  <div class="text-xl font-bold">Место для вашей работы</div>
+                  <div class="text-slate-300 text-sm mt-2">Замените этот блок на фотографию или рендер проекта.</div>
+                </div>
+              </div>
+            </article>
+            <article class="gallery-slide shrink-0 w-[82%] sm:w-[46%] lg:w-[24%] rounded-[28px] overflow-hidden border border-white/12 bg-white/[0.04]">
+              <div class="aspect-[4/5] bg-gradient-to-br from-blue-600/20 via-white/5 to-slate-900/70 flex items-end p-5">
+                <div>
+                  <div class="mono text-[10px] uppercase tracking-[0.22em] text-blue-400 mb-2">Изображение 16</div>
+                  <div class="text-xl font-bold">Место для вашей работы</div>
+                  <div class="text-slate-300 text-sm mt-2">Замените этот блок на фотографию или рендер проекта.</div>
+                </div>
+              </div>
+            </article>
+            <article class="gallery-slide shrink-0 w-[82%] sm:w-[46%] lg:w-[24%] rounded-[28px] overflow-hidden border border-white/12 bg-white/[0.04]">
+              <div class="aspect-[4/5] bg-gradient-to-br from-blue-600/20 via-white/5 to-slate-900/70 flex items-end p-5">
+                <div>
+                  <div class="mono text-[10px] uppercase tracking-[0.22em] text-blue-400 mb-2">Изображение 17</div>
+                  <div class="text-xl font-bold">Место для вашей работы</div>
+                  <div class="text-slate-300 text-sm mt-2">Замените этот блок на фотографию или рендер проекта.</div>
+                </div>
+              </div>
+            </article>
+            <article class="gallery-slide shrink-0 w-[82%] sm:w-[46%] lg:w-[24%] rounded-[28px] overflow-hidden border border-white/12 bg-white/[0.04]">
+              <div class="aspect-[4/5] bg-gradient-to-br from-blue-600/20 via-white/5 to-slate-900/70 flex items-end p-5">
+                <div>
+                  <div class="mono text-[10px] uppercase tracking-[0.22em] text-blue-400 mb-2">Изображение 18</div>
+                  <div class="text-xl font-bold">Место для вашей работы</div>
+                  <div class="text-slate-300 text-sm mt-2">Замените этот блок на фотографию или рендер проекта.</div>
+                </div>
+              </div>
+            </article>
+            <article class="gallery-slide shrink-0 w-[82%] sm:w-[46%] lg:w-[24%] rounded-[28px] overflow-hidden border border-white/12 bg-white/[0.04]">
+              <div class="aspect-[4/5] bg-gradient-to-br from-blue-600/20 via-white/5 to-slate-900/70 flex items-end p-5">
+                <div>
+                  <div class="mono text-[10px] uppercase tracking-[0.22em] text-blue-400 mb-2">Изображение 19</div>
+                  <div class="text-xl font-bold">Место для вашей работы</div>
+                  <div class="text-slate-300 text-sm mt-2">Замените этот блок на фотографию или рендер проекта.</div>
+                </div>
+              </div>
+            </article>
+            <article class="gallery-slide shrink-0 w-[82%] sm:w-[46%] lg:w-[24%] rounded-[28px] overflow-hidden border border-white/12 bg-white/[0.04]">
+              <div class="aspect-[4/5] bg-gradient-to-br from-blue-600/20 via-white/5 to-slate-900/70 flex items-end p-5">
+                <div>
+                  <div class="mono text-[10px] uppercase tracking-[0.22em] text-blue-400 mb-2">Изображение 20</div>
+                  <div class="text-xl font-bold">Место для вашей работы</div>
+                  <div class="text-slate-300 text-sm mt-2">Замените этот блок на фотографию или рендер проекта.</div>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <div id="gallery-dots" class="flex flex-wrap justify-center gap-2 mt-5"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="materials" class="py-24 sm:py-32">
+      <div class="max-w-7xl mx-auto px-5 sm:px-6">
+        <div class="flex flex-col md:flex-row justify-between items-end gap-6 mb-14 reveal">
+          <div>
+            <h2 class="text-4xl sm:text-5xl font-bold mb-4 italic">Материалы и возможности</h2>
+            <p class="text-slate-300 max-w-2xl">Объясняем по-человечески: какой вариант подходит под задачу, какие есть ограничения и с чем можно к нам прийти на старт.</p>
+          </div>
+          <div class="mono text-blue-400 text-sm uppercase tracking-[0.22em]">Материалы / выбор / ограничения</div>
+        </div>
+        <div class="grid lg:grid-cols-3 gap-5">
+          <div class="glass p-7 rounded-[30px] reveal bento-card">
+            <h3 class="text-2xl font-bold mb-3">Что используем</h3>
+            <p class="text-slate-300 text-sm leading-relaxed mb-5">Пластики для функциональных и презентационных деталей, фотополимеры для высокой детализации, а также решения под инженерные задачи.</p>
+            <div class="flex flex-wrap gap-2 text-xs font-bold">
+              <span class="px-3 py-2 rounded-full bg-white/10 border border-white/15">PLA</span>
+              <span class="px-3 py-2 rounded-full bg-white/10 border border-white/15">PETG</span>
+              <span class="px-3 py-2 rounded-full bg-white/10 border border-white/15">ABS</span>
+              <span class="px-3 py-2 rounded-full bg-white/10 border border-white/15">Фотополимер</span>
+            </div>
+          </div>
+          <div class="glass p-7 rounded-[30px] reveal bento-card" style="transition-delay:.06s">
+            <h3 class="text-2xl font-bold mb-3">Когда что подходит</h3>
+            <div class="space-y-3 text-sm">
+              <div class="rounded-2xl border border-white/12 bg-white/[0.02] p-4"><span class="font-bold block mb-1">Функциональная деталь</span><span class="text-slate-300">Когда важны прочность, посадка и повторяемость.</span></div>
+              <div class="rounded-2xl border border-white/12 bg-white/[0.02] p-4"><span class="font-bold block mb-1">Демонстрационный прототип</span><span class="text-slate-300">Когда нужно быстро показать форму, размер и общую идею.</span></div>
+              <div class="rounded-2xl border border-white/12 bg-white/[0.02] p-4"><span class="font-bold block mb-1">Точная малая деталь</span><span class="text-slate-300">Когда важны мелкие элементы и аккуратная геометрия.</span></div>
+            </div>
+          </div>
+          <div class="glass p-7 rounded-[30px] reveal bento-card" style="transition-delay:.12s">
+            <h3 class="text-2xl font-bold mb-3">Ограничения и старт</h3>
+            <p class="text-slate-300 text-sm leading-relaxed mb-5">На старт можно прийти даже без идеальной модели. Подойдут фото, образец, эскиз, сломанная деталь, чертеж или просто понятное описание задачи.</p>
+            <div class="space-y-3 text-sm text-slate-100">
+              <div>• Очень тонкие элементы могут потребовать доработки.</div>
+              <div>• Для точной посадки иногда нужен тестовый образец.</div>
+              <div>• При неизвестном материале образца сначала уточняем условия работы детали.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="trust" class="py-24 sm:py-32 bg-[#07090d]">
+      <div class="max-w-7xl mx-auto px-5 sm:px-6">
+        <div class="flex flex-col md:flex-row justify-between items-end gap-6 mb-14 reveal">
+          <div>
+            <h2 class="text-4xl sm:text-5xl font-bold mb-4 italic">Почему с нами удобно</h2>
+            <p class="text-slate-300 max-w-xl">Не длинная история компании, а короткие сигналы, которые помогают понять, как устроена работа и чего ждать.</p>
+          </div>
+          <div class="mono text-blue-400 text-sm uppercase tracking-[0.22em]">Доверие / качество / сопровождение</div>
+        </div>
+        <div class="grid md:grid-cols-2 xl:grid-cols-4 gap-4">
+          <div class="glass p-6 rounded-[28px] reveal bento-card"><div class="mono text-[10px] uppercase tracking-[0.22em] text-blue-400 mb-3">Опыт</div><div class="text-2xl font-bold mb-2">Разные типы задач</div><p class="text-slate-300 text-sm">От единичных деталей и ремонта узлов до прототипов и малых серий.</p></div>
+          <div class="glass p-6 rounded-[28px] reveal bento-card" style="transition-delay:.05s"><div class="mono text-[10px] uppercase tracking-[0.22em] text-blue-400 mb-3">Контроль</div><div class="text-2xl font-bold mb-2">Проверка перед выдачей</div><p class="text-slate-300 text-sm">Смотрим результат и сверяем его с задачей, а не просто печатаем файл.</p></div>
+          <div class="glass p-6 rounded-[28px] reveal bento-card" style="transition-delay:.1s"><div class="mono text-[10px] uppercase tracking-[0.22em] text-blue-400 mb-3">Сопровождение</div><div class="text-2xl font-bold mb-2">Помогаем разобраться</div><p class="text-slate-300 text-sm">Если модель неидеальна или задача сформулирована не до конца, доводим вход до рабочего вида.</p></div>
+          <div class="glass p-6 rounded-[28px] reveal bento-card" style="transition-delay:.15s"><div class="mono text-[10px] uppercase tracking-[0.22em] text-blue-400 mb-3">Коммуникация</div><div class="text-2xl font-bold mb-2">Несколько каналов связи</div><p class="text-slate-300 text-sm">Главный путь — заявка на расчет. Дополнительно доступны Telegram, почта и звонок.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="faq" class="py-24 sm:py-32">
+      <div class="max-w-4xl mx-auto px-5 sm:px-6">
+        <h2 class="text-4xl sm:text-5xl font-bold mb-12 text-center reveal italic">Вопросы</h2>
+        <div class="space-y-4">
+          <details class="glass rounded-[28px] p-6 sm:p-8 reveal group cursor-pointer">
+            <summary class="flex justify-between items-center gap-4 font-bold text-lg sm:text-xl list-none">
+              Можно ли начать без готовой 3D-модели?
+              <svg class="w-6 h-6 transition-transform shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </summary>
+            <p class="mt-5 text-slate-200 leading-relaxed">Да. Для старта подойдут фото, образец, эскиз, чертеж или просто понятное описание задачи. Дальше поможем определить следующий шаг.</p>
+          </details>
+          <details class="glass rounded-[28px] p-6 sm:p-8 reveal group cursor-pointer" style="transition-delay:.05s">
+            <summary class="flex justify-between items-center gap-4 font-bold text-lg sm:text-xl list-none">
+              Берете ли вы единичные заказы?
+              <svg class="w-6 h-6 transition-transform shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </summary>
+            <p class="mt-5 text-slate-200 leading-relaxed">Да. Можно обратиться как за одной деталью, так и за небольшой серией. Формат подбирается под реальную задачу.</p>
+          </details>
+          <details class="glass rounded-[28px] p-6 sm:p-8 reveal group cursor-pointer" style="transition-delay:.1s">
+            <summary class="flex justify-between items-center gap-4 font-bold text-lg sm:text-xl list-none">
+              Как быстро можно получить расчет?
+              <svg class="w-6 h-6 transition-transform shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </summary>
+            <p class="mt-5 text-slate-200 leading-relaxed">Обычно мы возвращаемся в день обращения или после первичного уточнения входных данных, если задача требует дополнительной оценки.</p>
+          </details>
+          <details class="glass rounded-[28px] p-6 sm:p-8 reveal group cursor-pointer" style="transition-delay:.15s">
+            <summary class="flex justify-between items-center gap-4 font-bold text-lg sm:text-xl list-none">
+              Что лучше прислать для точного расчета?
+              <svg class="w-6 h-6 transition-transform shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </summary>
+            <p class="mt-5 text-slate-200 leading-relaxed">Лучше всего — 3D-файл, чертеж или размеры. Но если этого нет, можно начать с фото, образца или описания того, что должно получиться.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact" class="py-24 sm:py-32 relative overflow-hidden">
+      <div class="max-w-7xl mx-auto px-5 sm:px-6 relative z-10">
+        <div class="glass-strong rounded-[40px] sm:rounded-[56px] p-6 sm:p-10 lg:p-16 grid lg:grid-cols-[1fr_.95fr] gap-10 lg:gap-16">
+          <div>
+            <div class="mono text-blue-400 text-xs mb-4 uppercase tracking-[0.38em]">[ Контакты ]</div>
+            <h2 class="text-4xl sm:text-6xl font-black mb-6 italic text-blue-600">Обсудим задачу</h2>
+            <p class="text-lg sm:text-xl text-slate-200 mb-10 max-w-xl">Главный путь — отправить задачу на расчет. Если удобнее, можно написать в Telegram, на почту или позвонить.</p>
+            <div class="flex flex-wrap gap-4 mb-10">
+              <a href="#brief" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-2xl font-bold transition shadow-glow">Отправить задачу на расчет</a>
+              <a href="https://t.me/step_3d_mngr" target="_blank" rel="noopener noreferrer" class="glass px-8 py-4 rounded-2xl font-bold transition hover:bg-white/12">Написать в Telegram</a>
+            </div>
+            <div class="grid sm:grid-cols-3 gap-4 text-sm">
+              <a href="mailto:projects.step3d@gmail.com" class="glass rounded-[24px] p-5 block hover:bg-white/[0.04] transition">
+                <div class="mono text-[10px] uppercase tracking-[0.22em] text-slate-500 mb-2">Почта</div>
+                <div class="font-bold break-all">projects.step3d@gmail.com</div>
+                <div class="text-slate-300 mt-2">Для заявок и материалов</div>
+              </a>
+              <a href="tel:+79959009141" class="glass rounded-[24px] p-5 block hover:bg-white/[0.04] transition">
+                <div class="mono text-[10px] uppercase tracking-[0.22em] text-slate-500 mb-2">Телефон</div>
+                <div class="font-bold">+7 (995) 900-91-41</div>
+                <div class="text-slate-300 mt-2">Когда нужен быстрый контакт</div>
+              </a>
+              <a href="https://t.me/STEP_3D_Lab" target="_blank" rel="noopener noreferrer" class="glass rounded-[24px] p-5 block hover:bg-white/[0.04] transition">
+                <div class="mono text-[10px] uppercase tracking-[0.22em] text-slate-500 mb-2">Telegram-канал</div>
+                <div class="font-bold">STEP_3D_Lab</div>
+                <div class="text-slate-300 mt-2">Примеры работ, новости и обновления</div>
+              </a>
+            </div>
+          </div>
+
+          <div class="glass rounded-[32px] p-6 sm:p-8 self-start">
+            <div class="mono text-[10px] uppercase tracking-[0.28em] text-blue-400 mb-3">Короткая форма</div>
+            <h3 class="text-2xl font-black mb-5">Быстрый запрос</h3>
+            <form id="contact-form" class="space-y-4">
+              <div>
+                <label for="contact-name" class="block text-sm font-bold mb-3">Имя</label>
+                <input id="contact-name" type="text" class="w-full rounded-2xl px-4 py-4" placeholder="Как к вам обращаться" required>
+              </div>
+              <div>
+                <label for="contact-value" class="block text-sm font-bold mb-3">Контакт</label>
+                <input id="contact-value" type="text" class="w-full rounded-2xl px-4 py-4" placeholder="Телефон или почта" required>
+              </div>
+              <div>
+                <label for="contact-message" class="block text-sm font-bold mb-3">Комментарий</label>
+                <textarea id="contact-message" rows="4" class="w-full rounded-2xl px-4 py-4" placeholder="Коротко опишите задачу"></textarea>
+              </div>
+              <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-2xl transition uppercase tracking-[0.18em] text-sm">Открыть письмо</button>
+              <p class="text-slate-100 text-sm leading-relaxed">Форма открывает черновик письма. Файлы можно приложить вручную или отправить в Telegram.</p>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="absolute -bottom-40 -right-40 w-[620px] h-[620px] bg-blue-600/5 blur-[160px] rounded-full"></div>
+    </section>
+  </main>
+
+  <footer class="py-10 border-t border-white/12 opacity-80">
+    <div class="max-w-7xl mx-auto px-5 sm:px-6 flex flex-col md:flex-row justify-between items-center gap-5 text-[10px] uppercase tracking-[0.45em] font-bold">
+      <div>Step3D // Москва</div>
+      <div class="hidden md:block">3D-печать • сканирование • реверс</div>
+      <div>projects.step3d@gmail.com</div>
+    </div>
+  </footer>
+
+  <script>
+    const services = {
+      print: {
+        title: '3D-печать',
+        badge: 'быстрый расчет',
+        chip: 'FDM / SLA',
+        heroText: 'Подходит, если у вас уже есть модель, чертеж или понятная форма детали.',
+        text: 'Подберем технологию, материал и ориентир по сроку. Подходит для прототипов, функциональных деталей и малых серий.',
+        points: ['Прототипы и единичные изделия', 'Малые серии', 'Подбор материала под задачу'],
+        inputs: ['STL', 'STEP', 'OBJ', 'чертеж', 'фото'],
+        panelInputs: ['3D-файл', 'чертеж', 'фото', 'пример детали']
+      },
+      modeling: {
+        title: '3D-моделирование',
+        badge: 'подготовка CAD',
+        chip: 'CAD / STL',
+        heroText: 'Подходит, если модель нужно создать с нуля или доработать перед производством.',
+        text: 'Создаем или корректируем геометрию под печать, визуализацию или дальнейшее производство.',
+        points: ['Создание модели по задаче', 'Подготовка под печать', 'Исправление проблемной геометрии'],
+        inputs: ['эскиз', 'чертеж', 'референс', 'фото'],
+        panelInputs: ['эскиз', 'референс', 'описание', 'размеры']
+      },
+      scan: {
+        title: '3D-сканирование',
+        badge: 'оцифровка объекта',
+        chip: 'scan / mesh',
+        heroText: 'Подходит, если есть физический объект, который нужно оцифровать для копирования или доработки.',
+        text: 'Сканируем объект и готовим цифровую основу для дальнейшего моделирования, анализа или воспроизводства.',
+        points: ['Оцифровка детали', 'Подготовка сетки', 'Основа для восстановления'],
+        inputs: ['образец', 'фото объекта', 'размеры'],
+        panelInputs: ['физический объект', 'фото', 'пояснение по задаче']
+      },
+      reverse: {
+        title: 'Реверсивный инжиниринг',
+        badge: 'восстановление детали',
+        chip: 'reverse / CAD',
+        heroText: 'Подходит, если нужно восстановить деталь по образцу, скану или даже фото.',
+        text: 'Восстанавливаем рабочую геометрию и готовим модель под изготовление, тесты или замену оригинала.',
+        points: ['Восстановление геометрии', 'Подготовка под производство', 'Замена отсутствующей детали'],
+        inputs: ['образец', 'скан', 'фото', 'сломанная деталь'],
+        panelInputs: ['образец', 'фото', 'скан', 'условия работы детали']
+      }
+    };
+
+    const cases = [
+      {
+        id: 'case1',
+        category: 'print',
+        categoryLabel: '3D-печать',
+        title: 'Корпуса для электроники',
+        excerpt: 'Малая серия защитных корпусов для систем мониторинга.',
+        detail: 'Собрали серию корпусов под электронный модуль. Подобрали пластик, геометрию креплений и формат выпуска, чтобы деталь была не просто напечатана, а удобна в сборке и эксплуатации.',
+        chips: ['ABS', 'малая серия', '14 дней']
+      },
+      {
+        id: 'case2',
+        category: 'reverse',
+        categoryLabel: 'Реверс-инжиниринг',
+        title: 'Шестерня редуктора',
+        excerpt: 'Восстановление детали по изношенному образцу.',
+        detail: 'Оцифровали образец, восстановили геометрию и подготовили рабочую модель для воспроизводства. Подход особенно полезен, когда оригинальная документация недоступна.',
+        chips: ['Nylon', 'восстановление', '3 дня']
+      },
+      {
+        id: 'case3',
+        category: 'modeling',
+        categoryLabel: '3D-моделирование',
+        title: 'Макет изделия по эскизу',
+        excerpt: 'Создание модели с нуля под презентацию и последующую печать.',
+        detail: 'Перевели идею из наброска в аккуратную 3D-модель, согласовали габариты и сделали основу для дальнейшего физического прототипа.',
+        chips: ['CAD', 'эскиз', 'прототип']
+      },
+      {
+        id: 'case4',
+        category: 'scan',
+        categoryLabel: '3D-сканирование',
+        title: 'Оцифровка сложной детали',
+        excerpt: 'Сканирование объекта для дальнейшего анализа и повторного изготовления.',
+        detail: 'Получили цифровую форму детали, которую затем можно использовать как основу для реверса, проверки размеров и подготовки к новому выпуску.',
+        chips: ['скан', 'mesh', 'основа для CAD']
+      }
+    ];
+
+    const caseFilters = [
+      { id: 'all', label: 'Все' },
+      { id: 'print', label: '3D-печать' },
+      { id: 'modeling', label: 'Моделирование' },
+      { id: 'scan', label: 'Сканирование' },
+      { id: 'reverse', label: 'Реверс' }
+    ];
+
+    let selectedService = 'print';
+    let selectedПроект = 'case1';
+    let selectedFilter = 'all';
+
+    function createPills(items){
+      return items.map(item => `<span class="px-3 py-2 rounded-full bg-white/10 border border-white/15 text-xs font-bold text-white/70">${item}</span>`).join('');
+    }
+
+    function renderServiceContent(key){
+      const data = services[key];
+      document.getElementById('service-panel-title').textContent = data.title;
+      document.getElementById('service-panel-badge').textContent = data.badge;
+      document.getElementById('service-panel-text').textContent = data.text;
+      document.getElementById('service-panel-list').innerHTML = data.points.map(point => `<div class="rounded-2xl border border-white/12 bg-white/[0.02] p-4 text-sm font-medium">${point}</div>`).join('');
+      document.getElementById('service-panel-inputs').innerHTML = createPills(data.panelInputs);
+      document.getElementById('hero-card-title').textContent = data.title;
+      document.getElementById('hero-card-text').textContent = data.heroText;
+      document.getElementById('hero-card-chip').textContent = data.chip;
+      document.getElementById('hero-card-points').innerHTML = createPills(data.inputs);
+      document.querySelectorAll('.service-card').forEach(card => card.classList.toggle('active', card.dataset.service === key));
+      document.querySelectorAll('.service-quick').forEach(btn => btn.classList.toggle('active', btn.dataset.service === key));
+      document.querySelectorAll('.brief-service-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.service === key));
+    }
+
+    function renderBriefServices(){
+      const container = document.getElementById('brief-services');
+      container.innerHTML = Object.entries(services).map(([key, value]) => `
+        <button type="button" class="brief-service-btn text-left rounded-2xl border border-white/12 px-4 py-4 transition ${key === selectedService ? 'active bg-white text-black' : 'glass hover:bg-white/12'}" data-service="${key}">
+          <span class="block font-bold">${value.title}</span>
+          <span class="text-sm ${key === selectedService ? 'text-black/70' : 'text-slate-200'}">${value.points[0]}</span>
+        </button>
+      `).join('');
+      container.querySelectorAll('.brief-service-btn').forEach(btn => btn.addEventListener('click', () => {
+        selectedService = btn.dataset.service;
+        renderBriefServices();
+        renderServiceContent(selectedService);
+      }));
+    }
+
+    function renderПроектFilters(){
+      const container = document.getElementById('case-filters');
+      container.innerHTML = caseFilters.map(filter => `
+        <button type="button" class="case-filter px-4 py-2 rounded-full border text-xs font-bold transition ${selectedFilter === filter.id ? 'bg-white text-black border-white' : 'glass text-slate-100 border-white/12 hover:bg-white/12'}" data-filter="${filter.id}">${filter.label}</button>
+      `).join('');
+      container.querySelectorAll('.case-filter').forEach(btn => btn.addEventListener('click', () => {
+        selectedFilter = btn.dataset.filter;
+        renderПроектFilters();
+        renderПроектs();
+      }));
+    }
+
+    function renderПроектDetail(){
+      const item = cases.find(c => c.id === selectedПроект) || cases[0];
+      document.getElementById('case-detail').innerHTML = `
+        <div class="text-[10px] mono text-blue-400 mb-3 uppercase tracking-[0.32em]">${item.categoryLabel}</div>
+        <h3 class="text-3xl font-black mb-4 tracking-tight">${item.title}</h3>
+        <p class="text-slate-200 leading-relaxed mb-6">${item.detail}</p>
+        <div class="flex flex-wrap gap-2 mb-8">${createPills(item.chips)}</div>
+        <a href="#brief" class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-2xl font-bold transition">Перейти к заявке <span aria-hidden="true">→</span></a>
+      `;
+    }
+
+    function renderПроектs(){
+      const grid = document.getElementById('case-grid');
+      const filtered = selectedFilter === 'all' ? cases : cases.filter(item => item.category === selectedFilter);
+      if (!filtered.some(item => item.id === selectedПроект)) selectedПроект = filtered[0]?.id || cases[0].id;
+      grid.innerHTML = filtered.map((item, index) => `
+        <button type="button" class="case-card text-left glass rounded-[30px] p-6 sm:p-7 bento-card ${selectedПроект === item.id ? 'border-blue-500/40 bg-blue-500/[0.05]' : ''}" data-case="${item.id}">
+          <div class="text-[10px] mono text-blue-400 mb-3 uppercase tracking-[0.3em]">${item.categoryLabel}</div>
+          <h3 class="text-2xl font-bold mb-3">${item.title}</h3>
+          <p class="text-slate-300 text-sm leading-relaxed mb-5">${item.excerpt}</p>
+          <div class="flex flex-wrap gap-2">${createPills(item.chips)}</div>
+        </button>
+      `).join('');
+      grid.querySelectorAll('.case-card').forEach(card => card.addEventListener('click', () => {
+        selectedПроект = card.dataset.case;
+        renderПроектs();
+      }));
+      renderПроектDetail();
+    }
+
+    function updateScrollProgress(){
+      const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const scrolled = height > 0 ? (winScroll / height) * 100 : 0;
+      document.getElementById('scroll-progress').style.width = scrolled + '%';
+    }
+
+    function revealOnScroll(){
+      document.querySelectorAll('.reveal').forEach(el => {
+        if (el.getBoundingClientRect().top < window.innerHeight - 50) el.classList.add('active');
+      });
+    }
+
+    function initMobileMenu(){
+      const nav = document.getElementById('mobile-nav');
+      document.getElementById('menu-open').onclick = () => nav.classList.remove('translate-x-full');
+      document.getElementById('menu-close').onclick = () => nav.classList.add('translate-x-full');
+      document.querySelectorAll('.mob-link').forEach(link => link.onclick = () => nav.classList.add('translate-x-full'));
+    }
+
+    function initServiceInteractions(){
+      document.querySelectorAll('.service-card, .service-quick').forEach(item => {
+        item.addEventListener('click', () => {
+          selectedService = item.dataset.service;
+          renderServiceContent(selectedService);
+          renderBriefServices();
+        });
+      });
+    }
+
+    function updateBriefSummary(){
+      const wrap = document.getElementById('brief-summary');
+      if (!wrap) return;
+      const deadline = document.getElementById('brief-deadline')?.value || 'Обычный';
+      const quantity = document.getElementById('brief-quantity')?.value || '1-3';
+      const files = document.getElementById('brief-file')?.files?.length || 0;
+      wrap.innerHTML = [services[selectedService].title, `Срок: ${deadline}`, `Количество: ${quantity}`, files ? `Файлов: ${files}` : 'Без файлов'].map(item => `<span class="summary-chip inline-flex rounded-full px-3 py-2 text-sm font-semibold">${item}</span>`).join('');
+    }
+
+    function showToast(message){
+      const toast = document.getElementById('toast');
+      if (!toast) return;
+      toast.textContent = message;
+      toast.classList.add('show');
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(() => toast.classList.remove('show'), 2400);
+    }
+
+    function initForms(){
+      const step1 = document.getElementById('brief-step-1');
+      const step2 = document.getElementById('brief-step-2');
+      const stepIndicator1 = document.getElementById('step-indicator-1');
+      const stepIndicator2 = document.getElementById('step-indicator-2');
+      document.getElementById('to-step-2').addEventListener('click', () => {
+        updateBriefSummary();
+        step1.classList.add('hidden');
+        step2.classList.remove('hidden');
+        stepIndicator1.className = 'px-3 py-2 rounded-full glass';
+        stepIndicator2.className = 'px-3 py-2 rounded-full bg-white text-black';
+        step2.scrollIntoView({behavior:'smooth', block:'start'});
+      });
+      document.getElementById('back-step-1').addEventListener('click', () => {
+        step2.classList.add('hidden');
+        step1.classList.remove('hidden');
+        stepIndicator1.className = 'px-3 py-2 rounded-full bg-white text-black';
+        stepIndicator2.className = 'px-3 py-2 rounded-full glass';
+      });
+
+      const fileInput = document.getElementById('brief-file');
+      const dropZone = document.getElementById('drop-zone');
+      const fileList = document.getElementById('file-list');
+
+      function updateFileList(files){
+        if (!files || !files.length) { fileList.textContent = ''; updateBriefSummary(); return; }
+        fileList.innerHTML = Array.from(files).map(file => `<div>${file.name}</div>`).join('');
+        updateBriefSummary();
+      }
+
+      fileInput.addEventListener('change', () => updateFileList(fileInput.files));
+      ['dragenter','dragover'].forEach(evt => dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.add('dragover'); }));
+      ['dragleave','drop'].forEach(evt => dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.remove('dragover'); }));
+      dropZone.addEventListener('drop', e => {
+        const files = e.dataTransfer.files;
+        if (files && files.length) {
+          fileInput.files = files;
+          updateFileList(files);
+        }
+      });
+
+      document.getElementById('brief-form').addEventListener('submit', e => {
+        e.preventDefault();
+        updateBriefSummary();
+        const name = document.getElementById('brief-name').value.trim();
+        const contact = document.getElementById('brief-contact').value.trim();
+        const comment = document.getElementById('brief-comment').value.trim();
+        const deadline = document.getElementById('brief-deadline').value;
+        const quantity = document.getElementById('brief-quantity').value;
+        const files = Array.from(fileInput.files || []).map(f => f.name).join(', ') || 'Файлы будут приложены отдельно';
+        const subject = encodeURIComponent(`Задача на расчет Step3D — ${services[selectedService].title}`);
+        const body = encodeURIComponent([
+          `Направление: ${services[selectedService].title}`,
+          `Срок: ${deadline}`,
+          `Количество: ${quantity}`,
+          `Имя: ${name}`,
+          `Контакт: ${contact}`,
+          `Комментарий: ${comment || 'Без комментария'}`,
+          `Файлы: ${files}`,
+          '',
+          'Файлы можно приложить к письму вручную или отправить в Telegram: @step_3d_mngr'
+        ].join('\n'));
+        showToast('Открываем письмо для отправки');
+        window.location.href = `mailto:projects.step3d@gmail.com?subject=${subject}&body=${body}`;
+      });
+
+      document.getElementById('contact-form').addEventListener('submit', e => {
+        e.preventDefault();
+        const name = document.getElementById('contact-name').value.trim();
+        const contact = document.getElementById('contact-value').value.trim();
+        const msg = document.getElementById('contact-message').value.trim();
+        const subject = encodeURIComponent('Быстрый запрос Step3D');
+        const body = encodeURIComponent([`Имя: ${name}`, `Контакт: ${contact}`, `Комментарий: ${msg || 'Без комментария'}`].join('\n'));
+        showToast('Открываем письмо для отправки');
+        showToast('Открываем письмо для отправки');
+        window.location.href = `mailto:projects.step3d@gmail.com?subject=${subject}&body=${body}`;
+      });
+      ['brief-deadline','brief-quantity','brief-name','brief-contact'].forEach(id => document.getElementById(id)?.addEventListener('change', updateBriefSummary));
+    }
+
+
+    function initGallery(){
+      const track = document.getElementById('gallery-track');
+      const prev = document.getElementById('gallery-prev');
+      const next = document.getElementById('gallery-next');
+      const dotsWrap = document.getElementById('gallery-dots');
+      if (!track || !prev || !next || !dotsWrap) return;
+
+      const slides = Array.from(track.children);
+      const perPage = () => window.innerWidth >= 1024 ? 4 : window.innerWidth >= 640 ? 2 : 1;
+      const slideStep = () => {
+        const first = slides[0];
+        if (!first) return track.clientWidth;
+        const styles = getComputedStyle(track);
+        const gap = parseFloat(styles.gap || styles.columnGap || 16);
+        return first.getBoundingClientRect().width + gap;
+      };
+
+      function updateDots(){
+        const dots = Array.from(dotsWrap.children);
+        const index = Math.min(dots.length - 1, Math.round(track.scrollLeft / (slideStep() * perPage())));
+        dots.forEach((dot, i) => dot.classList.toggle('active', i === index));
+      }
+
+      function buildDots(){
+        const count = Math.max(1, Math.ceil(slides.length / perPage()));
+        dotsWrap.innerHTML = '';
+        for(let i = 0; i < count; i += 1){
+          const dot = document.createElement('button');
+          dot.type = 'button';
+          dot.className = 'gallery-dot rounded-full border border-white/12 px-3 py-1.5 text-xs font-bold transition';
+          dot.textContent = i + 1;
+          dot.addEventListener('click', () => {
+            track.scrollTo({ left: i * slideStep() * perPage(), behavior: 'smooth' });
+          });
+          dotsWrap.appendChild(dot);
+        }
+        updateDots();
+      }
+
+      prev.addEventListener('click', () => track.scrollBy({ left: -(slideStep() * perPage()), behavior: 'smooth' }));
+      next.addEventListener('click', () => track.scrollBy({ left: slideStep() * perPage(), behavior: 'smooth' }));
+      track.addEventListener('scroll', updateDots, { passive: true });
+      window.addEventListener('resize', buildDots);
+      buildDots();
+    }
+
+    function initHeroScene(){
+      const container = document.getElementById('hero-canvas');
+      if (!container || typeof THREE === 'undefined') return;
+      let mouseX = 0, mouseY = 0;
+      document.addEventListener('mousemove', e => {
+        mouseX = (e.clientX - window.innerWidth / 2) / 100;
+        mouseY = (e.clientY - window.innerHeight / 2) / 100;
+      });
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+      renderer.setSize(container.clientWidth, container.clientHeight);
+      container.appendChild(renderer.domElement);
+      const group = new THREE.Group();
+      scene.add(group);
+      const geo = new THREE.IcosahedronGeometry(10, 1);
+      const mat = new THREE.MeshBasicMaterial({ color: 0x3b82f6, wireframe: true, transparent: true, opacity: 0.06 });
+      group.add(new THREE.Mesh(geo, mat));
+      const pGeo = new THREE.BufferGeometry();
+      const count = 1600;
+      const pos = new Float32Array(count * 3);
+      for(let i = 0; i < count * 3; i++) pos[i] = (Math.random() - 0.5) * 60;
+      pGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+      const pMat = new THREE.PointsMaterial({ size: 0.06, color: 0x3b82f6, transparent: true, opacity: 0.35 });
+      group.add(new THREE.Points(pGeo, pMat));
+      camera.position.z = 25;
+      function animate(){
+        requestAnimationFrame(animate);
+        group.rotation.y += 0.0012;
+        group.rotation.x += (mouseY * 0.004 - group.rotation.x) * 0.08;
+        group.rotation.y += (mouseX * 0.004 - group.rotation.y) * 0.08;
+        renderer.render(scene, camera);
+      }
+      animate();
+      window.addEventListener('resize', () => {
+        camera.aspect = container.clientWidth / container.clientHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(container.clientWidth, container.clientHeight);
+      });
+    }
+
+
+    function initHeaderUX(){
+      const header = document.getElementById('site-header');
+      const toTop = document.getElementById('to-top');
+      const sections = Array.from(document.querySelectorAll('section[id]'));
+      const links = Array.from(document.querySelectorAll('.nav-link'));
+
+      function onScroll(){
+        const y = window.scrollY || document.documentElement.scrollTop;
+        header?.classList.toggle('scrolled', y > 16);
+        toTop?.classList.toggle('show', y > 700);
+        let current = sections[0]?.id;
+        sections.forEach(section => {
+          const top = section.offsetTop - 140;
+          if (y >= top) current = section.id;
+        });
+        links.forEach(link => link.classList.toggle('active', link.getAttribute('href') === `#${current}`));
+      }
+      window.addEventListener('scroll', onScroll, {passive:true});
+      onScroll();
+      toTop?.addEventListener('click', () => window.scrollTo({top:0, behavior:'smooth'}));
+    }
+
+    window.addEventListener('scroll', () => { updateScrollProgress(); revealOnScroll(); });
+    window.addEventListener('load', () => {
+      renderBriefServices();
+      renderServiceContent(selectedService);
+      renderПроектFilters();
+      renderПроектs();
+      initMobileMenu();
+      initServiceInteractions();
+      initForms();
+      initGallery();
+      initHeaderUX();
+      updateBriefSummary();
+      updateScrollProgress();
+      revealOnScroll();
+      initHeroScene();
+    });
+  </script>
+
+  <button id="to-top" type="button" class="top-btn fixed right-4 bottom-28 sm:bottom-6 z-[120] opacity-0 pointer-events-none translate-y-4 transition-all duration-300 glass-strong w-12 h-12 rounded-full flex items-center justify-center" aria-label="Наверх">
+    <span aria-hidden="true">↑</span>
+  </button>
+
+  <div class="sm:hidden fixed inset-x-3 bottom-3 z-[110] glass-strong rounded-[22px] p-3">
+    <div class="grid grid-cols-3 gap-2 text-center text-[11px] font-bold">
+      <a href="#brief" class="bg-blue-600 text-white rounded-2xl py-3 px-2">Заявка</a>
+      <a href="https://t.me/step_3d_mngr" target="_blank" rel="noopener noreferrer" class="glass rounded-2xl py-3 px-2">Telegram</a>
+      <a href="tel:+79959009141" class="glass rounded-2xl py-3 px-2">Позвонить</a>
+    </div>
+  </div>
+
+  <div id="toast" class="toast fixed left-1/2 bottom-24 sm:bottom-6 z-[130] -translate-x-1/2 translate-y-6 opacity-0 transition-all duration-300 glass-strong rounded-full px-5 py-3 text-sm font-bold"></div>
+
 </body>
 </html>
