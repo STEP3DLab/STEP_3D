@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://step3dlab.github.io/Step3D/sitemap.xml
+Sitemap: https://step3dlab.github.io/STEP_3D/sitemap.xml

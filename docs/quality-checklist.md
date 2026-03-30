@@ -28,7 +28,7 @@
 
 ### Acceptance criteria
 - Search crawlers can discover canonical landing URL via `robots.txt` and `sitemap.xml`.
-- Core metadata remains consistent with deployed GitHub Pages base URL `https://step3dlab.github.io/Step3D/`.
+- Core metadata remains consistent with deployed GitHub Pages base URL `https://step3dlab.github.io/STEP_3D/`.
 
 ## Performance
 ### Checklist
