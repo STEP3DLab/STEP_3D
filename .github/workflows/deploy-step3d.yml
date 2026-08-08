@@ -1,0 +1,45 @@
+name: Publish STEP_3D to gh-pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'step3d/**'
+      - '.github/workflows/deploy-step3d.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: step3d-pages
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Prepare gh-pages worktree
+        run: |
+          git fetch origin gh-pages
+          git worktree add /tmp/step3d-pages origin/gh-pages
+          find /tmp/step3d-pages -mindepth 1 -maxdepth 1 ! -name '.git' -exec rm -rf {} +
+          cp -a step3d/. /tmp/step3d-pages/
+
+      - name: Publish site
+        working-directory: /tmp/step3d-pages
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to publish"
+            exit 0
+          fi
+          git commit -m "Publish STEP_3D site"
+          git push origin HEAD:gh-pages
