@@ -1,123 +1,406 @@
 <!doctype html>
-<html lang="ru">
+<html lang="ru" data-theme="light">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="theme-color" content="#0b0d10" />
-  <title>STEP_3D — 3D-услуги от идеи до результата</title>
-  <meta name="description" content="STEP_3D — 3D-моделирование, 3D-сканирование, 3D-печать, реверсивный инжиниринг, промышленный дизайн и XR. Предварительная оценка проекта онлайн." />
-  <link rel="stylesheet" href="styles.css" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f3f4f6">
+  <meta name="color-scheme" content="light dark">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="description" content="STEP_3D — единая точка входа в 3D-моделирование, 3D-сканирование, реверсивный инжиниринг, 3D-печать, промышленный дизайн и XR. Предварительная оценка проекта онлайн.">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="ru_RU">
+  <meta property="og:title" content="STEP_3D — 3D-услуги от задачи до результата">
+  <meta property="og:description" content="Оценка задачи, производственный маршрут и подготовка технического брифа в одном интерфейсе.">
+  <meta property="og:url" content="https://step3dlab.github.io/STEP_3D/">
+  <meta name="twitter:card" content="summary">
+  <link rel="canonical" href="https://step3dlab.github.io/STEP_3D/">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <title>STEP_3D — 3D-моделирование, сканирование и производство</title>
+  <script>document.documentElement.classList.add('js')</script>
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"Organization",
+    "name":"ООО СТЕП_3Д",
+    "legalName":"Общество с ограниченной ответственностью «Сервис тиражирования и единого производства 3Д-услуг»",
+    "url":"https://step3d.tech",
+    "email":"info@step3d.tech",
+    "telephone":"+7 995 900-91-41",
+    "address":{"@type":"PostalAddress","postalCode":"115093","addressLocality":"Москва","streetAddress":"1-й Павловский пер., д. 5","addressCountry":"RU"},
+    "sameAs":["https://t.me/STEP_3D_Lab"]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"FAQPage",
+    "mainEntity":[
+      {"@type":"Question","name":"Что нужно для предварительной оценки?","acceptedAnswer":{"@type":"Answer","text":"Описание результата, габариты или объём объекта, желаемый срок и доступные исходные материалы: эскиз, чертёж, 3D-файл, фотографии или физическая деталь."}},
+      {"@type":"Question","name":"Является ли расчёт на сайте окончательной ценой?","acceptedAnswer":{"@type":"Answer","text":"Нет. Расчёт является ориентировочным и не является публичной офертой. Финальные цена и срок подтверждаются после технической проверки исходных данных."}},
+      {"@type":"Question","name":"Можно ли заказать только один этап?","acceptedAnswer":{"@type":"Answer","text":"Да. Можно заказать отдельное моделирование, сканирование, печать или реверс-инжиниринг, а также собрать комплексный маршрут."}}
+    ]
+  }
+  </script>
 </head>
 <body>
-  <a class="skip" href="#main">К содержанию</a>
-  <header class="topbar">
-    <div class="shell navrow">
-      <a class="brand" href="#top" aria-label="STEP_3D — на главную"><span class="brand-mark">S3D</span><span>STEP_3D</span></a>
-      <nav class="nav" id="nav" aria-label="Основная навигация">
-        <a href="#services">Услуги</a><a href="#process">Как работаем</a><a href="#estimate">Расчёт</a><a href="#contacts">Контакты</a>
+  <a class="skip-link" href="#main">Перейти к содержанию</a>
+
+  <header class="site-header" id="top">
+    <div class="container header-inner">
+      <a class="brand" href="#hero" aria-label="STEP_3D — главная">
+        <span class="brand-symbol" aria-hidden="true">S3D</span>
+        <span class="brand-name">STEP_3D</span>
+      </a>
+
+      <nav class="desktop-nav" aria-label="Основная навигация">
+        <a href="#services">Услуги</a>
+        <a href="#routes">Маршруты</a>
+        <a href="#calculator">Расчёт</a>
+        <a href="#knowledge">Знания</a>
+        <a href="#contacts">Контакты</a>
       </nav>
-      <div class="nav-actions">
-        <button class="icon-btn" id="themeBtn" type="button" aria-label="Сменить тему">◐</button>
-        <button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="nav"><span></span><span></span></button>
-        <a class="btn btn-primary nav-cta" href="#estimate">Оценить проект</a>
+
+      <div class="header-actions">
+        <button class="icon-button" id="themeToggle" type="button" aria-label="Переключить цветовую тему" title="Цветовая тема">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9c0-.5-.04-1-.12-1.47A7 7 0 0 1 12 3Z"/></svg>
+        </button>
+        <a class="button button-primary header-cta" href="#calculator">Оценить проект</a>
+        <button class="menu-button" id="menuToggle" type="button" aria-label="Открыть меню" aria-expanded="false" aria-controls="mobileMenu">
+          <span></span><span></span>
+        </button>
       </div>
     </div>
+
+    <nav class="mobile-menu" id="mobileMenu" aria-label="Мобильная навигация" hidden>
+      <a href="#services">Услуги</a>
+      <a href="#routes">Маршруты</a>
+      <a href="#calculator">Расчёт</a>
+      <a href="#knowledge">Знания</a>
+      <a href="#contacts">Контакты</a>
+      <a class="button button-primary" href="#calculator">Оценить проект</a>
+    </nav>
   </header>
 
   <main id="main">
-    <section class="hero" id="top">
-      <div class="shell hero-grid">
+    <section class="hero" id="hero">
+      <div class="container hero-grid">
         <div class="hero-copy reveal">
-          <div class="eyebrow"><span class="dot"></span> Единая точка входа в 3D‑производство</div>
-          <h1>От идеи<br />до <span>результата.</span></h1>
-          <p class="lead">Опишете задачу один раз. STEP_3D поможет выбрать технологию, оценить бюджет и собрать производственный маршрут.</p>
-          <div class="hero-actions"><a class="btn btn-primary btn-lg" href="#estimate">Рассчитать проект</a><a class="btn btn-ghost btn-lg" href="#services">Посмотреть услуги</a></div>
-          <div class="hero-meta"><div><b>6</b><span>направлений</span></div><div><b>1</b><span>окно заказа</span></div><div><b>24/7</b><span>онлайн‑бриф</span></div></div>
+          <div class="status-label"><span></span> Единая точка входа в 3D-производство</div>
+          <h1>Одна задача.<br><em>Весь 3D‑процесс.</em></h1>
+          <p class="hero-lead">STEP_3D объединяет моделирование, сканирование, реверсивный инжиниринг, печать и XR. Вы описываете результат — система помогает собрать понятный маршрут, оценить бюджет и подготовить бриф.</p>
+          <div class="hero-actions">
+            <a class="button button-primary button-large" href="#calculator">Рассчитать проект</a>
+            <a class="button button-secondary button-large" href="#services">Выбрать услугу</a>
+          </div>
+          <div class="hero-proof" aria-label="Ключевые особенности">
+            <div><strong>1</strong><span>запрос вместо цепочки подрядчиков</span></div>
+            <div><strong>6</strong><span>основных технологических направлений</span></div>
+            <div><strong>24/7</strong><span>доступ к предварительному брифу</span></div>
+          </div>
         </div>
-        <div class="hero-visual reveal" aria-hidden="true">
-          <div class="scene"><div class="grid-floor"></div><div class="orb orb-a"></div><div class="orb orb-b"></div><div class="model"><div class="model-top"></div><div class="model-side"></div><div class="model-line l1"></div><div class="model-line l2"></div></div><div class="scene-label"><span>STEP_3D / DIGITAL WORKFLOW</span><span>01 — 06</span></div></div>
+
+        <div class="hero-visual reveal" aria-label="Схематичная 3D-визуализация процесса сканирования и производства">
+          <div class="visual-panel">
+            <div class="visual-topline"><span>STEP_3D / DIGITAL WORKFLOW</span><span>V14</span></div>
+            <div class="scan-stage">
+              <div class="axis axis-x"></div>
+              <div class="axis axis-y"></div>
+              <div class="axis axis-z"></div>
+              <div class="scan-object" aria-hidden="true">
+                <div class="object-face face-front"></div>
+                <div class="object-face face-side"></div>
+                <div class="object-face face-top"></div>
+                <span class="object-ring ring-one"></span>
+                <span class="object-ring ring-two"></span>
+              </div>
+              <div class="scan-plane"></div>
+              <div class="scan-beam"></div>
+              <div class="point-cloud" aria-hidden="true">
+                <i style="--x:12%;--y:28%;--d:.1s"></i><i style="--x:22%;--y:61%;--d:.8s"></i><i style="--x:35%;--y:18%;--d:1.3s"></i><i style="--x:42%;--y:72%;--d:.4s"></i><i style="--x:56%;--y:33%;--d:1.7s"></i><i style="--x:66%;--y:58%;--d:1s"></i><i style="--x:78%;--y:22%;--d:.6s"></i><i style="--x:83%;--y:69%;--d:1.9s"></i><i style="--x:50%;--y:48%;--d:.2s"></i><i style="--x:29%;--y:42%;--d:1.5s"></i>
+              </div>
+            </div>
+            <div class="visual-footer">
+              <div><span>INPUT</span><b>idea / drawing / object / file</b></div>
+              <div><span>OUTPUT</span><b>CAD / prototype / series / XR</b></div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
 
-    <section class="quick-start">
-      <div class="shell">
+    <section class="value-strip" aria-label="Принципы сервиса">
+      <div class="container value-grid reveal">
+        <div><span>01</span><b>Техническая оценка</b><small>Нужные параметры без лишней анкеты</small></div>
+        <div><span>02</span><b>Подходящий профиль</b><small>Маршрут формируется под конкретную задачу</small></div>
+        <div><span>03</span><b>Прозрачный диапазон</b><small>Стоимость и срок с указанием факторов</small></div>
+        <div><span>04</span><b>Контроль результата</b><small>Проверка геометрии, качества и комплектности</small></div>
+      </div>
+    </section>
+
+    <section class="section quick-section" aria-labelledby="quick-title">
+      <div class="container">
+        <div class="section-heading compact reveal">
+          <div><span class="section-label">Быстрый старт</span><h2 id="quick-title">С чего начинается задача?</h2></div>
+          <p>Выберите текущее состояние — калькулятор подготовит подходящий маршрут.</p>
+        </div>
         <div class="quick-grid reveal">
-          <button data-preset="idea"><span>01</span><b>Есть идея</b><small>Нужен путь до прототипа</small></button>
-          <button data-preset="drawing"><span>02</span><b>Есть чертёж</b><small>Нужна модель или изготовление</small></button>
-          <button data-preset="model"><span>03</span><b>Есть 3D‑файл</b><small>Нужна печать или доработка</small></button>
-          <button data-preset="object"><span>04</span><b>Есть деталь</b><small>Нужно сканирование или реверс</small></button>
+          <button class="quick-card" type="button" data-preset="idea">
+            <span class="quick-number">01</span><b>Есть только идея</b><small>Нужны дизайн, модель и прототип</small><i>Начать →</i>
+          </button>
+          <button class="quick-card" type="button" data-preset="drawing">
+            <span class="quick-number">02</span><b>Есть эскиз или чертёж</b><small>Нужна CAD-модель или изготовление</small><i>Начать →</i>
+          </button>
+          <button class="quick-card" type="button" data-preset="model">
+            <span class="quick-number">03</span><b>Есть готовый 3D-файл</b><small>Нужны проверка, печать или тираж</small><i>Начать →</i>
+          </button>
+          <button class="quick-card" type="button" data-preset="object">
+            <span class="quick-number">04</span><b>Есть физическая деталь</b><small>Нужны сканирование и реверс</small><i>Начать →</i>
+          </button>
         </div>
       </div>
     </section>
 
-    <section class="section" id="services">
-      <div class="shell">
-        <div class="section-head reveal"><div><div class="kicker">Услуги</div><h2>Весь цикл в одном месте</h2></div><p>Можно заказать отдельный этап или собрать комплексный маршрут.</p></div>
+    <section class="section" id="services" aria-labelledby="services-title">
+      <div class="container">
+        <div class="section-heading reveal">
+          <div><span class="section-label">Услуги</span><h2 id="services-title">Весь цикл в одном интерфейсе</h2></div>
+          <p>Можно заказать отдельный этап или собрать комплексный маршрут от исходной идеи до готового результата.</p>
+        </div>
         <div class="services-grid">
-          <article class="service reveal" data-service="modeling"><div class="service-num">01</div><h3>3D‑моделирование</h3><p>CAD, технические модели, подготовка исходных данных и документации.</p><button type="button">Рассчитать →</button></article>
-          <article class="service reveal" data-service="scan"><div class="service-num">02</div><h3>3D‑сканирование</h3><p>Оптическая и лазерная оцифровка объектов различного масштаба.</p><button type="button">Рассчитать →</button></article>
-          <article class="service reveal" data-service="print"><div class="service-num">03</div><h3>3D‑печать</h3><p>FDM, SLA и другие технологии для прототипов и малых серий.</p><button type="button">Рассчитать →</button></article>
-          <article class="service reveal" data-service="reverse"><div class="service-num">04</div><h3>Реверс‑инжиниринг</h3><p>Восстановление CAD‑геометрии по физическому объекту или скану.</p><button type="button">Рассчитать →</button></article>
-          <article class="service reveal" data-service="design"><div class="service-num">05</div><h3>Промышленный дизайн</h3><p>От концепции и формы до цифровой модели и физического прототипа.</p><button type="button">Рассчитать →</button></article>
-          <article class="service reveal" data-service="xr"><div class="service-num">06</div><h3>AR / VR / 3D</h3><p>Интерактивный 3D‑контент, визуализации и XR‑приложения.</p><button type="button">Рассчитать →</button></article>
+          <article class="service-card reveal" data-service="modeling">
+            <div class="service-head"><span>01</span><svg viewBox="0 0 48 48" aria-hidden="true"><path d="m12 17 12-7 12 7v14l-12 7-12-7Z"/><path d="m12 17 12 7 12-7M24 24v14"/></svg></div>
+            <h3>3D‑моделирование</h3><p>CAD-модели, сборки, техническая геометрия, подготовка к производству и визуализации.</p>
+            <ul><li>STEP / STL / OBJ</li><li>чертежи и сборки</li><li>проверка технологичности</li></ul>
+            <button type="button">Рассчитать услугу <span>→</span></button>
+          </article>
+          <article class="service-card reveal" data-service="scan">
+            <div class="service-head"><span>02</span><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M13 15h-3v8m25-8h3v8M13 34h-3v-8m25 8h3v-8"/><path d="M16 24h16M20 18h8M20 30h8"/></svg></div>
+            <h3>3D‑сканирование</h3><p>Оптическая и лазерная оцифровка деталей, объектов, поверхностей и помещений.</p>
+            <ul><li>облако точек / mesh</li><li>очистка и сшивка</li><li>выезд по согласованию</li></ul>
+            <button type="button">Рассчитать услугу <span>→</span></button>
+          </article>
+          <article class="service-card reveal" data-service="print">
+            <div class="service-head"><span>03</span><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M14 11h20v8H14zM18 19v7m12-7v7M15 34h18M19 26h10v8H19z"/></svg></div>
+            <h3>3D‑печать</h3><p>Прототипы, функциональные детали, мастер-модели и малые серии из полимеров.</p>
+            <ul><li>FDM / SLA / SLS</li><li>подбор материала</li><li>постобработка</li></ul>
+            <button type="button">Рассчитать услугу <span>→</span></button>
+          </article>
+          <article class="service-card reveal" data-service="reverse">
+            <div class="service-head"><span>04</span><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M14 16h20v20H14z"/><path d="m18 12-6 6 6 6M30 40l6-6-6-6"/></svg></div>
+            <h3>Реверс‑инжиниринг</h3><p>Восстановление параметрической CAD-геометрии по физическому объекту или скану.</p>
+            <ul><li>контроль отклонений</li><li>посадки и сопряжения</li><li>конструкторская документация</li></ul>
+            <button type="button">Рассчитать услугу <span>→</span></button>
+          </article>
+          <article class="service-card reveal" data-service="design">
+            <div class="service-head"><span>05</span><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M15 34 34 15M12 38l3-10 7 7ZM29 14l5 5"/><circle cx="35" cy="13" r="3"/></svg></div>
+            <h3>Промышленный дизайн</h3><p>Концепция изделия, форма, эргономика, визуализация и физический прототип.</p>
+            <ul><li>эскизы и варианты</li><li>дизайн-концепция</li><li>макет / прототип</li></ul>
+            <button type="button">Рассчитать услугу <span>→</span></button>
+          </article>
+          <article class="service-card reveal" data-service="xr">
+            <div class="service-head"><span>06</span><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M9 18h30v15H9z"/><path d="M18 25h-4m2-2v4m15-2h.01M34 28h.01M19 18l2-4h6l2 4"/></svg></div>
+            <h3>AR / VR / 3D‑контент</h3><p>Интерактивные модели, демонстрации, тренажёры, конфигураторы и цифровые сцены.</p>
+            <ul><li>web 3D</li><li>AR / VR / MR</li><li>визуализация и анимация</li></ul>
+            <button type="button">Рассчитать услугу <span>→</span></button>
+          </article>
         </div>
       </div>
     </section>
 
-    <section class="section section-dark" id="process">
-      <div class="shell">
-        <div class="section-head invert reveal"><div><div class="kicker">Процесс</div><h2>Один запрос. Четыре шага.</h2></div><p>Минимум бюрократии: сначала техническая оценка, затем согласованный маршрут.</p></div>
-        <div class="steps">
-          <div class="step reveal"><span>01</span><h3>Задача</h3><p>Вы описываете результат и прикладываете исходные данные.</p></div>
-          <div class="step reveal"><span>02</span><h3>Оценка</h3><p>Определяем технологию, сложность, бюджет и срок.</p></div>
-          <div class="step reveal"><span>03</span><h3>Исполнение</h3><p>Подбираем профиль специалиста и формируем маршрут.</p></div>
-          <div class="step reveal"><span>04</span><h3>Результат</h3><p>Контролируем качество и передаём цифровой или физический результат.</p></div>
+    <section class="section dark-section" id="routes" aria-labelledby="routes-title">
+      <div class="container">
+        <div class="section-heading inverted reveal">
+          <div><span class="section-label">Производственный маршрут</span><h2 id="routes-title">Не услуга ради услуги, а нужный результат</h2></div>
+          <p>Система связывает этапы в последовательность и показывает, какие исходные данные нужны на каждом шаге.</p>
+        </div>
+        <div class="routes-grid">
+          <article class="route-card reveal">
+            <span class="route-type">Деталь → CAD</span><h3>Восстановить изделие</h3><div class="route-flow"><b>Сканирование</b><i>→</i><b>Реверс</b><i>→</i><b>Контроль</b></div><p>Для ремонта, модернизации, воспроизводства или подготовки документации.</p><button type="button" data-route="reverse">Собрать маршрут →</button>
+          </article>
+          <article class="route-card reveal">
+            <span class="route-type">Идея → прототип</span><h3>Проверить новую концепцию</h3><div class="route-flow"><b>Дизайн</b><i>→</i><b>CAD</b><i>→</i><b>Печать</b></div><p>Для продуктовой гипотезы, демонстратора, макета или функционального теста.</p><button type="button" data-route="prototype">Собрать маршрут →</button>
+          </article>
+          <article class="route-card reveal">
+            <span class="route-type">Файл → серия</span><h3>Изготовить малую партию</h3><div class="route-flow"><b>Проверка</b><i>→</i><b>Подготовка</b><i>→</i><b>Тираж</b></div><p>Для пилотного выпуска, запасных частей и изделий по индивидуальным параметрам.</p><button type="button" data-route="series">Собрать маршрут →</button>
+          </article>
+        </div>
+        <div class="process-line reveal" aria-label="Этапы сопровождения">
+          <div><span>01</span><b>Заявка</b><small>цель и исходные данные</small></div>
+          <div><span>02</span><b>Техническая проверка</b><small>геометрия, технология, риски</small></div>
+          <div><span>03</span><b>Предложение</b><small>состав работ, цена, срок</small></div>
+          <div><span>04</span><b>Выполнение</b><small>контрольные точки</small></div>
+          <div><span>05</span><b>Передача</b><small>результат и комплектность</small></div>
         </div>
       </div>
     </section>
 
-    <section class="section estimate-section" id="estimate">
-      <div class="shell">
-        <div class="section-head reveal"><div><div class="kicker">Предварительный расчёт</div><h2>Опишите проект</h2></div><p>Расчёт ориентировочный. Финальные цена и срок подтверждаются после технической проверки.</p></div>
-        <div class="estimate-layout reveal">
-          <form class="estimate-form" id="estimateForm">
-            <div class="form-step"><span>1</span><b>Задача</b><small>Что требуется</small></div>
-            <div class="field"><label for="service">Услуга</label><select id="service" name="service"><option value="modeling">3D‑моделирование</option><option value="scan">3D‑сканирование</option><option value="print">3D‑печать</option><option value="reverse">Реверс‑инжиниринг</option><option value="design">Промышленный дизайн</option><option value="xr">AR / VR / 3D‑контент</option></select></div>
-            <div class="two-col"><div class="field"><label for="complexity">Сложность</label><select id="complexity"><option value="1">Стандартная</option><option value="1.35">Повышенная</option><option value="1.75">Высокая</option></select></div><div class="field"><label for="urgency">Срок</label><select id="urgency"><option value="1">Стандартный</option><option value="1.25">Ускоренный</option><option value="1.5">Срочный</option></select></div></div>
-            <div class="two-col"><div class="field"><label for="qty">Количество</label><input id="qty" type="number" value="1" min="1" max="1000" /></div><div class="field dynamic" id="dynamicField"></div></div>
-            <div class="field"><label for="description">Кратко о задаче <span id="descCount">0/500</span></label><textarea id="description" maxlength="500" placeholder="Например: нужно восстановить CAD‑модель корпуса по физической детали и подготовить STEP для производства"></textarea></div>
-            <div class="form-step second"><span>2</span><b>Контакт</b><small>Куда прислать уточнение</small></div>
-            <div class="two-col"><div class="field"><label for="name">Имя</label><input id="name" placeholder="Как к вам обращаться" /></div><div class="field"><label for="contact">Телефон / Telegram / e‑mail</label><input id="contact" placeholder="@username или +7…" /></div></div>
-            <label class="consent"><input id="consent" type="checkbox" /><span>Согласен на обработку контактных данных для ответа по заявке.</span></label>
+    <section class="section calculator-section" id="calculator" aria-labelledby="calculator-title">
+      <div class="container">
+        <div class="section-heading reveal">
+          <div><span class="section-label">Предварительная оценка</span><h2 id="calculator-title">Соберите технический бриф</h2></div>
+          <p>Поля меняются под выбранную услугу. Данные сохраняются только в вашем браузере до явного действия.</p>
+        </div>
+
+        <div class="calculator-layout reveal">
+          <form class="brief-form" id="briefForm" novalidate>
+            <div class="form-progress" aria-label="Этапы формы">
+              <span class="active"><b>1</b> Задача</span><i></i><span><b>2</b> Параметры</span><i></i><span><b>3</b> Контакт</span>
+            </div>
+
+            <fieldset>
+              <legend><span>01</span><div><b>Что требуется</b><small>Основная услуга и конечный результат</small></div></legend>
+              <div class="field-grid two">
+                <label class="field"><span>Основная услуга</span><select id="serviceSelect" name="service"><option value="modeling">3D‑моделирование</option><option value="scan">3D‑сканирование</option><option value="print">3D‑печать</option><option value="reverse">Реверс‑инжиниринг</option><option value="design">Промышленный дизайн</option><option value="xr">AR / VR / 3D‑контент</option></select></label>
+                <label class="field"><span>Желаемый результат</span><select id="resultSelect" name="result"><option value="digital">Цифровая модель</option><option value="prototype">Физический прототип</option><option value="series">Малая серия</option><option value="documentation">Чертежи / документация</option><option value="visual">Визуализация / XR</option></select></label>
+              </div>
+              <div class="service-tabs" id="serviceTabs" aria-label="Быстрый выбор услуги"></div>
+            </fieldset>
+
+            <fieldset>
+              <legend><span>02</span><div><b>Параметры</b><small>Точность расчёта зависит от исходных данных</small></div></legend>
+              <div id="dynamicFields"></div>
+              <details class="advanced-details">
+                <summary><span>Дополнительные параметры</span><small>бюджет, формат, особые требования</small></summary>
+                <div class="details-content">
+                  <div class="field-grid two">
+                    <label class="field"><span>Ориентир бюджета</span><select id="budgetSelect" name="budget"><option value="">Не определён</option><option value="10000">до 10 000 ₽</option><option value="30000">10 000–30 000 ₽</option><option value="100000">30 000–100 000 ₽</option><option value="300000">100 000–300 000 ₽</option><option value="500000">свыше 300 000 ₽</option></select></label>
+                    <label class="field"><span>Требуемый формат</span><select id="formatSelect" name="format"><option value="">Определим вместе</option><option>STEP / STP</option><option>STL</option><option>OBJ / FBX / GLB</option><option>Чертежи PDF / DWG</option><option>Физическое изделие</option><option>Web / AR / VR</option></select></label>
+                  </div>
+                  <label class="field"><span>Особые требования</span><input id="requirementsInput" name="requirements" type="text" placeholder="Точность, материал, цвет, условия эксплуатации"></label>
+                </div>
+              </details>
+              <label class="field"><span>Описание задачи <small id="descriptionCount">0 / 800</small></span><textarea id="descriptionInput" name="description" maxlength="800" placeholder="Что должно получиться, для чего используется изделие, какие размеры и ограничения известны"></textarea></label>
+              <label class="file-zone" id="fileZone"><input id="fileInput" type="file" multiple accept=".stl,.step,.stp,.obj,.fbx,.glb,.gltf,.dwg,.dxf,.pdf,.jpg,.jpeg,.png,.zip"><span class="file-icon">＋</span><b>Указать исходные файлы</b><small>Файлы не загружаются на сайт — в бриф попадут только названия</small><em id="fileList">Файлы не выбраны</em></label>
+            </fieldset>
+
+            <fieldset>
+              <legend><span>03</span><div><b>Контакт</b><small>Для уточнения задачи и отправки предложения</small></div></legend>
+              <div class="field-grid two">
+                <label class="field"><span>Имя</span><input id="nameInput" name="name" autocomplete="name" placeholder="Как к вам обращаться"></label>
+                <label class="field"><span>Организация</span><input id="companyInput" name="company" autocomplete="organization" placeholder="Необязательно"></label>
+              </div>
+              <label class="field"><span>Телефон, e-mail или Telegram</span><input id="contactInput" name="contact" autocomplete="email" placeholder="@username, +7… или name@example.ru"></label>
+              <label class="check-row"><input id="consentInput" type="checkbox"><span>Согласен на обработку контактных данных исключительно для ответа по заявке. <a href="privacy.html">Подробнее</a>.</span></label>
+            </fieldset>
           </form>
-          <aside class="estimate-result" aria-live="polite">
-            <div class="result-top"><span>Оценка проекта</span><span class="status-dot">предварительно</span></div>
-            <div class="price" id="price">от 1 000 ₽</div>
-            <div class="range" id="range">Ориентир: 1 000–1 300 ₽</div>
-            <div class="result-list"><div><span>Услуга</span><b id="summaryService">3D‑моделирование</b></div><div><span>Срок</span><b id="summaryTime">2–4 раб. дня</b></div><div><span>Готовность брифа</span><b id="briefScore">25%</b></div></div>
-            <div class="progress"><span id="progressBar"></span></div>
-            <button class="btn btn-primary btn-block" id="sendBtn" type="button">Подготовить заявку</button>
-            <button class="btn btn-ghost btn-block" id="copyBtn" type="button">Скопировать расчёт</button>
-            <p class="result-note" id="resultNote">Добавьте описание и контакт — расчёт станет полезнее для технической проверки.</p>
+
+          <aside class="estimate-panel" aria-live="polite">
+            <div class="estimate-status"><span>Предварительная оценка</span><b id="requestId">S3D-DRAFT</b></div>
+            <div class="estimate-price" id="estimatePrice">от 2 500 ₽</div>
+            <p class="estimate-range" id="estimateRange">Ориентировочный диапазон: 2 500–3 500 ₽</p>
+
+            <div class="route-preview">
+              <span>Рекомендуемый маршрут</span>
+              <div id="routeChips"><b>Техническая проверка</b><i>→</i><b>3D‑моделирование</b></div>
+            </div>
+
+            <dl class="estimate-meta">
+              <div><dt>Срок</dt><dd id="estimateTime">2–4 раб. дня</dd></div>
+              <div><dt>Готовность брифа</dt><dd id="briefScore">20%</dd></div>
+              <div><dt>Уровень оценки</dt><dd id="estimateLevel">Базовый</dd></div>
+            </dl>
+            <div class="score-track"><span id="scoreBar"></span></div>
+
+            <div class="checklist" id="briefChecklist"></div>
+
+            <button class="button button-primary button-block" id="prepareRequest" type="button">Подготовить заявку</button>
+            <div class="secondary-actions">
+              <button type="button" id="copyBrief">Скопировать бриф</button>
+              <button type="button" id="downloadBrief">Скачать JSON</button>
+            </div>
+            <p class="estimate-note" id="estimateNote">Расчёт не является офертой. Итоговые условия подтверждаются после технической проверки.</p>
           </aside>
         </div>
       </div>
     </section>
 
-    <section class="section contact-section" id="contacts">
-      <div class="shell contact-grid reveal">
-        <div><div class="kicker">Контакты</div><h2>Есть задача?<br />Начнём с неё.</h2><p>Москва · Работаем с заказчиками и специалистами из разных регионов.</p></div>
-        <div class="contact-card"><a href="mailto:info@step3d.tech"><span>E‑mail</span><b>info@step3d.tech</b></a><a href="https://t.me/step_3d_mngr" target="_blank" rel="noopener"><span>Telegram</span><b>@step_3d_mngr</b></a><a href="tel:+79959009141"><span>Телефон</span><b>+7 (995) 900‑91‑41</b></a><a href="https://t.me/STEP_3D_Lab" target="_blank" rel="noopener"><span>Канал</span><b>@STEP_3D_Lab</b></a></div>
+    <section class="section knowledge-section" id="knowledge" aria-labelledby="knowledge-title">
+      <div class="container">
+        <div class="section-heading reveal">
+          <div><span class="section-label">Знания и развитие</span><h2 id="knowledge-title">Не только изготовление</h2></div>
+          <p>STEP_3D объединяет практиков, образовательные проекты и материалы по 3D-технологиям.</p>
+        </div>
+        <div class="knowledge-grid">
+          <article class="knowledge-main reveal"><span>Образование</span><h3>Курсы и практические программы</h3><p>3D-моделирование, реверсивный инжиниринг, аддитивное производство и прикладное использование цифровых инструментов.</p><a href="mailto:info@step3d.tech?subject=Запрос%20по%20обучению%20STEP_3D">Запросить программу →</a></article>
+          <article class="knowledge-card reveal"><span>Материалы</span><h3>Разборы технологий и проектов</h3><p>Новости, практические заметки и опыт сообщества.</p><a href="https://t.me/STEP_3D_Lab" target="_blank" rel="noopener">Открыть Telegram‑канал →</a></article>
+          <article class="knowledge-card reveal"><span>Исполнителям</span><h3>Стать частью сообщества</h3><p>Инженеры, дизайнеры, операторы оборудования и XR-разработчики могут предложить свою специализацию.</p><button type="button" id="performerButton">Подготовить профиль →</button></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section faq-section" aria-labelledby="faq-title">
+      <div class="container faq-layout">
+        <div class="faq-intro reveal"><span class="section-label">FAQ</span><h2 id="faq-title">Перед началом</h2><p>Короткие ответы на вопросы, которые влияют на оценку и производство.</p></div>
+        <div class="faq-list reveal">
+          <details><summary>Что нужно для предварительной оценки?<span>＋</span></summary><p>Описание результата, примерные габариты или объём, желаемый срок и доступные исходные материалы: эскиз, чертёж, 3D-файл, фотографии или физическая деталь.</p></details>
+          <details><summary>Расчёт на сайте — окончательная цена?<span>＋</span></summary><p>Нет. Это ориентир и инструмент подготовки брифа. Финальная цена определяется после проверки геометрии, материала, точности, количества и требований к результату.</p></details>
+          <details><summary>Можно заказать только один этап?<span>＋</span></summary><p>Да. Можно заказать отдельное моделирование, сканирование, печать, реверс или XR-разработку. Комплексный маршрут нужен только там, где этапы технологически связаны.</p></details>
+          <details><summary>Что происходит с выбранными файлами?<span>＋</span></summary><p>В этой версии сайта файлы никуда не отправляются. В бриф попадают только их названия. Сами файлы передаются менеджеру отдельным сообщением после согласования.</p></details>
+          <details><summary>Как контролируется качество?<span>＋</span></summary><p>Метод контроля зависит от задачи: проверка размеров, отклонений CAD от скана, визуальный контроль, тестовая сборка, согласование промежуточной модели или прототипа.</p></details>
+        </div>
+      </div>
+    </section>
+
+    <section class="section contact-section" id="contacts" aria-labelledby="contacts-title">
+      <div class="container contact-layout reveal">
+        <div class="contact-copy"><span class="section-label">Контакты</span><h2 id="contacts-title">Есть задача?<br>Начнём с результата.</h2><p>Москва. Работаем с заказчиками, специалистами и партнёрами из разных регионов России.</p><a class="button button-primary button-large" href="#calculator">Подготовить бриф</a></div>
+        <div class="contact-list">
+          <a href="mailto:info@step3d.tech"><span>E‑mail</span><b>info@step3d.tech</b><i>↗</i></a>
+          <a href="https://t.me/step_3d_mngr" target="_blank" rel="noopener"><span>Менеджер</span><b>@step_3d_mngr</b><i>↗</i></a>
+          <a href="tel:+79959009141"><span>Телефон</span><b>+7 (995) 900‑91‑41</b><i>↗</i></a>
+          <a href="https://t.me/STEP_3D_Lab" target="_blank" rel="noopener"><span>Telegram‑канал</span><b>@STEP_3D_Lab</b><i>↗</i></a>
+          <div><span>Юридическое лицо</span><b>ООО «СТЕП_3Д» · ИНН 9725161467</b></div>
+        </div>
       </div>
     </section>
   </main>
 
-  <footer><div class="shell footer-row"><div><b>STEP_3D</b><span>ООО «СТЕП_3Д» · ИНН 9725161467</span></div><div class="tags">#мечтай #учись #твори #вдохновляй</div></div></footer>
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div><a class="brand footer-brand" href="#hero"><span class="brand-symbol">S3D</span><span class="brand-name">STEP_3D</span></a><p>Сервис тиражирования и единого производства 3D‑услуг.</p></div>
+      <div class="footer-links"><a href="#services">Услуги</a><a href="#calculator">Расчёт</a><a href="privacy.html">Конфиденциальность</a><a href="https://github.com/STEP3DLab/STEP_3D" target="_blank" rel="noopener">GitHub</a></div>
+      <div class="footer-values">#мечтай<br>#учись<br>#твори<br>#вдохновляй</div>
+    </div>
+    <div class="container footer-bottom"><span>© <span id="currentYear"></span> STEP_3D</span><span>Предварительные расчёты не являются публичной офертой.</span></div>
+  </footer>
 
-  <dialog id="requestDialog"><div class="dialog-head"><div><span class="kicker">Заявка STEP_3D</span><h3>Проверьте перед отправкой</h3></div><button id="closeDialog" aria-label="Закрыть">×</button></div><textarea id="requestText"></textarea><div class="dialog-actions"><button class="btn btn-ghost" id="dialogCopy" type="button">Скопировать</button><a class="btn btn-primary" id="telegramLink" href="https://t.me/step_3d_mngr" target="_blank" rel="noopener">Открыть Telegram</a></div><p>Файлы через эту форму не загружаются. Их можно приложить к сообщению менеджеру отдельно.</p></dialog>
+  <div class="mobile-cta" id="mobileCta"><div><span id="mobilePrice">от 2 500 ₽</span><small>предварительно</small></div><a class="button button-primary" href="#calculator">Рассчитать</a></div>
+
+  <dialog class="request-dialog" id="requestDialog">
+    <form method="dialog" class="dialog-shell">
+      <div class="dialog-header"><div><span class="section-label">Заявка STEP_3D</span><h2>Проверьте бриф</h2></div><button class="dialog-close" value="close" aria-label="Закрыть диалог">×</button></div>
+      <div class="dialog-readiness"><span>Готовность</span><b id="dialogScore">0%</b></div>
+      <textarea id="requestText" aria-label="Текст заявки"></textarea>
+      <div class="dialog-actions">
+        <button class="button button-secondary" id="dialogCopy" type="button">Скопировать</button>
+        <a class="button button-secondary" id="emailRequest" href="mailto:info@step3d.tech">Открыть e‑mail</a>
+        <a class="button button-primary" id="telegramRequest" href="https://t.me/step_3d_mngr" target="_blank" rel="noopener">Открыть Telegram</a>
+      </div>
+      <p>Текст заявки копируется перед переходом в Telegram. Прикрепите исходные файлы к сообщению отдельно.</p>
+    </form>
+  </dialog>
+
+  <dialog class="performer-dialog" id="performerDialog">
+    <form method="dialog" class="dialog-shell" id="performerForm">
+      <div class="dialog-header"><div><span class="section-label">Профиль исполнителя</span><h2>Предложить специализацию</h2></div><button class="dialog-close" value="close" aria-label="Закрыть диалог">×</button></div>
+      <div class="field-grid two">
+        <label class="field"><span>Имя</span><input id="performerName" placeholder="Фамилия Имя"></label>
+        <label class="field"><span>Регион</span><input id="performerRegion" placeholder="Москва / другой регион"></label>
+      </div>
+      <label class="field"><span>Специализация</span><select id="performerSpeciality"><option>3D-моделирование / CAD</option><option>3D-сканирование</option><option>3D-печать</option><option>Реверс-инжиниринг</option><option>Промышленный дизайн</option><option>AR / VR / 3D-графика</option></select></label>
+      <label class="field"><span>Контакт</span><input id="performerContact" placeholder="Telegram, телефон или e-mail"></label>
+      <label class="field"><span>Портфолио / опыт</span><textarea id="performerPortfolio" placeholder="Ссылка на портфолио, ПО, оборудование, примеры задач"></textarea></label>
+      <div class="dialog-actions"><button class="button button-secondary" id="copyPerformer" type="button">Скопировать профиль</button><a class="button button-primary" href="https://t.me/step_3d_mngr" target="_blank" rel="noopener">Открыть Telegram</a></div>
+      <p>Профиль не публикуется автоматически. Включение в сообщество возможно после проверки компетенций.</p>
+    </form>
+  </dialog>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="config.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
