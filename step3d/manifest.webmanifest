@@ -1,0 +1,12 @@
+{
+  "name": "STEP_3D",
+  "short_name": "STEP_3D",
+  "description": "Предварительная оценка и технический бриф для 3D-услуг.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f3f4f6",
+  "theme_color": "#101216",
+  "lang": "ru",
+  "icons": [{"src":"icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
+}
