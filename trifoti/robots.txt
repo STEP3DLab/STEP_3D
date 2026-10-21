@@ -1,0 +1,13 @@
+User-Agent: OAI-SearchBot
+Allow: /STEP_3D/trifoti/
+Disallow: /STEP_3D/trifoti/api/
+Disallow: /STEP_3D/trifoti/leads
+Disallow: /STEP_3D/trifoti/status
+
+User-Agent: *
+Allow: /STEP_3D/trifoti/
+Disallow: /STEP_3D/trifoti/api/
+Disallow: /STEP_3D/trifoti/leads
+Disallow: /STEP_3D/trifoti/status
+
+Sitemap: https://step3dlab.github.io/STEP_3D/trifoti/sitemap.xml

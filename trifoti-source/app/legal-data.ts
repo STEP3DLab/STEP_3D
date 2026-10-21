@@ -1,0 +1,16 @@
+export const company = {
+  fullName: "Общество с ограниченной ответственностью «Сервис тиражирования и единого производства 3Д-услуг»",
+  shortName: "ООО «СТЕП_3Д»",
+  inn: "9725161467",
+  kpp: "772501001",
+  ogrn: "1247700430449",
+  director: "Понкратова Христина Анатольевна",
+  email: "projects.step3d@gmail.com",
+  corporateEmail: "info@step3d.tech",
+  phone: "+7 995 900-91-41",
+  foundedAt: "13 июня 2024 года",
+  account: "40702810710001626342",
+  bank: "АО «ТБанк»",
+  bik: "044525974",
+  correspondentAccount: "30101810145250000974",
+};
