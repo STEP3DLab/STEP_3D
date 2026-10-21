@@ -11,7 +11,7 @@ const ids=[...html.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]);
 assert.equal(new Set(ids).size,ids.length,'All HTML IDs must be unique');
 for(const [,url] of html.matchAll(/\b(?:src|href|poster)="([^"]+)"/g)){
  if(url.startsWith('#'))assert(ids.includes(url.slice(1)),`Missing anchor ${url}`);
- else if(!/^(?:https?:|data:)/.test(url))assert(existsSync(resolve(dist,url)),`Missing file ${url}`);
+ else if(!/^(?:https?:|data:)/.test(url))assert(existsSync(resolve(dist,url.split(/[?#]/)[0])),`Missing file ${url}`);
 }
 for(const [,url] of css.matchAll(/url\(['"]?([^)'"\s]+)['"]?\)/g))assert(existsSync(resolve(dist,url)),`Missing style asset ${url}`);
 let photos=0,videos=0;
