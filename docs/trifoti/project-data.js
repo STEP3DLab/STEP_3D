@@ -1,5 +1,10 @@
 const bear='assets/projects/bear/';
 export const projects={
+ stdAwards:{title:'Награды для премии СТД России',type:'Из портфолио STEP_3D / Награды',description:'Скульптурные награды для Премии Председателя и Сопредседателя СТД РФ. От цифровой формы и 3D-печати до готовой серии и церемонии вручения с Владимиром Машковым.',attribution:'Проект реализован командой Технопарка РГСУ.',sources:[{label:'О создании наград',url:'https://technopark-rgsu.ru/skb/news/nagrady-dlya-zvezd-teatra/'},{label:'О церемонии · СТД РФ',url:'https://stdrf.ru/novosti/sostoyalos-vruchenie-premiy-predsedatelya-i-sopredsedatelya-std-rf/'}],direction:'Бренды в объёме',tags:['Награды','Цифровой дизайн','3D-печать'],media:[
+  {src:'assets/projects/std-awards/award-series.webp',caption:'Готовая серия скульптурных наград в мастерской.'},
+  {src:'assets/projects/std-awards/award-ceremony.webp',caption:'Вручение премии с Владимиром Машковым. Театральный центр «На Страстном», 18 декабря 2025 года.'},
+  {src:'assets/projects/std-awards/design-process.webp',caption:'Проработка образа и этапов изготовления награды в Технопарке РГСУ.'}
+ ]},
  mascot:{title:'Медведь. С характером.',type:'ТРИФОТИ / Фирменный персонаж',description:'От первого рисунка до готовой скульптуры. Простой силуэт, узнаваемый нос и мягкая пластика превращают медведя в самостоятельный характер. В галерее — эскиз, исходная форма и несколько цветовых исполнений.',tags:['Персонаж','Скульптура','Цветовые версии'],media:[
   {src:bear+'white-front.webp',caption:'Белый медведь с красным акцентом. Вид спереди.'},
   {src:bear+'white-side.webp',caption:'Пластика силуэта. Белое исполнение.'},
