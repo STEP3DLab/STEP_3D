@@ -1,0 +1,14 @@
+{
+  "source": "document_5386715156208203059.mp4",
+  "source_start": 1.8,
+  "source_end": 17.133333333333333,
+  "frames": 176,
+  "fps": 20,
+  "duration": 8.8,
+  "colors": [
+    "#e71931",
+    "ivory"
+  ],
+  "processing": "background cutout, stabilization, selective recoloring, loop seam",
+  "seam": "8-frame circular overlap; redundant initial overlap removed"
+}

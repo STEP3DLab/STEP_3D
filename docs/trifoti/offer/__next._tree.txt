@@ -1,4 +1,0 @@
-:HL["/STEP_3D/trifoti/_next/static/css/5582693e059cc530.css","style"]
-:HL["/STEP_3D/trifoti/_next/static/css/47161438444e03fd.css","style"]
-:HL["/STEP_3D/trifoti/_next/static/css/302643e8f6221839.css","style"]
-0:{"tree":{"name":"","param":null,"prefetchHints":16,"slots":{"children":{"name":"offer","param":null,"prefetchHints":0,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":0,"slots":null}}}}},"staleTime":300,"buildId":"LYl4tB-rl3gmlOOkmAVeQ"}
