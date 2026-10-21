@@ -15,7 +15,7 @@ npm run build:pages
 
 Проверенная статическая сборка появится в `pages-dist/`. Замените ею содержимое двух выделенных каталогов портфолио: `../trifoti/` и `../docs/trifoti/`. Сохраните пустой файл `../docs/.nojekyll`, затем отправьте изменения в `main`. Другие файлы в `docs/` относятся к прежним страницам репозитория.
 
-Ожидаемые настройки экспорта: `PAGES_BASE_PATH=/STEP_3D/trifoti`, `PAGES_SITE_ORIGIN=https://step3dlab.github.io` (это значения по умолчанию в скрипте).
+Ожидаемые настройки экспорта: `NEXT_PUBLIC_BASE_PATH=/STEP_3D/trifoti`, `NEXT_PUBLIC_SITE_ORIGIN=https://step3dlab.github.io` (это значения по умолчанию в скрипте).
 
 Файл `.nojekyll` располагается в корне источника Pages (`docs/`) и позволяет публиковать готовые ресурсы Next.js, включая `_next`, без обработки Jekyll. См. [официальную инструкцию GitHub](https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site).
 
