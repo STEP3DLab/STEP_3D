@@ -19,7 +19,7 @@ test('Reflow is limited to the verified very narrow header, not ordinary mobile 
  assert.equal(rule('.header')['grid-template-columns'],'minmax(0,1fr) 44px');
  for(const clientWidth of [285,316.25,320,337]){
   const firstColumn=clientWidth*.9-44-8;
-  assert(firstColumn>=159,'The complete existing 159px logo fits beside the menu');
+  assert(firstColumn>=60,'The complete final 60px logo fits beside the menu');
  }
 });
 test('Logo and full-size menu occupy the first row, while the existing CTA reflows below',()=>{
@@ -28,7 +28,7 @@ test('Logo and full-size menu occupy the first row, while the existing CTA reflo
  assert.equal(rule('.header-cta')['grid-column'],'1/-1');
  assert.equal(rule('.header-cta')['grid-row'],'2');
  assert.match(css,/\.menu-button\{min-width:44px;min-height:44px/);
- assert.match(css,/\.brand-full\{width:159px;gap:7px\}/);
+ assert.match(css,/\.brand\.brand-final\{width:60px;height:60px\}/);
 });
 test('Header grows with its content and never masks horizontal overflow or hides a control',()=>{
  assert.equal(rule('.header').height,'auto');

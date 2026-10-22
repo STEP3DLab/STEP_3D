@@ -32,8 +32,8 @@ test('Readiness is activated only after prevention, local export and input handl
  assert.equal(app.match(/brief-save/g).length,1);
  assert.doesNotMatch(app,/\.submit\(\)|fetch\(|XMLHttpRequest|sendBeacon/);
 });
-test('Short-height review control stays in normal flow, not hidden or inaccessible',()=>{
- const rule=css.match(/@media\(max-height:500px\)\{\.review-launch\{([^}]*)\}\}/)[1];
+test('Review control stays in normal flow at every height, not hidden or inaccessible',()=>{
+ const rule=css.match(/^\.review-launch\{([^}]*)\}/m)[1];
  assert.match(rule,/position:static/);assert.match(rule,/transform:none/);assert.match(rule,/width:max-content/);assert.match(rule,/max-width:calc\(100% - 32px\)/);
  assert.doesNotMatch(rule,/display:none|visibility:hidden|pointer-events:none/);
  assert.ok(html.indexOf('id="review-launch"')>html.indexOf('</footer>'));

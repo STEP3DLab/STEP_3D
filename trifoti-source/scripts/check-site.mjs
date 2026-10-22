@@ -42,7 +42,7 @@ assert.deepEqual([...brief.matchAll(/\bname="([^"]+)"/g)].map(match=>match[1]).s
 assert(/<textarea id="brief-text" readonly/.test(brief),'Copy fallback must be readonly and have no storage field name');
 assert(brief.includes('id="brief-draft-status" role="status"'));
 assert(brief.includes('id="brief-text-fallback" hidden'));
-const optimized=statSync(resolve(dist,'assets/logo.webp')).size,original=statSync(resolve(dist,'assets/logo.png')).size;
-assert(optimized<original*.15,'Header logo should be at least 85% smaller');
+const optimized=statSync(resolve(dist,'assets/brand/trifoti-logo-256.webp')).size,original=statSync(resolve(dist,'assets/brand/trifoti-logo-original.png')).size;
+assert(optimized<original*.4,'Header logo derivative should remain substantially smaller than the preserved original');
 console.log(`Passed: unique IDs, local links/assets, 6 cases, ${photos} photos, ${videos} videos, dialog labels, truthful local brief.`);
 console.log(`Header logo: ${original} → ${optimized} bytes (${Math.round((1-optimized/original)*100)}% smaller). Original retained.`);
