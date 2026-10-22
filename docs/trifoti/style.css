@@ -108,3 +108,9 @@ input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px soli
 #brief-text-fallback{margin-top:14px;font-size:11px;line-height:1.6}
 #brief-text-fallback summary{cursor:pointer;min-height:44px;display:list-item;padding:12px 0}
 #brief-text-fallback label{margin-top:10px}
+
+/* Explicit case sharing, using the existing typography and colors. */
+.case-share{margin-top:16px}
+.case-share-button{min-height:44px;background:none;border:0;border-bottom:1px solid var(--line)}
+.case-share-fallback{display:block;font-size:11px;line-height:1.6;margin-top:12px}
+.case-share-fallback input{font-size:16px;min-width:0}
