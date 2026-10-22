@@ -114,3 +114,6 @@ input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px soli
 .case-share-button{min-height:44px;background:none;border:0;border-bottom:1px solid var(--line)}
 .case-share-fallback{display:block;font-size:11px;line-height:1.6;margin-top:12px}
 .case-share-fallback input{font-size:16px;min-width:0}
+
+#review-save-status{margin:12px 0}
+#review-save-status[data-state="error"],#review-status[data-state="error"]{color:#a3162c}

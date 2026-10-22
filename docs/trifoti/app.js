@@ -5,7 +5,6 @@ import {keepDialogFocus,galleryArrow} from './dialog-controls.js?v=20261022-gall
 import {projects} from './project-data.js?v=20261021-awards';
 const $=(s,root=document)=>root.querySelector(s);
 const $$=(s,root=document)=>[...root.querySelectorAll(s)];
-const storage={get(key,fallback){try{return JSON.parse(localStorage.getItem(key))??fallback}catch{return fallback}},set(key,value){try{localStorage.setItem(key,JSON.stringify(value))}catch{}}};
 const menu=$('.menu-button'),nav=$('#navigation');
 function setMenuOpen(open){menu.setAttribute('aria-expanded',String(open));menu.setAttribute('aria-label',open?'Закрыть меню':'Открыть меню');nav.classList.toggle('open',open)}
 menu.addEventListener('click',()=>setMenuOpen(menu.getAttribute('aria-expanded')!=='true'));
@@ -44,13 +43,7 @@ form.addEventListener('submit',e=>{
 });
 $('#brief-text-fallback').addEventListener('toggle',()=>{if($('#brief-text-fallback').open)$('#brief-text').value=formatBrief(Object.fromEntries(new FormData(form)))});
 
-const sections=['Главная и вращающийся медведь','Направления','Проекты','Процесс','Студия','Обсуждение проекта'];
-const review=storage.get('trifoti-review-v1',{sections:{},notes:''});
-sections.forEach((name,i)=>{const row=document.createElement('div');row.className='review-section-row';const number=document.createElement('span');number.textContent=String(i+1).padStart(2,'0');const label=document.createElement('span');label.textContent=name;const select=document.createElement('select');select.setAttribute('aria-label',`Решение по разделу «${name}»`);['Обсудить','Оставляем','Доработать','Убрать'].forEach(value=>select.add(new Option(value,value)));select.value=review.sections[name]||'Обсудить';select.addEventListener('change',()=>{review.sections[name]=select.value;storage.set('trifoti-review-v1',review)});row.append(number,label,select);$('#review-sections').append(row)});
-$('#review-notes').value=review.notes;
-$('#review-notes').addEventListener('input',e=>{review.notes=e.target.value;storage.set('trifoti-review-v1',review)});
-$('#review-launch').addEventListener('click',()=>$('#review-dialog').showModal());
-$('#export-review').addEventListener('click',()=>{download(`ТРИФОТИ — решения по сайту\nКонцепт 01\n\nСТРУКТУРА\n${sections.map((name,i)=>`${i+1}. ${name}: ${review.sections[name]||'Обсудить'}`).join('\n')}\n\nВНЕШНИЙ ВИД И ПОЖЕЛАНИЯ\n${review.notes||'Пока без комментариев'}\n\nДОПОЛНИТЬ\n— Согласованные проекты: фото и описания\n— Контакты студии\n`,'TRIFOTI-site-review.txt');$('#review-status').textContent='Решения подготовлены к скачиванию.'});
+$('#review-launch')?.addEventListener('click',()=>$('#review-dialog')?.showModal());
 $$('[data-close]').forEach(b=>b.addEventListener('click',()=>document.getElementById(b.dataset.close).close()));
 $$('dialog').forEach(dialog=>{keepDialogFocus(dialog);let backdropPressed=false;dialog.addEventListener('pointerdown',e=>{const r=dialog.getBoundingClientRect();backdropPressed=e.target===dialog&&(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)});dialog.addEventListener('click',e=>{if(backdropPressed&&e.target===dialog)dialog.close();backdropPressed=false})});
 const projectDialog=$('#project-dialog');
@@ -90,3 +83,9 @@ projectDialog.addEventListener('keydown',e=>{if(!projectDialog.open||projects[ga
 projectDialog.addEventListener('close',()=>{if(projectDialog.open)return;slideRevision++;$$('video',projectDialog).forEach(v=>v.pause());const mode=caseNavigation.closed();if(mode!=='route'){const card=$(`[data-project="${galleryProject}"]`),target=card&&!card.hidden?card:$('[data-filter][aria-pressed="true"]');target?.focus({preventScroll:mode!=='fallback'})}});
 caseNavigation.sync();
 import('./bear-video.js?v=20261022-motion');
+
+// Optional review storage or UI must never interrupt portfolio, brief or bear setup.
+import('./review-panel.js?v=20261022-review').then(({initializeReviewPanel})=>initializeReviewPanel({document,download})).catch(()=>{
+ const status=$('#review-save-status');if(status){status.textContent='Панель заметок не загрузилась. Обновите страницу, чтобы попробовать снова.';status.dataset.state='error'}
+ $$('#review-dialog textarea, #review-dialog select, #export-review').forEach(control=>control.disabled=true);
+});

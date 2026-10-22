@@ -6,9 +6,9 @@
   <meta name="description" content="ТРИФОТИ — творческая студия Владимира Ганьшина и Фёдора Паршина. Скульптуры, арт-объекты, предметный дизайн и 3D-производство.">
   <meta name="theme-color" content="#f5f3ee"><meta name="robots" content="noindex,nofollow">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="style.css?v=20261022-case-links">
+  <link rel="stylesheet" href="style.css?v=20261022-review">
   <script type="importmap">{"imports":{"three":"./assets/vendor/three.module.js"}}</script>
-  <script type="module" src="app.js?v=20261022-case-links"></script>
+  <script type="module" src="app.js?v=20261022-review"></script>
 </head>
 <body>
 <a class="skip" href="#main">Перейти к содержимому</a>
@@ -78,7 +78,7 @@
 </main>
 <footer><a href="#home" class="footer-wordmark" aria-label="ТРИФОТИ">ТРИ<span>Ф</span>ОТИ</a><div><span>Пределов в творчестве не существует.</span><span>© ТРИФОТИ, 2026</span></div><a href="#home">Наверх ↑</a></footer>
 <button class="review-launch" id="review-launch"><span class="red-dot"></span> Концепт 01 <span class="review-launch-label">/ Структура и заметки</span> ↗</button>
-<dialog id="review-dialog" class="review-dialog" aria-labelledby="review-title"><div class="dialog-heading"><div><span class="eyebrow">Рабочее обсуждение</span><h2 id="review-title">Соберём ваш сайт.</h2></div><button class="close-button" data-close="review-dialog" aria-label="Закрыть">×</button></div><p>Отметьте подходящие разделы и запишите правки. Заметки сохраняются в этом браузере.</p><div id="review-sections"></div><label class="review-notes-label">Внешний вид и общие пожелания<textarea id="review-notes" rows="4" placeholder="Что нравится? Что изменить? Какие проекты добавить?"></textarea></label><button class="button button-dark" id="export-review">Скачать решения <span>↓</span></button><div class="font-note">Типографика: Oswald — высокий узкий слоган; Unbounded — заголовки разделов; Manrope — текст и навигация. Шрифты загружаются вместе с сайтом.</div><p id="review-status" role="status"></p></dialog>
+<dialog id="review-dialog" class="review-dialog" aria-labelledby="review-title"><div class="dialog-heading"><div><span class="eyebrow">Рабочее обсуждение</span><h2 id="review-title">Соберём ваш сайт.</h2></div><button class="close-button" data-close="review-dialog" aria-label="Закрыть">×</button></div><p>Отметьте подходящие разделы и запишите правки. Заметки не отправляются студии.</p><p id="review-save-status" class="form-note" role="status" aria-atomic="true">Панель заметок загружается…</p><div id="review-sections"></div><label class="review-notes-label">Внешний вид и общие пожелания<textarea id="review-notes" disabled rows="4" placeholder="Что нравится? Что изменить? Какие проекты добавить?"></textarea></label><button class="button button-dark" id="export-review" disabled>Скачать решения <span>↓</span></button><div class="font-note">Типографика: Oswald — высокий узкий слоган; Unbounded — заголовки разделов; Manrope — текст и навигация. Шрифты загружаются вместе с сайтом.</div><p id="review-status" role="status"></p></dialog>
 <dialog id="project-dialog" class="project-dialog" aria-labelledby="case-title" aria-describedby="case-description"><button class="close-button" data-close="project-dialog" aria-label="Закрыть проект">×</button><div id="project-content"></div></dialog>
 <div class="toast" role="status" id="toast"></div>
 </body></html>
