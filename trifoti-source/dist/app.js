@@ -1,7 +1,7 @@
 import {watchGalleryMedia} from './media-recovery.js?v=20261022-retry';
 import {createProjectNavigation,projectLink,copyProjectLink} from './project-navigation.js?v=20261022-case-links';
 import {thumbnailSource} from './media-utils.js?v=20261022-previews';
-import {readBriefDraft,saveBriefDraft,briefErrors,formatBrief,requestBriefDownload} from './brief-utils.js?v=20261022-identity';
+import {BRIEF_KEY,createBriefDraftSession,briefErrors,formatBrief,requestBriefDownload} from './brief-utils.js?v=20261022-draft-conflict';
 import {keepDialogFocus,galleryArrow} from './dialog-controls.js?v=20261022-gallery';
 import {projects} from './project-data.js?v=20261022-rto';
 const $=(s,root=document)=>root.querySelector(s);
@@ -38,11 +38,12 @@ $$('[data-show-projects="all"]').forEach(link=>link.addEventListener('click',()=
 $('#empty-category-brief').addEventListener('click',()=>{const direction=$('[data-filter][aria-pressed="true"]').dataset.direction;if(direction){$('#brief-direction').value=direction;saveDraft()}});
 $$('[data-service]').forEach(a=>a.addEventListener('click',()=>{$('#brief-direction').value=a.dataset.service;saveDraft()}));
 
-const form=$('#brief-form'),recovered=readBriefDraft();
-const draftMessages={empty:'Черновик сохраняется в этом браузере.',restored:'Черновик восстановлен из этого браузера.',saved:'Черновик сохранён в этом браузере.',unavailable:'Автосохранение недоступно. Не закрывайте страницу, пока не скачаете или не скопируете бриф.',invalid:'Сохранённый черновик не удалось прочитать. Заполните бриф заново.',partial:'Часть черновика восстановлена. Проверьте поля перед скачиванием.',failed:'Черновик не удалось сохранить в браузере. Не закрывайте страницу: скачайте или скопируйте бриф.'};
-function draftStatus(state){const status=$('#brief-draft-status');if(status.textContent!==draftMessages[state])status.textContent=draftMessages[state];status.dataset.state=['unavailable','invalid','partial','failed'].includes(state)?'error':'ready'}
+const form=$('#brief-form'),draftSession=createBriefDraftSession(),recovered=draftSession.recovered;
+const draftMessages={empty:'Черновик сохраняется в этом браузере.',restored:'Черновик восстановлен из этого браузера.',saved:'Черновик сохранён в этом браузере.',unavailable:'Автосохранение недоступно. Не закрывайте страницу, пока не скачаете или не скопируете бриф.',invalid:'Сохранённый черновик не удалось прочитать. Заполните бриф заново.',partial:'Часть черновика восстановлена. Проверьте поля перед скачиванием.',failed:'Черновик не удалось сохранить в браузере. Не закрывайте страницу: скачайте или скопируйте бриф.',conflict:'Черновик изменён в другой вкладке. Автосохранение здесь остановлено, чтобы не перезаписать другую версию. Ваши текущие поля не изменены: скачайте бриф или скопируйте текст ниже до обновления страницы. После обновления откроется сохранённая версия.'};
+function draftStatus(state){const status=$('#brief-draft-status');if(status.textContent!==draftMessages[state])status.textContent=draftMessages[state];status.dataset.state=['unavailable','invalid','partial','failed','conflict'].includes(state)?'error':'ready';if(state==='conflict'){$('#brief-text-fallback').hidden=false;$('#brief-text').value=formatBrief(Object.fromEntries(new FormData(form)))}}
 for(const [key,value] of Object.entries(recovered.draft)){const field=form.elements.namedItem(key);if(!field)continue;if(field.tagName==='SELECT'&&![...field.options].some(option=>option.value===value)){if(key==='direction'&&value==='3D-модель и производство')field.add(new Option(value+' (из прежнего черновика)',value));else{recovered.state='partial';continue}}field.value=value}
-function saveDraft(){const values=Object.fromEntries(new FormData(form));draftStatus(saveBriefDraft(values)?'saved':'failed');$('#brief-status').textContent='';if(!$('#brief-text-fallback').hidden)$('#brief-text').value=formatBrief(values)}
+function saveDraft(){const values=Object.fromEntries(new FormData(form));draftStatus(draftSession.save(values));$('#brief-status').textContent='';if(!$('#brief-text-fallback').hidden)$('#brief-text').value=formatBrief(values)}
+addEventListener('storage',event=>{if(event.key!==BRIEF_KEY&&event.key!==null)return;const state=draftSession.check();if(state)draftStatus(state)});
 function updateReference(){const title=form.elements.namedItem('reference').value;$('#brief-reference').hidden=!title;$('#brief-reference-title').textContent=title}
 function selectReference(title){form.elements.namedItem('reference').value=title;updateReference();saveDraft()}
 updateReference();

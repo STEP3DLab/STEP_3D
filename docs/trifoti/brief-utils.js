@@ -8,9 +8,7 @@ const previousDirections = new Map([
   ['Бренды в объёме', 'Сувениры, призы, награды']
 ]);
 
-export function readBriefDraft(getStorage = () => localStorage) {
-  let raw;
-  try { raw = getStorage().getItem(BRIEF_KEY); } catch { return {draft: {}, state: 'unavailable'}; }
+function decodeBriefDraft(raw) {
   if (raw === null) return {draft: {}, state: 'empty'};
   let value;
   try { value = JSON.parse(raw); } catch { return {draft: {}, state: 'invalid'}; }
@@ -21,8 +19,40 @@ export function readBriefDraft(getStorage = () => localStorage) {
   return {draft, state: partial ? 'partial' : 'restored'};
 }
 
+export function readBriefDraft(getStorage = () => localStorage) {
+  try { return decodeBriefDraft(getStorage().getItem(BRIEF_KEY)); }
+  catch { return {draft: {}, state: 'unavailable'}; }
+}
+
 export function saveBriefDraft(values, getStorage = () => localStorage) {
   try { getStorage().setItem(BRIEF_KEY, JSON.stringify(onlyFields(values))); return true; } catch { return false; }
+}
+
+// Keep the exact recovered snapshot in memory, never in another storage key.
+// A conflict is latched until reload: neither version is silently replaced.
+export function createBriefDraftSession(getStorage = () => localStorage) {
+  let expected, conflicted = false;
+  const recovered = readBriefDraft(() => ({getItem(key) {
+    expected = getStorage().getItem(key); return expected;
+  }}));
+  function check() {
+    if (conflicted) return 'conflict';
+    if (expected === undefined) return 'unavailable';
+    let current;
+    try { current = getStorage().getItem(BRIEF_KEY); } catch { return 'unavailable'; }
+    if (current !== expected) { conflicted = true; return 'conflict'; }
+    return null;
+  }
+  return {
+    recovered,
+    check,
+    save(values) {
+      const state = check(); if (state) return state;
+      if (!saveBriefDraft(values, getStorage)) return 'failed';
+      expected = JSON.stringify(onlyFields(values));
+      return 'saved';
+    }
+  };
 }
 
 export function briefErrors(values) {
