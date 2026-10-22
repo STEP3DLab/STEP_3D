@@ -4,8 +4,10 @@ const image=document.getElementById('bear-gif');
 const toggle=document.getElementById('rotate-toggle');
 const keyboardHelp=document.getElementById('bear-keyboard-help');
 const motionPreference=matchMedia('(prefers-reduced-motion: reduce)');
+const sources=[...video.querySelectorAll('source')];
+const failedSources=new Set();
 let wantsPlayback=!motionPreference.matches;
-let gifMode=false,dragging=false,lastX=0,resumeAfterDrag=false,playRequest=0;
+let gifMode=false,dragging=false,lastX=0,resumeAfterDrag=false,playRequest=0,exhaustionCheck=null;
 
 function update(){
  toggle.textContent=wantsPlayback?'Ⅱ':'▷';
@@ -30,14 +32,34 @@ function play(){wantsPlayback=true;syncPlayback()}
 function pause(){wantsPlayback=false;syncPlayback()}
 function togglePlayback(){wantsPlayback?pause():play()}
 
-video.muted=true;
-video.addEventListener('error',()=>{
+function useFallback(){
  if(gifMode)return;
+ if(exhaustionCheck!==null){clearTimeout(exhaustionCheck);exhaustionCheck=null}
  gifMode=true;video.hidden=true;image.hidden=false;stage.dataset.renderer='gif';
  document.querySelector('.drag-hint').textContent='Скульптура · 360°';
  keyboardHelp.textContent='Пробел или Enter — включить или приостановить анимацию.';
  stage.setAttribute('aria-keyshortcuts','Space Enter');
  syncPlayback();
+}
+function checkExhaustionSoon(){
+ if(gifMode||exhaustionCheck!==null)return;
+ // NETWORK_NO_SOURCE can be transient while the browser selects a source.
+ // Recheck once in the next task, never poll or restart a network request.
+ exhaustionCheck=setTimeout(()=>{
+  exhaustionCheck=null;
+  if(video.networkState===3&&video.readyState===0)useFallback();
+ },0);
+}
+video.muted=true;
+video.addEventListener('error',useFallback);
+video.addEventListener('loadstart',()=>failedSources.clear());
+for(const source of sources)source.addEventListener('error',()=>{
+ if(gifMode)return;
+ failedSources.add(source);
+ // Child source errors do not bubble to video. One failed format must not
+ // hide another usable format; stale source events cannot replace ready media.
+ if(video.readyState===0&&sources.every(item=>failedSources.has(item)))useFallback();
+ else checkExhaustionSoon();
 });
 video.addEventListener('loadeddata',()=>{if(!gifMode)stage.dataset.renderer='video'});
 toggle.addEventListener('click',togglePlayback);
@@ -80,4 +102,9 @@ motionPreference.addEventListener('change',e=>{
  if(e.matches){resumeAfterDrag=false;pause()}
 });
 document.addEventListener('visibilitychange',syncPlayback);
+// The dynamic module may arrive after the browser has already exhausted both
+// sources. Keep empty/loading/ready media, and an explicit user abort, intact.
+if(video.readyState>=2)stage.dataset.renderer='video';
+if([2,3,4].includes(video.error?.code))useFallback();
+else if(video.networkState===3&&video.readyState===0)checkExhaustionSoon();
 syncPlayback();

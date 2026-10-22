@@ -104,7 +104,7 @@ addEventListener('popstate',caseNavigation.sync);addEventListener('hashchange',c
 projectDialog.addEventListener('keydown',e=>{if(!projectDialog.open||projects[galleryProject]?.media.length<2)return;const step=galleryArrow(e);if(step){e.preventDefault();showSlide(galleryIndex+step)}});
 projectDialog.addEventListener('close',()=>{if(projectDialog.open)return;slideRevision++;$$('video',projectDialog).forEach(v=>v.pause());const mode=caseNavigation.closed();if(mode!=='route'){const card=$(`[data-project="${galleryProject}"]`),openerMatches=projectOpener?.dataset.project===galleryProject||projectOpener?.getAttribute('href')==='#project/'+galleryProject,target=projectOpener?.isConnected&&!projectOpener.hidden&&openerMatches?projectOpener:card&&!card.hidden?card:$('[data-filter][aria-pressed="true"]');target?.focus({preventScroll:mode!=='fallback'})}});
 caseNavigation.sync();
-import('./bear-video.js?v=20261022-motion');
+import('./bear-video.js?v=20261022-bear-fallback');
 
 // Optional review storage or UI must never interrupt portfolio, brief or bear setup.
 import('./review-panel.js?v=20261022-identity').then(({initializeReviewPanel})=>initializeReviewPanel({document,download})).catch(()=>{
