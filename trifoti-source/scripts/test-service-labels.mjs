@@ -13,7 +13,7 @@ test('The four requested directions appear in their exact order',()=>{
  assert.deepEqual(links.map(m=>m[2]),expected);
 });
 test('Existing real cases use fitting directions without inventing architecture cases',()=>{
- assert.deepEqual(Object.keys(projects).sort(),['gesture','mascot','pink','restoration','stdAwards']);
+ assert.deepEqual(Object.keys(projects).sort(),['gesture','mascot','pink','restoration','rto-traveling-cup','stdAwards']);
  assert.equal(projects.stdAwards.direction,'Сувениры, призы, награды');
  for(const key of ['gesture','mascot','pink','restoration'])assert.equal(projects[key].direction,'Скульптура');
 });
@@ -33,7 +33,7 @@ test('Footer has four useful groups and only real section or case destinations',
   if(href.startsWith('#project/'))assert(Object.hasOwn(projects,href.slice(9)));
   else assert(html.includes(`id="${href.slice(1)}"`));
  }
- assert.equal(hrefs.filter(x=>x.startsWith('#project/')).length,5);
+ assert.equal(hrefs.filter(x=>x.startsWith('#project/')).length,6);
  assert.equal(hrefs.filter(x=>x.startsWith('#service-')).length,4);
  assert(footer.includes('aria-label="Разделы сайта"'));assert(!hrefs.includes('#'));
 });
@@ -74,7 +74,7 @@ test('Portfolio filters use the current directions and honest case counts',()=>{
  const filters=[...html.matchAll(/<button[^>]+data-filter="([^"]+)"[^>]*>([^<]+)<\/button>/g)];
  assert.deepEqual(filters.map(m=>m[2]),['Все','Дизайн и архитектура','Скульптура','Бытовой дизайн','Сувениры, призы, награды']);
  const cards=[...html.matchAll(/data-category="([^"]+)" data-project="([^"]+)"/g)];
- assert.deepEqual(filters.map(([,key])=>cards.filter(([,category])=>key==='all'||category.split(' ').includes(key)).length),[5,0,4,0,1]);
+ assert.deepEqual(filters.map(([,key])=>cards.filter(([,category])=>key==='all'||category.split(' ').includes(key)).length),[6,0,4,0,2]);
  assert(html.includes('id="project-empty" hidden'));assert(html.includes('Проекты этого направления пока не добавлены.'));
  assert(html.includes('id="empty-category-brief" href="#contact"'));
  const app=readFileSync(new URL('../dist/app.js',import.meta.url),'utf8');

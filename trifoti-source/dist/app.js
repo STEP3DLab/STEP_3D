@@ -3,7 +3,7 @@ import {createProjectNavigation,projectLink,copyProjectLink} from './project-nav
 import {thumbnailSource} from './media-utils.js?v=20261022-previews';
 import {readBriefDraft,saveBriefDraft,briefErrors,formatBrief,requestBriefDownload} from './brief-utils.js?v=20261022-identity';
 import {keepDialogFocus,galleryArrow} from './dialog-controls.js?v=20261022-gallery';
-import {projects} from './project-data.js?v=20261022-identity';
+import {projects} from './project-data.js?v=20261022-rto';
 const $=(s,root=document)=>root.querySelector(s);
 const $$=(s,root=document)=>[...root.querySelectorAll(s)];
 const menu=$('.menu-button'),nav=$('#navigation'),header=$('.header');

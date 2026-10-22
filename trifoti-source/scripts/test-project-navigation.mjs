@@ -24,7 +24,7 @@ function browser(start='https://example.test/STEP_3D/trifoti/#projects') {
   };
 }
 
-test('All five case IDs have exact, allowlisted routes; anchors and malformed IDs are ignored',()=>{
+test('All six case IDs have exact, allowlisted routes; anchors and malformed IDs are ignored',()=>{
   for(const key of keys) assert.equal(projectKey('#project/'+key,keys),key);
   for(const hash of ['', '#projects','#brief','#contact','#studio','#project/unknown','#project/__proto__','#project/constructor','#project/%','#project/mascot/extra']) assert.equal(projectKey(hash,keys),null);
 });

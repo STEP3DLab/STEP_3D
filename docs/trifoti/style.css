@@ -95,8 +95,9 @@ input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px soli
  .brief-row{grid-template-columns:1fr;gap:0}
 }
 
-/* One verified awards case, with visible authorship and source links. */
-.awards-card{grid-column:span 2}
+/* Verified awards cases, with visible authorship and source links. */
+.awards-card{grid-column:auto}
+.rto-card img{object-fit:contain}
 .case-provenance{margin-top:20px;padding-top:16px;border-top:1px solid var(--line);font-size:11px;line-height:1.8;color:var(--muted)}
 .case-provenance p{margin:0 0 6px}
 .case-provenance a{display:block;min-height:44px;padding:12px 0;text-decoration:underline;text-underline-offset:3px;color:var(--ink)}

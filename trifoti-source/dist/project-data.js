@@ -31,5 +31,10 @@ export const projects={
  ]},
  gesture:{direction:'Скульптура',title:'Пластика жеста',type:'Скульптурная композиция / Арт-объект',description:'Серебристая скульптурная композиция с переплетёнными руками. В движении хорошо видны её объём, линии и фактура поверхности.',tags:['Арт-объект','Скульптура','Фактура'],media:[
   {src:'assets/projects/gesture/gesture-turntable.mp4',poster:'assets/projects/gesture/gesture-poster.webp',type:'video',caption:'Круговой обзор скульптуры из мастерской.'}
+ ]},
+ 'rto-traveling-cup':{direction:'Сувениры, призы, награды',title:'Переходящий кубок Спартакиады РТО',type:'Из портфолио STEP_3D / Награды · 2026',description:'Переходящий кубок для Спартакиады Российского театрального общества. Step3D разработал и изготовил награду: от 3D-моделирования и печати до сборки и декоративной отделки. В 2026 году первым обладателем кубка стал Театр «Ленком Марка Захарова».',attribution:'Разработка и производство — Step3D. Из портфолио STEP_3D.',sources:[{label:'О кубке · портфолио Step3D',url:'https://step3dlab.github.io/Technopark_project/industrial-design-lab/cases/rto-traveling-cup/'},{label:'Итоги Спартакиады · СТД РФ',url:'https://stdrf.ru/novosti/itogi-pervoy-spartakiady-rto/'}],tags:['Переходящий кубок','3D-печать','Декоративная отделка'],media:[
+  {src:'assets/projects/rto-traveling-cup/trophy.webp',caption:'Переходящий кубок Спартакиады РТО. Готовое изделие с табличкой первого победителя, 2026 год.'},
+  {src:'assets/projects/rto-traveling-cup/ceremony.webp',caption:'Кубок у команды Театра «Ленком Марка Захарова», победителя общекомандного зачёта Спартакиады РТО — 2026.'},
+  {src:'assets/projects/rto-traveling-cup/winners.webp',caption:'Участники и победители Спартакиады Российского театрального общества, 2026 год.'}
  ]}
 };

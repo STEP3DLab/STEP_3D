@@ -28,7 +28,7 @@ for(const [key,project] of Object.entries(projects)){
   else photos++;
  }
 }
-assert.equal(Object.keys(projects).length,5);assert.equal(photos,20);assert.equal(videos,2);
+assert.equal(Object.keys(projects).length,6);assert.equal(photos,23);assert.equal(videos,2);
 assert(projects.stdAwards.attribution.includes('Технопарка РГСУ'));
 assert.equal(projects.stdAwards.media.length,3);
 assert.equal(projects.stdAwards.sources.length,2);
@@ -44,5 +44,5 @@ assert(brief.includes('id="brief-draft-status" role="status"'));
 assert(brief.includes('id="brief-text-fallback" hidden'));
 const optimized=statSync(resolve(dist,'assets/logo.webp')).size,original=statSync(resolve(dist,'assets/logo.png')).size;
 assert(optimized<original*.15,'Header logo should be at least 85% smaller');
-console.log(`Passed: unique IDs, local links/assets, 5 cases, ${photos} photos, ${videos} videos, dialog labels, truthful local brief.`);
+console.log(`Passed: unique IDs, local links/assets, 6 cases, ${photos} photos, ${videos} videos, dialog labels, truthful local brief.`);
 console.log(`Header logo: ${original} → ${optimized} bytes (${Math.round((1-optimized/original)*100)}% smaller). Original retained.`);
