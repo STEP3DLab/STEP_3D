@@ -1,0 +1,121 @@
+{
+  "fonts": [
+    {
+      "family": "unbounded",
+      "glyphs": 1419,
+      "unicode_mappings": 1138,
+      "axes": [
+        [
+          "wght",
+          200.0,
+          400.0,
+          900.0
+        ]
+      ],
+      "identical_tables": [
+        "hhea",
+        "maxp",
+        "OS/2",
+        "hmtx",
+        "cmap",
+        "prep",
+        "name",
+        "post",
+        "gasp",
+        "GDEF",
+        "GPOS",
+        "GSUB",
+        "HVAR",
+        "MVAR",
+        "STAT",
+        "avar",
+        "fvar",
+        "gvar"
+      ],
+      "ttf_bytes": 778272,
+      "gzip_ttf_bytes": 385716,
+      "woff2_bytes": 260104,
+      "ttf_sha256": "323b511be380c8d474ef030686b71aedde501f8d9cd46da558b7c40454372c3f",
+      "woff2_sha256": "e5382d3550933388d502fca14be603db377b09a1429c60010b64fc24d72fbfcf"
+    },
+    {
+      "family": "oswald",
+      "glyphs": 883,
+      "unicode_mappings": 850,
+      "axes": [
+        [
+          "wght",
+          200.0,
+          400.0,
+          700.0
+        ]
+      ],
+      "identical_tables": [
+        "hhea",
+        "maxp",
+        "OS/2",
+        "hmtx",
+        "cmap",
+        "prep",
+        "name",
+        "post",
+        "gasp",
+        "GDEF",
+        "GPOS",
+        "GSUB",
+        "HVAR",
+        "STAT",
+        "avar",
+        "fvar",
+        "gvar"
+      ],
+      "ttf_bytes": 172088,
+      "gzip_ttf_bytes": 90763,
+      "woff2_bytes": 72104,
+      "ttf_sha256": "5b38c246e255a12f5712d640d56bcced0472466fc68983d2d0410ec0457c2817",
+      "woff2_sha256": "6bbc262410618b85e3d3154309cad8346a9e3c3085a61d04b3710a4cf2831f4d"
+    },
+    {
+      "family": "manrope",
+      "glyphs": 742,
+      "unicode_mappings": 678,
+      "axes": [
+        [
+          "wght",
+          200.0,
+          200.0,
+          800.0
+        ]
+      ],
+      "identical_tables": [
+        "hhea",
+        "maxp",
+        "OS/2",
+        "hmtx",
+        "cmap",
+        "prep",
+        "name",
+        "post",
+        "gasp",
+        "GDEF",
+        "GPOS",
+        "GSUB",
+        "HVAR",
+        "STAT",
+        "fvar",
+        "gvar"
+      ],
+      "ttf_bytes": 164700,
+      "gzip_ttf_bytes": 67825,
+      "woff2_bytes": 53892,
+      "ttf_sha256": "3ae11c49db0455a3cc33e37d380f20fdb8c7f8b41dc07625c177e3d87a9d6ae6",
+      "woff2_sha256": "30b83738add8c9edd9e3450b98036a9a8fb5668d0cbd4eb0ce5fe6761197f21f"
+    }
+  ],
+  "totals": {
+    "glyphs": 3044,
+    "ttf_bytes": 1115060,
+    "gzip_ttf_bytes": 544304,
+    "woff2_bytes": 386100
+  }
+}
