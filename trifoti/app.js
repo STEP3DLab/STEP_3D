@@ -1,9 +1,9 @@
 import {watchGalleryMedia} from './media-recovery.js?v=20261022-retry';
 import {createProjectNavigation,projectLink,copyProjectLink} from './project-navigation.js?v=20261022-case-links';
 import {thumbnailSource} from './media-utils.js?v=20261022-previews';
-import {readBriefDraft,saveBriefDraft,briefErrors,formatBrief,requestBriefDownload} from './brief-utils.js?v=20261022-brief';
+import {readBriefDraft,saveBriefDraft,briefErrors,formatBrief,requestBriefDownload} from './brief-utils.js?v=20261022-identity';
 import {keepDialogFocus,galleryArrow} from './dialog-controls.js?v=20261022-gallery';
-import {projects} from './project-data.js?v=20261021-awards';
+import {projects} from './project-data.js?v=20261022-identity';
 const $=(s,root=document)=>root.querySelector(s);
 const $$=(s,root=document)=>[...root.querySelectorAll(s)];
 const menu=$('.menu-button'),nav=$('#navigation');
@@ -18,13 +18,23 @@ let toastTimer;
 function toast(text){$('#toast').textContent=text;$('#toast').classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#toast').classList.remove('visible'),3200)}
 function download(text,name){const blob=new Blob(['\ufeff'+text],{type:'text/plain;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)}
 
-$$('[data-filter]').forEach(button=>button.addEventListener('click',()=>{const filter=button.dataset.filter;$$('[data-filter]').forEach(b=>{b.classList.toggle('active',b===button);b.setAttribute('aria-pressed',String(b===button))});$$('[data-category]').forEach(card=>card.hidden=filter!=='all'&&!card.dataset.category.split(' ').includes(filter));$('#filter-status').textContent=`Показано проектов: ${$$('[data-category]').filter(card=>!card.hidden).length}`}));
+function selectProjectFilter(button){
+ const filter=button.dataset.filter;
+ $$('[data-filter]').forEach(b=>{b.classList.toggle('active',b===button);b.setAttribute('aria-pressed',String(b===button))});
+ $$('[data-category]').forEach(card=>card.hidden=filter!=='all'&&!card.dataset.category.split(' ').includes(filter));
+ const count=$$('[data-category]').filter(card=>!card.hidden).length;
+ $('#filter-status').textContent=`Показано проектов: ${count}`;$('#project-empty').hidden=count>0;
+ $('#empty-category-brief').setAttribute('aria-label',`Обсудить идею ↗ (${button.dataset.direction||'Все направления'})`);
+}
+$$('[data-filter]').forEach(button=>button.addEventListener('click',()=>selectProjectFilter(button)));
+$$('[data-show-projects="all"]').forEach(link=>link.addEventListener('click',()=>selectProjectFilter($('[data-filter="all"]'))));
+$('#empty-category-brief').addEventListener('click',()=>{const direction=$('[data-filter][aria-pressed="true"]').dataset.direction;if(direction){$('#brief-direction').value=direction;saveDraft()}});
 $$('[data-service]').forEach(a=>a.addEventListener('click',()=>{$('#brief-direction').value=a.dataset.service;saveDraft()}));
 
 const form=$('#brief-form'),recovered=readBriefDraft();
 const draftMessages={empty:'Черновик сохраняется в этом браузере.',restored:'Черновик восстановлен из этого браузера.',saved:'Черновик сохранён в этом браузере.',unavailable:'Автосохранение недоступно. Не закрывайте страницу, пока не скачаете или не скопируете бриф.',invalid:'Сохранённый черновик не удалось прочитать. Заполните бриф заново.',partial:'Часть черновика восстановлена. Проверьте поля перед скачиванием.',failed:'Черновик не удалось сохранить в браузере. Не закрывайте страницу: скачайте или скопируйте бриф.'};
 function draftStatus(state){const status=$('#brief-draft-status');if(status.textContent!==draftMessages[state])status.textContent=draftMessages[state];status.dataset.state=['unavailable','invalid','partial','failed'].includes(state)?'error':'ready'}
-for(const [key,value] of Object.entries(recovered.draft)){const field=form.elements.namedItem(key);if(!field)continue;if(field.tagName==='SELECT'&&![...field.options].some(option=>option.value===value)){recovered.state='partial';continue}field.value=value}
+for(const [key,value] of Object.entries(recovered.draft)){const field=form.elements.namedItem(key);if(!field)continue;if(field.tagName==='SELECT'&&![...field.options].some(option=>option.value===value)){if(key==='direction'&&value==='3D-модель и производство')field.add(new Option(value+' (из прежнего черновика)',value));else{recovered.state='partial';continue}}field.value=value}
 function saveDraft(){const values=Object.fromEntries(new FormData(form));draftStatus(saveBriefDraft(values)?'saved':'failed');$('#brief-status').textContent='';if(!$('#brief-text-fallback').hidden)$('#brief-text').value=formatBrief(values)}
 function updateReference(){const title=form.elements.namedItem('reference').value;$('#brief-reference').hidden=!title;$('#brief-reference-title').textContent=title}
 function selectReference(title){form.elements.namedItem('reference').value=title;updateReference();saveDraft()}
@@ -50,7 +60,7 @@ $('#review-launch')?.addEventListener('click',()=>$('#review-dialog')?.showModal
 $$('[data-close]').forEach(b=>b.addEventListener('click',()=>document.getElementById(b.dataset.close).close()));
 $$('dialog').forEach(dialog=>{keepDialogFocus(dialog);let backdropPressed=false;dialog.addEventListener('pointerdown',e=>{const r=dialog.getBoundingClientRect();backdropPressed=e.target===dialog&&(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)});dialog.addEventListener('click',e=>{if(backdropPressed&&e.target===dialog)dialog.close();backdropPressed=false})});
 const projectDialog=$('#project-dialog');
-let galleryProject=null,galleryIndex=0,slideRevision=0;
+let galleryProject=null,galleryIndex=0,slideRevision=0,projectOpener=null;
 function showSlide(index,retrying=false){
  const project=projects[galleryProject];if(!project?.media.length)return;
  galleryIndex=(index+project.media.length)%project.media.length;const item=project.media[galleryIndex];const viewer=$('#gallery-viewer');
@@ -77,15 +87,19 @@ function openProject(key){
  showSlide(0);if(!projectDialog.open)projectDialog.showModal();projectDialog.scrollTop=0;
 }
 const caseNavigation=createProjectNavigation({keys:Object.keys(projects),location,history,onOpen:openProject,onClose:()=>{if(projectDialog.open)projectDialog.close()}});
-$$('[data-project]').forEach(card=>card.addEventListener('click',()=>caseNavigation.open(card.dataset.project)));
+$$('[data-project]').forEach(card=>card.addEventListener('click',()=>{projectOpener=card;caseNavigation.open(card.dataset.project)}));
+$$('a[data-case-link]').forEach(link=>link.addEventListener('click',event=>{
+ if(event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;
+ event.preventDefault();projectOpener=link;caseNavigation.open(link.getAttribute('href').slice('#project/'.length));
+}));
 addEventListener('popstate',caseNavigation.sync);addEventListener('hashchange',caseNavigation.sync);
 projectDialog.addEventListener('keydown',e=>{if(!projectDialog.open||projects[galleryProject]?.media.length<2)return;const step=galleryArrow(e);if(step){e.preventDefault();showSlide(galleryIndex+step)}});
-projectDialog.addEventListener('close',()=>{if(projectDialog.open)return;slideRevision++;$$('video',projectDialog).forEach(v=>v.pause());const mode=caseNavigation.closed();if(mode!=='route'){const card=$(`[data-project="${galleryProject}"]`),target=card&&!card.hidden?card:$('[data-filter][aria-pressed="true"]');target?.focus({preventScroll:mode!=='fallback'})}});
+projectDialog.addEventListener('close',()=>{if(projectDialog.open)return;slideRevision++;$$('video',projectDialog).forEach(v=>v.pause());const mode=caseNavigation.closed();if(mode!=='route'){const card=$(`[data-project="${galleryProject}"]`),openerMatches=projectOpener?.dataset.project===galleryProject||projectOpener?.getAttribute('href')==='#project/'+galleryProject,target=projectOpener?.isConnected&&!projectOpener.hidden&&openerMatches?projectOpener:card&&!card.hidden?card:$('[data-filter][aria-pressed="true"]');target?.focus({preventScroll:mode!=='fallback'})}});
 caseNavigation.sync();
 import('./bear-video.js?v=20261022-motion');
 
 // Optional review storage or UI must never interrupt portfolio, brief or bear setup.
-import('./review-panel.js?v=20261022-review').then(({initializeReviewPanel})=>initializeReviewPanel({document,download})).catch(()=>{
+import('./review-panel.js?v=20261022-identity').then(({initializeReviewPanel})=>initializeReviewPanel({document,download})).catch(()=>{
  const status=$('#review-save-status');if(status){status.textContent='Панель заметок не загрузилась. Обновите страницу, чтобы попробовать снова.';status.dataset.state='error'}
  $$('#review-dialog textarea, #review-dialog select, #export-review').forEach(control=>control.disabled=true);
 });

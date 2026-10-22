@@ -2,6 +2,11 @@
 export const BRIEF_KEY = 'trifoti-brief-v1';
 const fields = ['reference', 'name', 'direction', 'idea', 'budget', 'deadline'];
 const onlyFields = values => Object.fromEntries(fields.filter(key => typeof values[key] === 'string').map(key => [key, values[key]]));
+const previousDirections = new Map([
+  ['Скульптуры и арт-объекты', 'Скульптура'],
+  ['Предметы и интерьер', 'Бытовой дизайн'],
+  ['Бренды в объёме', 'Сувениры, призы, награды']
+]);
 
 export function readBriefDraft(getStorage = () => localStorage) {
   let raw;
@@ -11,7 +16,9 @@ export function readBriefDraft(getStorage = () => localStorage) {
   try { value = JSON.parse(raw); } catch { return {draft: {}, state: 'invalid'}; }
   if (!value || typeof value !== 'object' || Array.isArray(value)) return {draft: {}, state: 'invalid'};
   const partial = fields.some(key => Object.hasOwn(value, key) && typeof value[key] !== 'string');
-  return {draft: onlyFields(value), state: partial ? 'partial' : 'restored'};
+  const draft = onlyFields(value);
+  if (previousDirections.has(draft.direction)) draft.direction = previousDirections.get(draft.direction);
+  return {draft, state: partial ? 'partial' : 'restored'};
 }
 
 export function saveBriefDraft(values, getStorage = () => localStorage) {
@@ -26,7 +33,7 @@ export function briefErrors(values) {
 }
 
 export function formatBrief(d) {
-  return `ТРИФОТИ — бриф проекта\n\nИмя: ${d.name || ''}\nНаправление: ${d.direction || ''}${d.reference ? '\nОтправная точка: ' + d.reference : ''}\n\nИдея:\n${d.idea || ''}\n\nБюджет: ${d.budget || 'Обсудим'}\nСроки: ${d.deadline || 'Обсудим'}\n\nЭтот бриф подготовлен на сайте ТРИФОТИ. Передайте его студии удобным способом.`;
+  return `ТРИФОТИ — бриф проекта\n\nИмя: ${d.name || ''}\nНаправление: ${d.direction || ''}${d.reference ? '\nОтправная точка: ' + d.reference : ''}\n\nИдея:\n${d.idea || ''}\n\nБюджет: ${d.budget || 'Обсудим'}\nСроки: ${d.deadline || 'Обсудим'}\n\nЭтот бриф подготовлен на сайте ТРИФОТИ. Передайте его объединению удобным способом.`;
 }
 
 export function requestBriefDownload(text, env = globalThis) {

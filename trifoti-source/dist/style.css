@@ -124,3 +124,31 @@ input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px soli
 
 /* Short viewports keep the review entry point out of the form hit area. */
 @media(max-height:500px){.review-launch{position:static;transform:none;width:max-content;max-width:calc(100% - 32px);margin:18px auto}}
+
+/* A compact section directory, with real destinations on every screen size. */
+footer.site-footer{display:block;margin:0;padding:48px 4.5% 88px;background:#ebe9e4;border-top:1px solid var(--line)}
+.site-footer .footer-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:34px}
+.site-footer .footer-column h3{font-family:Manrope,sans-serif;font-size:13px;line-height:1.5;font-weight:750;margin:0 0 12px;color:var(--ink)}
+.site-footer ul{list-style:none;margin:0;padding:0}
+.site-footer .footer-column a{display:inline-block;max-width:100%;padding:6px 0;font-size:12px;line-height:1.6;color:var(--muted);overflow-wrap:anywhere}
+.site-footer a:hover{color:var(--red);text-decoration:underline;text-underline-offset:4px}
+.site-footer .footer-bottom{display:flex;flex-direction:row;align-items:center;flex-wrap:wrap;order:0;gap:18px 32px;margin-top:38px;padding-top:25px;border-top:1px solid var(--line);color:var(--muted);font-size:11px;line-height:1.6}
+.site-footer .footer-bottom p{flex:1;min-width:180px}.site-footer small{font-size:11px}.site-footer .footer-top{margin-left:auto;padding:8px 0;color:var(--ink);white-space:nowrap}
+@media(max-width:800px){footer.site-footer{padding:36px 5% 82px}.site-footer .footer-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:28px}.site-footer .footer-bottom{gap:16px 24px}}
+@media(max-width:480px){.site-footer .footer-grid{grid-template-columns:1fr;gap:24px}.site-footer .footer-bottom p{flex-basis:100%;min-width:0}.site-footer .footer-column a{font-size:13px}}
+@media(max-height:500px){footer.site-footer{padding-bottom:28px}}
+.projects-heading .filters{flex-wrap:wrap;max-width:720px;justify-content:flex-end}.filters button{white-space:normal;max-width:100%;line-height:1.5}
+.project-empty{padding:30px;border:1px solid var(--line);margin:0 0 30px}.project-empty p{font-size:16px;line-height:1.6;margin-bottom:16px}
+@media(max-width:800px){.projects-heading .filters{justify-content:flex-start}.project-empty{padding:22px}.project-empty p{font-size:14px}}
+/* A typographic team portrait: only supplied names and the confirmed design role. */
+.team-block{margin-top:58px;scroll-margin-top:95px}.team-block>h3{font-family:Unbounded,Manrope,sans-serif;font-size:20px;font-weight:600;letter-spacing:-.03em;margin-bottom:24px}
+.team-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;list-style:none;margin:0;padding:0}
+.team-card{position:relative;overflow:hidden;padding:24px;border:1px solid var(--line);background:#efede8;display:flex;flex-direction:column;min-width:0}
+.team-index{font-size:10px;letter-spacing:.1em;opacity:.65}.team-monogram{font-family:Unbounded,Manrope,sans-serif;font-weight:750;font-size:clamp(84px,8vw,128px);line-height:1.1;letter-spacing:-.07em;margin:32px 0 28px}
+.team-person{min-height:56px;margin-top:auto}.team-person h3{font-family:Manrope,sans-serif;font-size:21px;font-weight:650;letter-spacing:-.02em;margin:0}.team-person p{font-size:12px;line-height:1.5;margin-top:5px;color:var(--muted)}
+.team-card-accent{background:var(--red);border-color:var(--red);color:white}
+@media(max-width:900px){.team-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.team-monogram{font-size:100px}}
+@media(max-width:480px){.team-block{margin-top:36px;scroll-margin-top:80px}.team-block>h3{font-size:17px}.team-grid{gap:12px}.team-card{padding:18px 16px}.team-monogram{font-size:72px;margin:26px 0 22px}.team-person{min-height:47px}.team-person h3{font-size:17px}.team-person p{font-size:11px}}
+.journal{padding-top:16px}.journal-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;margin-top:34px}.journal-card{min-width:0;border-top:1px solid var(--line);padding-top:14px}.journal-card>img{display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;background:#e8e5df}.journal-copy{padding:20px 0 0}.journal-label{font-size:10px!important;letter-spacing:.04em;color:var(--muted);margin-bottom:13px}.journal-copy h3{font-family:Unbounded,Manrope,sans-serif;font-size:19px;line-height:1.45;letter-spacing:-.035em;margin-bottom:14px}.journal-copy>p:not(.journal-label){font-size:13px;line-height:1.75;color:var(--muted)}.journal-copy .text-link{margin-top:22px}
+@media(max-width:800px){.journal-grid{grid-template-columns:1fr;gap:32px}.journal-card{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px}.journal-copy{padding:0}.journal-copy h3{font-size:17px}}
+@media(max-width:560px){.journal-card{display:block}.journal-copy{padding-top:18px}.journal-copy h3{font-size:19px}}

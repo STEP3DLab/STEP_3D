@@ -42,13 +42,13 @@ test('The main gallery still uses original files; single-item cases do not build
   assert(app.includes('if(p.media.length>1)p.media.forEach'));
   assert(app.includes('img.src=thumbnailSource(item);img.width=180;img.height=200;'));
 });
-test('Main-page image loading and original project sources remain unchanged', () => {
+test('Portfolio and journal images stay lazy while original project sources remain unchanged', () => {
   const html=file('index.html').toString();
   assert.equal((html.match(/class="project-card/g)||[]).length,5);
   for (const project of Object.values(projects)) for(const item of project.media) {
     assert(item.src.startsWith('assets/projects/')); assert(!item.src.includes('/previews/'));
   }
   const cards=html.match(/<img src="assets\/projects\/[^>]+>/g);
-  assert.equal(cards.length,5);
+  assert.equal(cards.length,8);
   for(const image of cards) assert(image.includes('loading="lazy"'));
 });

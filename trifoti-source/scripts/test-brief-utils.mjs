@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {BRIEF_KEY, readBriefDraft, saveBriefDraft, briefErrors, formatBrief, requestBriefDownload} from '../dist/brief-utils.js';
-const values = {name: 'Проверка', idea: 'Пробный бриф', direction: 'Бренды в объёме', reference: 'Награды', budget: '', deadline: ''};
+const values = {name: 'Проверка', idea: 'Пробный бриф', direction: 'Сувениры, призы, награды', reference: 'Награды', budget: '', deadline: ''};
 const storage = raw => ({getItem(key) { assert.equal(key, BRIEF_KEY); return raw; }});
 
 test('An absent draft stays empty and does not create storage', () => {
@@ -9,6 +9,16 @@ test('An absent draft stays empty and does not create storage', () => {
 });
 test('The six existing draft fields restore without changing their text', () => {
   assert.deepEqual(readBriefDraft(() => storage(JSON.stringify(values))), {draft: values, state: 'restored'});
+});
+test('Known old directions map without touching other draft fields or writing storage', () => {
+  for (const [old,direction] of [['Скульптуры и арт-объекты','Скульптура'],['Предметы и интерьер','Бытовой дизайн'],['Бренды в объёме','Сувениры, призы, награды']]) {
+    const source={...values,direction:old};
+    assert.deepEqual(readBriefDraft(()=>storage(JSON.stringify(source))),{draft:{...source,direction},state:'restored'});
+  }
+});
+test('Ambiguous old 3D direction remains intact instead of guessing a new category', () => {
+  const source={...values,direction:'3D-модель и производство'};
+  assert.deepEqual(readBriefDraft(()=>storage(JSON.stringify(source))),{draft:source,state:'restored'});
 });
 test('Blocked storage access is reported instead of claiming a saved draft', () => {
   for (const getStorage of [() => { throw new Error('SecurityError'); }, () => ({getItem() { throw new Error('Blocked'); }})]) {

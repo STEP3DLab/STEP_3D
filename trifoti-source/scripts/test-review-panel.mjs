@@ -13,6 +13,16 @@ test('Missing review data is empty and reading never writes or deletes storage',
 test('Existing valid notes and section choices are recovered unchanged',()=>{
  const storage=memory(JSON.stringify(valid));assert.deepEqual(readReview(()=>storage),{review:valid,state:'restored'});assert.equal(storage.writes,0);
 });
+test('The association label preserves the legacy review section decision and storage key',()=>{
+ const storage=memory(JSON.stringify({sections:{Студия:'Оставляем'},notes:'Keep'}));
+ const {ids}=panel(()=>storage);const row=ids['review-sections'].children[4];
+ assert.equal(row.children[1].textContent,'Об объединении');
+ assert.equal(row.children[2]['aria-label'],'Решение по разделу «Об объединении»');
+ assert.equal(row.children[2].value,'Оставляем');assert.equal(storage.writes,0);
+ row.children[2].value='Доработать';row.children[2].fire('change');
+ assert.deepEqual(JSON.parse(storage.raw),{sections:{Студия:'Доработать'},notes:'Keep'});
+ assert(formatReview(JSON.parse(storage.raw)).includes('5. Об объединении: Доработать'));
+});
 test('Legacy notes survive absent, null, array and primitive sections',()=>{
  for(const sections of [undefined,null,[],true,42,'old']){
   const storage=memory(JSON.stringify({sections,notes:'prior note'}));

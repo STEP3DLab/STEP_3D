@@ -1,15 +1,48 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
+import {projects} from '../dist/project-data.js';
 const html=readFileSync(new URL('../dist/index.html',import.meta.url),'utf8');
 const links=[...html.matchAll(/<a\b([^>]*\bdata-service="([^"]+)"[^>]*)>([^<]*)<\/a>/g)];
 const attr=(text,name)=>text.match(new RegExp(`\\b${name}="([^"]*)"`))?.[1];
+
+test('The four requested directions appear in their exact order',()=>{
+ const expected=['Дизайн и архитектура','Скульптура','Бытовой дизайн','Сувениры, призы, награды'];
+ const section=html.match(/<div class="service-list">(.*?)<\/section>/s)[1];
+ assert.deepEqual([...section.matchAll(/<h3>([^<]+)<\/h3>/g)].map(m=>m[1]),expected);
+ assert.deepEqual(links.map(m=>m[2]),expected);
+});
+test('Existing real cases use fitting directions without inventing architecture cases',()=>{
+ assert.deepEqual(Object.keys(projects).sort(),['gesture','mascot','pink','restoration','stdAwards']);
+ assert.equal(projects.stdAwards.direction,'Сувениры, призы, награды');
+ for(const key of ['gesture','mascot','pink','restoration'])assert.equal(projects[key].direction,'Скульптура');
+});
+test('Hero, identity and contact copy follow the latest wording with stable anchors',()=>{
+ assert(html.includes('Воплощаем смелые идеи в дизайне и архитектуре интерьеров и экстерьеров, скульптуре и бытовом дизайне.'));
+ assert(html.includes('<title>ТРИФОТИ — творческое объединение</title>'));
+ assert(html.includes('Творческое объединение «ТРИФОТИ»'));
+ assert(html.replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').includes('Осуществим Вашу идею!'));
+ assert(html.includes('id="studio"'));assert(html.includes('href="#studio">Об объединении'));
+ assert.doesNotMatch(html,/студи[яиюе]/i);
+});
+test('Footer has four useful groups and only real section or case destinations',()=>{
+ const footer=html.match(/<footer class="site-footer">(.*?)<\/footer>/s)[1];
+ assert.deepEqual([...footer.matchAll(/<h3>([^<]+)<\/h3>/g)].map(m=>m[1]),['Направления','Проекты','Об объединении','Начало работы']);
+ const hrefs=[...footer.matchAll(/href="([^"]+)"/g)].map(m=>m[1]);
+ for(const href of hrefs){
+  if(href.startsWith('#project/'))assert(Object.hasOwn(projects,href.slice(9)));
+  else assert(html.includes(`id="${href.slice(1)}"`));
+ }
+ assert.equal(hrefs.filter(x=>x.startsWith('#project/')).length,5);
+ assert.equal(hrefs.filter(x=>x.startsWith('#service-')).length,4);
+ assert(footer.includes('aria-label="Разделы сайта"'));assert(!hrefs.includes('#'));
+});
 
 test('All four service CTAs retain their visible label, target and contextual accessible name',()=>{
  assert.equal(links.length,4);
  const names=new Set();
  for(const [,attrs,service,visible] of links){
-  assert.equal(visible,service==='3D-модель и производство'?'Обсудить задачу ↗':'Обсудить идею ↗');
+  assert.equal(visible,'Обсудить идею ↗');
   assert.equal(attr(attrs,'href'),'#contact');
   const name=attr(attrs,'aria-label');
   assert.ok(name.startsWith(visible));assert.ok(name.includes(service));names.add(name);
@@ -34,5 +67,35 @@ test('Only the existing name and idea fields are visibly and natively required',
 test('The brief retains its original six stored fields and local-only explanation',()=>{
  const form=html.match(/<form id="brief-form">(.*?)<\/form>/s)[1];
  assert.deepEqual([...form.matchAll(/\bname="([^"]+)"/g)].map(m=>m[1]),['reference','name','direction','idea','budget','deadline']);
- assert.match(form,/Бриф скачивается файлом, а не отправляется студии/);
+ assert.match(form,/Бриф скачивается файлом, а не отправляется объединению/);
+});
+
+test('Portfolio filters use the current directions and honest case counts',()=>{
+ const filters=[...html.matchAll(/<button[^>]+data-filter="([^"]+)"[^>]*>([^<]+)<\/button>/g)];
+ assert.deepEqual(filters.map(m=>m[2]),['Все','Дизайн и архитектура','Скульптура','Бытовой дизайн','Сувениры, призы, награды']);
+ const cards=[...html.matchAll(/data-category="([^"]+)" data-project="([^"]+)"/g)];
+ assert.deepEqual(filters.map(([,key])=>cards.filter(([,category])=>key==='all'||category.split(' ').includes(key)).length),[5,0,4,0,1]);
+ assert(html.includes('id="project-empty" hidden'));assert(html.includes('Проекты этого направления пока не добавлены.'));
+ assert(html.includes('id="empty-category-brief" href="#contact"'));
+ const app=readFileSync(new URL('../dist/app.js',import.meta.url),'utf8');
+ assert(app.includes("$('#project-empty').hidden=count>0"));assert(app.includes("b.setAttribute('aria-pressed',String(b===button))"));
+});
+
+test('Team presents exactly the four supplied first names and only the supplied design role',()=>{
+ const team=html.match(/<div class="team-block" aria-labelledby="team"(.*?)<\/ul>/s)[1];
+ assert.deepEqual([...team.matchAll(/<h3>([^<]+)<\/h3>/g)].map(m=>m[1]),['Фёдор','Оксана','Христина','Владимир']);
+ assert.deepEqual([...team.matchAll(/<p>([^<]+)<\/p>/g)].map(m=>m[1]),['Дизайн']);
+ assert.doesNotMatch(team,/<img\b/);assert.equal((team.match(/class="team-monogram" aria-hidden="true"/g)||[]).length,4);
+ assert(html.includes('<h2 id="team">Команда</h2>'));assert(html.includes('href="#team">Команда'));assert(!html.includes('Два взгляда.'));
+});
+
+test('Project heading and unified journal retain factual content and real actions',()=>{
+ assert(html.replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').includes('Наши проекты'));
+ assert(!html.includes('Воплощённые.'));
+ const journal=html.match(/<section class="section journal[^>]*>(.*?)<\/section>/s)[1];
+ assert.equal((journal.match(/<article\b/g)||[]).length,3);
+ assert(journal.includes('18 декабря 2025'));assert(journal.includes('Проект команды Технопарка РГСУ из портфолио STEP_3D'));
+ for(const [,key] of journal.matchAll(/href="#project\/([^"]+)"/g))assert(Object.hasOwn(projects,key));
+ assert.equal((journal.match(/data-case-link/g)||[]).length,3);assert.equal((journal.match(/loading="lazy" decoding="async"/g)||[]).length,3);
+ assert(!journal.includes('Читать далее'));assert(html.includes('href="#journal">Новости и блог'));
 });

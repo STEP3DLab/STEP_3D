@@ -12,7 +12,8 @@ for(const [,url] of app.matchAll(/(?:from\s*|import\s*\()['\"]([^'\"]+)['\"]/g))
 const ids=[...html.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]);
 assert.equal(new Set(ids).size,ids.length,'All HTML IDs must be unique');
 for(const [,url] of html.matchAll(/\b(?:src|href|poster)="([^"]+)"/g)){
- if(url.startsWith('#'))assert(ids.includes(url.slice(1)),`Missing anchor ${url}`);
+ if(url.startsWith('#project/'))assert(Object.hasOwn(projects,url.slice('#project/'.length)),`Missing case route ${url}`);
+ else if(url.startsWith('#'))assert(ids.includes(url.slice(1)),`Missing anchor ${url}`);
  else if(!/^(?:https?:|data:)/.test(url))assert(existsSync(resolve(dist,url.split(/[?#]/)[0])),`Missing file ${url}`);
 }
 for(const [,url] of css.matchAll(/url\(['"]?([^)'"\s]+)['"]?\)/g))assert(existsSync(resolve(dist,url)),`Missing style asset ${url}`);
@@ -35,7 +36,7 @@ assert(projects.stdAwards.sources.every(source=>new URL(source.url).protocol==='
 assert(html.includes('data-filter="awards"'));
 assert(html.includes('aria-describedby="bear-keyboard-help"'));assert(ids.includes('bear-keyboard-help'));assert(html.includes('aria-controls="bear-video bear-gif"'));
 assert(html.includes('aria-labelledby="case-title"'));assert(html.includes('aria-labelledby="review-title"'));
-assert(html.includes('name="reference"'));assert(html.includes('не отправляется студии'));
+assert(html.includes('name="reference"'));assert(html.includes('не отправляется объединению'));
 const brief=html.match(/<form id="brief-form">([\s\S]*?)<\/form>/)[1];
 assert.deepEqual([...brief.matchAll(/\bname="([^"]+)"/g)].map(match=>match[1]).sort(),['budget','deadline','direction','idea','name','reference']);
 assert(/<textarea id="brief-text" readonly/.test(brief),'Copy fallback must be readonly and have no storage field name');

@@ -74,5 +74,13 @@ test('Sharing is click-only, fallback is readonly and focus recovery excludes fi
   const nav=readFileSync(new URL('../dist/project-navigation.js',import.meta.url),'utf8');assert(!/localStorage|sessionStorage|fetch\(/.test(nav));
 });
 test('First-screen studio introduction now targets the existing studio section',()=>{
-  const html=readFileSync(new URL('../dist/index.html',import.meta.url),'utf8');assert(html.includes('class="text-link" href="#studio">Познакомиться со студией'));assert(html.includes('id="studio"'));
+  const html=readFileSync(new URL('../dist/index.html',import.meta.url),'utf8');assert(html.includes('class="text-link" href="#studio">Познакомиться с объединением'));assert(html.includes('id="studio"'));
+});
+
+test('Footer case links preserve modified navigation and remember their visible trigger',()=>{
+ const app=readFileSync(new URL('../dist/app.js',import.meta.url),'utf8');
+ assert(app.includes("$$('a[data-case-link]')"));
+ assert(app.includes('if(event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;'));
+ assert(app.includes('event.preventDefault();projectOpener=link;caseNavigation.open('));
+ assert(app.includes('projectOpener?.isConnected&&!projectOpener.hidden&&openerMatches?projectOpener:'));
 });
