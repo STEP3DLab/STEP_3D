@@ -103,3 +103,10 @@ import('./review-panel.js?v=20261022-identity').then(({initializeReviewPanel})=>
  const status=$('#review-save-status');if(status){status.textContent='Панель заметок не загрузилась. Обновите страницу, чтобы попробовать снова.';status.dataset.state='error'}
  $$('#review-dialog textarea, #review-dialog select, #export-review').forEach(control=>control.disabled=true);
 });
+
+// Optional catalogue enhancement: source links stay usable if this module fails.
+import('./publication-filters.js?v=20261022-press').then(({initializePublicationFilters})=>initializePublicationFilters({document})).catch(()=>{
+ $$('#publication-catalog [data-publication-category]').forEach(entry=>entry.hidden=false);
+ const filters=$('#publication-filters');if(filters)filters.hidden=true;
+ const count=$('#publication-count');if(count)count.textContent='Все материалы доступны ниже.';
+});

@@ -93,7 +93,7 @@ test('Project heading and unified journal retain factual content and real action
  assert(html.replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').includes('Наши проекты'));
  assert(!html.includes('Воплощённые.'));
  const journal=html.match(/<section class="section journal[^>]*>(.*?)<\/section>/s)[1];
- assert.equal((journal.match(/<article\b/g)||[]).length,3);
+ assert.equal((journal.match(/<article class="journal-card"/g)||[]).length,3);
  assert(journal.includes('18 декабря 2025'));assert(journal.includes('Проект команды Технопарка РГСУ из портфолио STEP_3D'));
  for(const [,key] of journal.matchAll(/href="#project\/([^"]+)"/g))assert(Object.hasOwn(projects,key));
  assert.equal((journal.match(/data-case-link/g)||[]).length,3);assert.equal((journal.match(/loading="lazy" decoding="async"/g)||[]).length,3);
