@@ -121,3 +121,6 @@ input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px soli
 .gallery-retry{margin:0 0 16px;min-height:44px;background:transparent}
 .gallery-retry[aria-disabled="true"]{opacity:.65;cursor:wait}
 .gallery-viewer:focus-visible{outline:2px solid var(--red);outline-offset:3px}
+
+/* Short viewports keep the review entry point out of the form hit area. */
+@media(max-height:500px){.review-launch{position:static;transform:none;width:max-content;max-width:calc(100% - 32px);margin:18px auto}}

@@ -25,7 +25,6 @@ const form=$('#brief-form'),recovered=readBriefDraft();
 const draftMessages={empty:'Черновик сохраняется в этом браузере.',restored:'Черновик восстановлен из этого браузера.',saved:'Черновик сохранён в этом браузере.',unavailable:'Автосохранение недоступно. Не закрывайте страницу, пока не скачаете или не скопируете бриф.',invalid:'Сохранённый черновик не удалось прочитать. Заполните бриф заново.',partial:'Часть черновика восстановлена. Проверьте поля перед скачиванием.',failed:'Черновик не удалось сохранить в браузере. Не закрывайте страницу: скачайте или скопируйте бриф.'};
 function draftStatus(state){const status=$('#brief-draft-status');if(status.textContent!==draftMessages[state])status.textContent=draftMessages[state];status.dataset.state=['unavailable','invalid','partial','failed'].includes(state)?'error':'ready'}
 for(const [key,value] of Object.entries(recovered.draft)){const field=form.elements.namedItem(key);if(!field)continue;if(field.tagName==='SELECT'&&![...field.options].some(option=>option.value===value)){recovered.state='partial';continue}field.value=value}
-draftStatus(recovered.state);
 function saveDraft(){const values=Object.fromEntries(new FormData(form));draftStatus(saveBriefDraft(values)?'saved':'failed');$('#brief-status').textContent='';if(!$('#brief-text-fallback').hidden)$('#brief-text').value=formatBrief(values)}
 function updateReference(){const title=form.elements.namedItem('reference').value;$('#brief-reference').hidden=!title;$('#brief-reference-title').textContent=title}
 function selectReference(title){form.elements.namedItem('reference').value=title;updateReference();saveDraft()}
@@ -43,6 +42,9 @@ form.addEventListener('submit',e=>{
  if(result!=='started'){fallback.open=true;preview.focus();preview.select()}
 });
 $('#brief-text-fallback').addEventListener('toggle',()=>{if($('#brief-text-fallback').open)$('#brief-text').value=formatBrief(Object.fromEntries(new FormData(form)))});
+// Keep the native submit button disabled until local-only handling is ready.
+draftStatus(recovered.state);
+$('#brief-save').disabled=false;
 
 $('#review-launch')?.addEventListener('click',()=>$('#review-dialog')?.showModal());
 $$('[data-close]').forEach(b=>b.addEventListener('click',()=>document.getElementById(b.dataset.close).close()));
