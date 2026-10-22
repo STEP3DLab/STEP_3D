@@ -1,3 +1,4 @@
+import {keepDialogFocus,galleryArrow} from './dialog-controls.js?v=20261022-gallery';
 import {projects} from './project-data.js?v=20261021-awards';
 const $=(s,root=document)=>root.querySelector(s);
 const $$=(s,root=document)=>[...root.querySelectorAll(s)];
@@ -36,7 +37,7 @@ $('#review-notes').addEventListener('input',e=>{review.notes=e.target.value;stor
 $('#review-launch').addEventListener('click',()=>$('#review-dialog').showModal());
 $('#export-review').addEventListener('click',()=>{download(`ТРИФОТИ — решения по сайту\nКонцепт 01\n\nСТРУКТУРА\n${sections.map((name,i)=>`${i+1}. ${name}: ${review.sections[name]||'Обсудить'}`).join('\n')}\n\nВНЕШНИЙ ВИД И ПОЖЕЛАНИЯ\n${review.notes||'Пока без комментариев'}\n\nДОПОЛНИТЬ\n— Согласованные проекты: фото и описания\n— Контакты студии\n`,'TRIFOTI-site-review.txt');$('#review-status').textContent='Решения подготовлены к скачиванию.'});
 $$('[data-close]').forEach(b=>b.addEventListener('click',()=>document.getElementById(b.dataset.close).close()));
-$$('dialog').forEach(dialog=>{let backdropPressed=false;dialog.addEventListener('pointerdown',e=>{const r=dialog.getBoundingClientRect();backdropPressed=e.target===dialog&&(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)});dialog.addEventListener('click',e=>{if(backdropPressed&&e.target===dialog)dialog.close();backdropPressed=false})});
+$$('dialog').forEach(dialog=>{keepDialogFocus(dialog);let backdropPressed=false;dialog.addEventListener('pointerdown',e=>{const r=dialog.getBoundingClientRect();backdropPressed=e.target===dialog&&(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)});dialog.addEventListener('click',e=>{if(backdropPressed&&e.target===dialog)dialog.close();backdropPressed=false})});
 const projectDialog=$('#project-dialog');
 let galleryProject=null,galleryIndex=0,slideRevision=0;
 function showSlide(index){
@@ -65,6 +66,6 @@ $$('[data-project]').forEach(card=>card.addEventListener('click',()=>{
  const multiple=p.media.length>1;$('#gallery-prev').hidden=!multiple;$('#gallery-next').hidden=!multiple;$('#gallery-thumbnails').hidden=!multiple;
  showSlide(0);projectDialog.showModal();projectDialog.scrollTop=0;
 }));
-projectDialog.addEventListener('keydown',e=>{if(e.target.closest('video,input,textarea,select')||projects[galleryProject]?.media.length<2)return;if(e.key==='ArrowLeft'){e.preventDefault();showSlide(galleryIndex-1)}if(e.key==='ArrowRight'){e.preventDefault();showSlide(galleryIndex+1)}});
+projectDialog.addEventListener('keydown',e=>{if(!projectDialog.open||projects[galleryProject]?.media.length<2)return;const step=galleryArrow(e);if(step){e.preventDefault();showSlide(galleryIndex+step)}});
 projectDialog.addEventListener('close',()=>{slideRevision++;$$('video',projectDialog).forEach(v=>v.pause())});
 import('./bear-video.js?v=20261022-motion');

@@ -7,6 +7,8 @@ const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const dist=resolve(root,'dist');
 const html=readFileSync(resolve(dist,'index.html'),'utf8');
 const css=readFileSync(resolve(dist,'style.css'),'utf8');
+const app=readFileSync(resolve(dist,'app.js'),'utf8');
+for(const [,url] of app.matchAll(/(?:from\s*|import\s*\()['\"]([^'\"]+)['\"]/g))assert(existsSync(resolve(dist,url.split(/[?#]/)[0])),`Missing module ${url}`);
 const ids=[...html.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]);
 assert.equal(new Set(ids).size,ids.length,'All HTML IDs must be unique');
 for(const [,url] of html.matchAll(/\b(?:src|href|poster)="([^"]+)"/g)){

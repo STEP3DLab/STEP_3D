@@ -5,6 +5,6 @@
   "type": "module",
   "description": "Static public portfolio for ТРИФОТИ",
   "scripts": {
-    "check": "node --check dist/app.js && node --check dist/project-data.js && node --check dist/bear-video.js && node scripts/check-site.mjs && node --test scripts/test-bear-controls.mjs"
+    "check": "node --check dist/app.js && node --check dist/project-data.js && node --check dist/bear-video.js && node --check dist/dialog-controls.js && node scripts/check-site.mjs && node --test scripts/test-bear-controls.mjs scripts/test-dialog-controls.mjs"
   }
 }
