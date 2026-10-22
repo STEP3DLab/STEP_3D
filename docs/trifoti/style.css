@@ -190,3 +190,11 @@ footer.site-footer{display:block;margin:0;padding:48px 4.5% 88px;background:#ebe
 
 /* DOM order puts mobile disclosure links after their trigger; desktop visuals stay unchanged. */
 .header nav{order:1}.header-cta{order:2}.menu-button{order:3}
+
+/* Keep Close outside the scrolling case, without covering media or copy. */
+.project-dialog{padding:0;overflow:hidden}
+.project-dialog[open]{display:flex;flex-direction:column}
+.project-dialog-header{flex:0 0 60px;display:flex;justify-content:flex-end;align-items:flex-start;padding:8px 16px}
+.project-dialog-header>.close-button{position:static;background:var(--paper)}
+#project-content{min-height:0;min-width:0;overflow:auto;overscroll-behavior:contain;padding:6px 30px 30px;scroll-padding-block:6px}
+@media(max-width:800px){#project-content{padding:6px 20px 25px}}

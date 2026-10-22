@@ -91,7 +91,7 @@ function openProject(key){
  const shareButton=$('#case-share'),shareStatus=$('#case-share-status'),shareFallback=$('#case-share-fallback'),shareURL=$('#case-share-url');shareURL.value=projectLink(location.href,key);
  shareButton.addEventListener('click',async()=>{const copied=await copyProjectLink(shareURL.value,navigator.clipboard);if(!shareButton.isConnected)return;shareStatus.textContent=copied?'Ссылка скопирована.':'Не удалось скопировать автоматически. Выделите ссылку ниже и скопируйте её.';shareFallback.hidden=copied;if(!copied){shareURL.focus();shareURL.select()}});
  const multiple=p.media.length>1;$('#gallery-prev').hidden=!multiple;$('#gallery-next').hidden=!multiple;$('#gallery-thumbnails').hidden=!multiple;
- showSlide(0);if(!projectDialog.open)projectDialog.showModal();projectDialog.scrollTop=0;
+ showSlide(0);if(!projectDialog.open)projectDialog.showModal();host.scrollTop=0;projectDialog.scrollTop=0;
 }
 const caseNavigation=createProjectNavigation({keys:Object.keys(projects),location,history,onOpen:openProject,onClose:()=>{if(projectDialog.open)projectDialog.close()}});
 $$('[data-project]').forEach(card=>card.addEventListener('click',()=>{projectOpener=card;caseNavigation.open(card.dataset.project)}));

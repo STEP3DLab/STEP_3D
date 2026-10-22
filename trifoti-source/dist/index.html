@@ -6,9 +6,9 @@
   <meta name="description" content="ТРИФОТИ — творческое объединение. Дизайн и архитектура, скульптура, бытовой дизайн, сувениры, призы и награды.">
   <meta name="theme-color" content="#f5f3ee"><meta name="robots" content="noindex,nofollow">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="style.css?v=20261022-fonts">
+  <link rel="stylesheet" href="style.css?v=20261022-gallery-close">
   <script type="importmap">{"imports":{"three":"./assets/vendor/three.module.js"}}</script>
-  <script type="module" src="app.js?v=20261022-menu"></script>
+  <script type="module" src="app.js?v=20261022-gallery-close"></script>
 </head>
 <body>
 <a class="skip" href="#main">Перейти к содержимому</a>
@@ -162,6 +162,6 @@
 </footer>
 <button class="review-launch" id="review-launch"><span class="red-dot"></span> Концепт 01 <span class="review-launch-label">/ Структура и заметки</span> ↗</button>
 <dialog id="review-dialog" class="review-dialog" aria-labelledby="review-title"><div class="dialog-heading"><div><span class="eyebrow">Рабочее обсуждение</span><h2 id="review-title">Соберём ваш сайт.</h2></div><button class="close-button" data-close="review-dialog" aria-label="Закрыть">×</button></div><p>Отметьте подходящие разделы и запишите правки. Заметки не отправляются объединению.</p><p id="review-save-status" class="form-note" role="status" aria-atomic="true">Панель заметок загружается…</p><div id="review-sections"></div><label class="review-notes-label">Внешний вид и общие пожелания<textarea id="review-notes" disabled rows="4" placeholder="Что нравится? Что изменить? Какие проекты добавить?"></textarea></label><button class="button button-dark" id="export-review" disabled>Скачать решения <span>↓</span></button><div class="font-note">Типографика: Oswald — высокий узкий слоган; Unbounded — заголовки разделов; Manrope — текст и навигация. Шрифты загружаются вместе с сайтом.</div><p id="review-status" role="status"></p></dialog>
-<dialog id="project-dialog" class="project-dialog" aria-labelledby="case-title" aria-describedby="case-description"><button class="close-button" data-close="project-dialog" aria-label="Закрыть проект">×</button><div id="project-content"></div></dialog>
+<dialog id="project-dialog" class="project-dialog" aria-labelledby="case-title" aria-describedby="case-description"><div class="project-dialog-header"><button type="button" class="close-button" data-close="project-dialog" aria-label="Закрыть проект">×</button></div><div id="project-content"></div></dialog>
 <div class="toast" role="status" id="toast"></div>
 </body></html>
