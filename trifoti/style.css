@@ -117,3 +117,7 @@ input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px soli
 
 #review-save-status{margin:12px 0}
 #review-save-status[data-state="error"],#review-status[data-state="error"]{color:#a3162c}
+
+.gallery-retry{margin:0 0 16px;min-height:44px;background:transparent}
+.gallery-retry[aria-disabled="true"]{opacity:.65;cursor:wait}
+.gallery-viewer:focus-visible{outline:2px solid var(--red);outline-offset:3px}
