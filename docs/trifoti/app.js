@@ -6,13 +6,20 @@ import {keepDialogFocus,galleryArrow} from './dialog-controls.js?v=20261022-gall
 import {projects} from './project-data.js?v=20261022-identity';
 const $=(s,root=document)=>root.querySelector(s);
 const $$=(s,root=document)=>[...root.querySelectorAll(s)];
-const menu=$('.menu-button'),nav=$('#navigation');
+const menu=$('.menu-button'),nav=$('#navigation'),header=$('.header');
+const desktopNavigation=matchMedia('(min-width: 801px)');
 function setMenuOpen(open){menu.setAttribute('aria-expanded',String(open));menu.setAttribute('aria-label',open?'Закрыть меню':'Открыть меню');nav.classList.toggle('open',open)}
 menu.addEventListener('click',()=>setMenuOpen(menu.getAttribute('aria-expanded')!=='true'));
 $$('.header a').forEach(a=>a.addEventListener('click',()=>setMenuOpen(false)));
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&menu.getAttribute('aria-expanded')==='true'){setMenuOpen(false);menu.focus()}});
 document.addEventListener('click',e=>{if(!e.target.closest('.header'))setMenuOpen(false)});
-matchMedia('(min-width: 801px)').addEventListener('change',()=>setMenuOpen(false));
+// Native Tab follows the DOM; leaving the header never traps or steals focus.
+header.addEventListener('focusout',e=>{if(e.relatedTarget&&!header.contains(e.relatedTarget))setMenuOpen(false)});
+desktopNavigation.addEventListener('change',()=>{
+ const active=document.activeElement;setMenuOpen(false);
+ if(!desktopNavigation.matches&&nav.contains(active))menu.focus({preventScroll:true});
+ else if(desktopNavigation.matches&&active===menu)nav.querySelector('a[href]')?.focus({preventScroll:true});
+});
 
 let toastTimer;
 function toast(text){$('#toast').textContent=text;$('#toast').classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#toast').classList.remove('visible'),3200)}

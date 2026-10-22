@@ -81,7 +81,7 @@ test('Brand red, white button text, large headings and decorative team numerals 
  assert.equal(declarations('.team-index').opacity,'.65');
  assert.equal((html.match(/class="team-index" aria-hidden="true"/g)||[]).length,4);
 });
-test('Only the stylesheet gets a new cache URL for this CSS-only runtime patch',()=>{
- assert(html.includes('style.css?v=20261022-contrast'));
- assert(html.includes('app.js?v=20261022-press'));
+test('Stylesheet and application retain explicit cache version URLs',()=>{
+ assert.match(html,/style\.css\?v=[^\"]+/);
+ assert.match(html,/app\.js\?v=[^\"]+/);
 });

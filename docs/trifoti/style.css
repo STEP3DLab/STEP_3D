@@ -187,3 +187,6 @@ footer.site-footer{display:block;margin:0;padding:48px 4.5% 88px;background:#ebe
 
 /* Use a deeper brand red only where responsive type is ordinary-size text. */
 @media(max-width:800px){.service-list details[open] h3{color:var(--red-text)}}
+
+/* DOM order puts mobile disclosure links after their trigger; desktop visuals stay unchanged. */
+.header nav{order:1}.header-cta{order:2}.menu-button{order:3}
