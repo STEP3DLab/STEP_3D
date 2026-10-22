@@ -67,4 +67,4 @@ $$('[data-project]').forEach(card=>card.addEventListener('click',()=>{
 }));
 projectDialog.addEventListener('keydown',e=>{if(e.target.closest('video,input,textarea,select')||projects[galleryProject]?.media.length<2)return;if(e.key==='ArrowLeft'){e.preventDefault();showSlide(galleryIndex-1)}if(e.key==='ArrowRight'){e.preventDefault();showSlide(galleryIndex+1)}});
 projectDialog.addEventListener('close',()=>{slideRevision++;$$('video',projectDialog).forEach(v=>v.pause())});
-import('./bear-video.js');
+import('./bear-video.js?v=20261022-motion');

@@ -8,7 +8,7 @@
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="style.css?v=20261021-awards">
   <script type="importmap">{"imports":{"three":"./assets/vendor/three.module.js"}}</script>
-  <script type="module" src="app.js?v=20261021-awards"></script>
+  <script type="module" src="app.js?v=20261022-motion"></script>
 </head>
 <body>
 <a class="skip" href="#main">Перейти к содержимому</a>
@@ -30,9 +30,10 @@
   <div class="hero-art">
     <div class="art-caption"><span>ОБЪЕКТ № 001</span><span>МАСКОТ СТУДИИ</span></div>
     <div class="art-orbit orbit-one"></div><div class="art-orbit orbit-two"></div>
-    <div class="bear-stage video-stage" id="bear-stage" aria-label="Вращающийся медведь ТРИФОТИ — анимация настоящей скульптуры"><video id="bear-video" loop muted playsinline preload="metadata" poster="assets/animation/bear-loop-poster.webp" aria-label="Круговой обзор красно-белой скульптуры медведя"><source src="assets/animation/bear-loop.webm" type="video/webm"><source src="assets/animation/bear-loop.mp4" type="video/mp4"></video><img id="bear-gif" src="assets/animation/bear-loop-poster.webp" alt="Медведь ТРИФОТИ" hidden></div>
+    <div class="bear-stage video-stage" id="bear-stage" role="group" aria-describedby="bear-keyboard-help" aria-label="Вращающийся медведь ТРИФОТИ — анимация настоящей скульптуры"><video id="bear-video" loop muted playsinline preload="metadata" poster="assets/animation/bear-loop-poster.webp" aria-label="Круговой обзор красно-белой скульптуры медведя"><source src="assets/animation/bear-loop.webm" type="video/webm"><source src="assets/animation/bear-loop.mp4" type="video/mp4"></video><img id="bear-gif" src="assets/animation/bear-loop-poster.webp" alt="Медведь ТРИФОТИ" hidden></div>
+    <p id="bear-keyboard-help" class="sr-only">Стрелки влево и вправо — повернуть медведя. Пробел или Enter — включить или приостановить вращение.</p>
     <div class="scene-annotation"><span class="annotation-dot"></span> Характер — в деталях.</div>
-    <div class="art-bottom"><div class="scene-controls" aria-label="Управление анимацией"><button class="round-button" id="rotate-toggle" aria-label="Приостановить вращение" aria-pressed="true">Ⅱ</button><button class="round-button" id="bear-reset" aria-label="Начать вращение сначала">↺</button><span class="animation-palette"><i></i><i></i> Цвета ТРИФОТИ</span></div><span class="drag-hint">↔ Поверните медведя</span></div>
+    <div class="art-bottom"><div class="scene-controls" aria-label="Управление анимацией"><button class="round-button" id="rotate-toggle" aria-controls="bear-video bear-gif" aria-label="Приостановить вращение" aria-pressed="true">Ⅱ</button><button class="round-button" id="bear-reset" aria-label="Начать вращение сначала">↺</button><span class="animation-palette"><i></i><i></i> Цвета ТРИФОТИ</span></div><span class="drag-hint">↔ Поверните медведя</span></div>
     <span class="model-note">Настоящая скульптура · 360°</span>
   </div>
 </section>

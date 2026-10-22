@@ -31,6 +31,7 @@ assert.equal(projects.stdAwards.media.length,3);
 assert.equal(projects.stdAwards.sources.length,2);
 assert(projects.stdAwards.sources.every(source=>new URL(source.url).protocol==='https:'));
 assert(html.includes('data-filter="awards"'));
+assert(html.includes('aria-describedby="bear-keyboard-help"'));assert(ids.includes('bear-keyboard-help'));assert(html.includes('aria-controls="bear-video bear-gif"'));
 assert(html.includes('aria-labelledby="case-title"'));assert(html.includes('aria-labelledby="review-title"'));
 assert(html.includes('name="reference"'));assert(html.includes('не отправляется студии'));
 const optimized=statSync(resolve(dist,'assets/logo.webp')).size,original=statSync(resolve(dist,'assets/logo.png')).size;
