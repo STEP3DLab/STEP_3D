@@ -102,3 +102,9 @@ input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px soli
 .case-provenance a{display:block;min-height:44px;padding:12px 0;text-decoration:underline;text-underline-offset:3px;color:var(--ink)}
 @media(min-width:1101px){.project-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:380px){.awards-card{grid-column:auto}}
+
+/* Brief feedback uses existing type, spacing and colors. */
+#brief-draft-status[data-state="error"],#brief-status[data-state="error"]{color:#a3162c}
+#brief-text-fallback{margin-top:14px;font-size:11px;line-height:1.6}
+#brief-text-fallback summary{cursor:pointer;min-height:44px;display:list-item;padding:12px 0}
+#brief-text-fallback label{margin-top:10px}

@@ -1,3 +1,4 @@
+import {readBriefDraft,saveBriefDraft,briefErrors,formatBrief,requestBriefDownload} from './brief-utils.js?v=20261022-brief';
 import {keepDialogFocus,galleryArrow} from './dialog-controls.js?v=20261022-gallery';
 import {projects} from './project-data.js?v=20261021-awards';
 const $=(s,root=document)=>root.querySelector(s);
@@ -18,16 +19,28 @@ function download(text,name){const blob=new Blob(['\ufeff'+text],{type:'text/pla
 $$('[data-filter]').forEach(button=>button.addEventListener('click',()=>{const filter=button.dataset.filter;$$('[data-filter]').forEach(b=>{b.classList.toggle('active',b===button);b.setAttribute('aria-pressed',String(b===button))});$$('[data-category]').forEach(card=>card.hidden=filter!=='all'&&!card.dataset.category.split(' ').includes(filter));$('#filter-status').textContent=`Показано проектов: ${$$('[data-category]').filter(card=>!card.hidden).length}`}));
 $$('[data-service]').forEach(a=>a.addEventListener('click',()=>{$('#brief-direction').value=a.dataset.service;saveDraft()}));
 
-const form=$('#brief-form'),draft=storage.get('trifoti-brief-v1',{});
-for(const [key,value] of Object.entries(draft)){if(form.elements.namedItem(key)&&typeof value==='string')form.elements.namedItem(key).value=value}
-function saveDraft(){storage.set('trifoti-brief-v1',Object.fromEntries(new FormData(form)))}
+const form=$('#brief-form'),recovered=readBriefDraft();
+const draftMessages={empty:'Черновик сохраняется в этом браузере.',restored:'Черновик восстановлен из этого браузера.',saved:'Черновик сохранён в этом браузере.',unavailable:'Автосохранение недоступно. Не закрывайте страницу, пока не скачаете или не скопируете бриф.',invalid:'Сохранённый черновик не удалось прочитать. Заполните бриф заново.',partial:'Часть черновика восстановлена. Проверьте поля перед скачиванием.',failed:'Черновик не удалось сохранить в браузере. Не закрывайте страницу: скачайте или скопируйте бриф.'};
+function draftStatus(state){const status=$('#brief-draft-status');if(status.textContent!==draftMessages[state])status.textContent=draftMessages[state];status.dataset.state=['unavailable','invalid','partial','failed'].includes(state)?'error':'ready'}
+for(const [key,value] of Object.entries(recovered.draft)){const field=form.elements.namedItem(key);if(!field)continue;if(field.tagName==='SELECT'&&![...field.options].some(option=>option.value===value)){recovered.state='partial';continue}field.value=value}
+draftStatus(recovered.state);
+function saveDraft(){const values=Object.fromEntries(new FormData(form));draftStatus(saveBriefDraft(values)?'saved':'failed');$('#brief-status').textContent='';if(!$('#brief-text-fallback').hidden)$('#brief-text').value=formatBrief(values)}
 function updateReference(){const title=form.elements.namedItem('reference').value;$('#brief-reference').hidden=!title;$('#brief-reference-title').textContent=title}
 function selectReference(title){form.elements.namedItem('reference').value=title;updateReference();saveDraft()}
 updateReference();
 $('#clear-reference').addEventListener('click',()=>{selectReference('');form.elements.namedItem('name').focus()});
-form.addEventListener('input',saveDraft);
+form.addEventListener('input',()=>{for(const key of ['name','idea'])form.elements.namedItem(key).setCustomValidity('');saveDraft()});
 form.addEventListener('change',saveDraft);
-form.addEventListener('submit',e=>{e.preventDefault();if(!form.reportValidity())return;const d=Object.fromEntries(new FormData(form));download(`ТРИФОТИ — бриф проекта\n\nИмя: ${d.name}\nНаправление: ${d.direction}${d.reference?'\nОтправная точка: '+d.reference:''}\n\nИдея:\n${d.idea}\n\nБюджет: ${d.budget||'Обсудим'}\nСроки: ${d.deadline||'Обсудим'}\n\nЭтот бриф подготовлен на сайте ТРИФОТИ. Передайте его студии удобным способом.`, 'TRIFOTI-brief.txt');$('#brief-status').textContent='Бриф сохранён файлом. Вы можете передать его студии.';toast('Бриф подготовлен к скачиванию')});
+form.addEventListener('submit',e=>{
+ e.preventDefault();const values=Object.fromEntries(new FormData(form));
+ for(const [key,message] of Object.entries(briefErrors(values)))form.elements.namedItem(key).setCustomValidity(message);
+ if(!form.reportValidity())return;
+ const text=formatBrief(values),fallback=$('#brief-text-fallback'),preview=$('#brief-text'),status=$('#brief-status');preview.value=text;fallback.hidden=false;
+ const result=requestBriefDownload(text);status.dataset.state=result==='started'?'ready':'error';
+ status.textContent=result==='started'?'Скачивание брифа запрошено. Если файл не появился, откройте текст ниже и скопируйте его.':'Не удалось начать скачивание. Скопируйте готовый текст ниже, чтобы не потерять бриф.';
+ if(result!=='started'){fallback.open=true;preview.focus();preview.select()}
+});
+$('#brief-text-fallback').addEventListener('toggle',()=>{if($('#brief-text-fallback').open)$('#brief-text').value=formatBrief(Object.fromEntries(new FormData(form)))});
 
 const sections=['Главная и вращающийся медведь','Направления','Проекты','Процесс','Студия','Обсуждение проекта'];
 const review=storage.get('trifoti-review-v1',{sections:{},notes:''});
