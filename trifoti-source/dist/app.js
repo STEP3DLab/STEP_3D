@@ -1,3 +1,4 @@
+import {thumbnailSource} from './media-utils.js?v=20261022-previews';
 import {readBriefDraft,saveBriefDraft,briefErrors,formatBrief,requestBriefDownload} from './brief-utils.js?v=20261022-brief';
 import {keepDialogFocus,galleryArrow} from './dialog-controls.js?v=20261022-gallery';
 import {projects} from './project-data.js?v=20261021-awards';
@@ -74,7 +75,7 @@ $$('[data-project]').forEach(card=>card.addEventListener('click',()=>{
  $('#case-type').textContent=p.type;$('#case-title').textContent=p.title;$('#case-description').textContent=p.description;
  if(p.attribution){const provenance=$('#case-provenance');provenance.hidden=false;const credit=document.createElement('p');credit.textContent=p.attribution;provenance.append(credit);for(const source of p.sources||[]){const link=document.createElement('a');link.href=source.url;link.textContent=source.label;link.target='_blank';link.rel='noopener noreferrer';provenance.append(link)}}
  p.tags.forEach(tag=>{const span=document.createElement('span');span.textContent=tag;$('#case-tags').append(span)});
- p.media.forEach((item,i)=>{const b=document.createElement('button');b.className='gallery-thumb';b.setAttribute('aria-label',`Показать: ${item.caption}`);const img=document.createElement('img');img.src=item.poster||item.src;img.alt='';img.loading='lazy';img.decoding='async';b.append(img);if(item.type==='video'){const label=document.createElement('span');label.textContent='▷';b.append(label)}b.addEventListener('click',()=>showSlide(i));$('#gallery-thumbnails').append(b)});
+ if(p.media.length>1)p.media.forEach((item,i)=>{const b=document.createElement('button');b.className='gallery-thumb';b.setAttribute('aria-label',`Показать: ${item.caption}`);const img=document.createElement('img');img.src=thumbnailSource(item);img.width=180;img.height=200;img.alt='';img.loading='lazy';img.decoding='async';b.append(img);if(item.type==='video'){const label=document.createElement('span');label.textContent='▷';b.append(label)}b.addEventListener('click',()=>showSlide(i));$('#gallery-thumbnails').append(b)});
  $('#gallery-prev').addEventListener('click',()=>showSlide(galleryIndex-1));$('#gallery-next').addEventListener('click',()=>showSlide(galleryIndex+1));$('#case-contact').addEventListener('click',()=>{const direction=form.elements.namedItem('direction');if(p.direction&&direction.selectedIndex===0)direction.value=p.direction;selectReference(p.title);projectDialog.close();requestAnimationFrame(()=>form.elements.namedItem('name').focus({preventScroll:true}))});
  const multiple=p.media.length>1;$('#gallery-prev').hidden=!multiple;$('#gallery-next').hidden=!multiple;$('#gallery-thumbnails').hidden=!multiple;
  showSlide(0);projectDialog.showModal();projectDialog.scrollTop=0;

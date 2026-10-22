@@ -1,0 +1,27 @@
+"""Rebuild small portfolio previews. Requires Python Pillow and Node; no network."""
+from pathlib import Path
+import json
+import subprocess
+from PIL import Image, ImageOps
+
+ROOT = Path(__file__).resolve().parents[1]
+projects = json.loads(subprocess.check_output(
+    ['node', '--input-type=module', '-e', "import {projects} from './dist/project-data.js'; console.log(JSON.stringify(projects))"],
+    cwd=ROOT, text=True))
+source_bytes = preview_bytes = count = 0
+for project in projects.values():
+    if len(project['media']) < 2:
+        continue
+    for item in project['media']:
+        source = item.get('poster', item['src'])
+        target = source.replace('assets/projects/', 'assets/previews/').replace('.webp', '-thumb.webp')
+        path = ROOT / 'dist' / target
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with Image.open(ROOT / 'dist' / source) as original:
+            # Matches the existing approximately 0.9 aspect-ratio cover thumbnails.
+            preview = ImageOps.fit(original.convert('RGB'), (180, 200), Image.Resampling.LANCZOS)
+            preview.save(path, 'WEBP', quality=82, method=6)
+        source_bytes += (ROOT / 'dist' / source).stat().st_size
+        preview_bytes += path.stat().st_size
+        count += 1
+print(f'{count} previews: {source_bytes:,} → {preview_bytes:,} bytes; originals unchanged.')
