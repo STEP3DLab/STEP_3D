@@ -199,3 +199,14 @@ footer.site-footer{display:block;margin:0;padding:48px 4.5% 88px;background:#ebe
 .project-dialog-header>.close-button{position:static;background:var(--paper)}
 #project-content{min-height:0;min-width:0;overflow:auto;overscroll-behavior:contain;padding:6px 30px 30px;scroll-padding-block:6px}
 @media(max-width:800px){#project-content{padding:6px 20px 25px}}
+
+/* Reflow the complete header at extreme zoom instead of clipping its controls. */
+@media(max-width:340px){
+ html{scroll-padding-top:132px}
+ .header{display:grid;grid-template-columns:minmax(0,1fr) 44px;height:auto;min-height:74px;padding-block:7px;column-gap:8px;row-gap:4px}
+ .brand-full{grid-column:1;grid-row:1}
+ .menu-button{grid-column:2;grid-row:1}
+ .header-cta{grid-column:1/-1;grid-row:2;justify-self:end;min-width:0;max-width:100%;white-space:normal;overflow-wrap:anywhere}
+ .header nav{top:100%;max-height:calc(100dvh - 100%)}
+ .header nav a{white-space:normal;overflow-wrap:anywhere}
+}
