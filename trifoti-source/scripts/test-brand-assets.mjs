@@ -19,12 +19,12 @@ test('The selected original PNG is preserved byte for byte, not the superseded J
  assert.deepEqual(pngSize(original),[1254,1254]);assert.equal(original[25],2,'Supplied PNG is opaque RGB, not a cutout');
 });
 test('Both web derivatives are square, lossless WebP with appropriate pixel sizes',()=>{
- for(const size of [256,512])assert.deepEqual(webpSize(bytes(`assets/brand/trifoti-logo-${size}.webp`)),[size,size]);
+ for(const size of [256,512])assert.deepEqual(webpSize(bytes(`assets/brand/trifoti-logo-transparent-${size}.webp`)),[size,size]);
 });
 test('The header uses one complete mark instead of separated cropped parts',()=>{
  const header=html.match(/<header class="header">([\s\S]*?)<\/header>/)[1];
  assert.equal((header.match(/<img\b/g)||[]).length,1);assert.match(header,/brand-final-image/);
- assert.match(header,/src="assets\/brand\/trifoti-logo-256\.webp"/);
+ assert.match(header,/src="assets\/brand\/trifoti-logo-transparent-256\.webp"/);
  assert.match(header,/sizes="\(max-width:800px\) 60px, 76px"/);
  assert.doesNotMatch(header,/brand-icon|brand-type|assets\/logo\.(?:png|webp)/);
 });
@@ -36,12 +36,12 @@ test('Header and footer brand links retain accessible names and the Home target'
 });
 test('The footer uses the same complete logo with reserved geometry and deferred loading',()=>{
  const footer=html.match(/<footer class="site-footer">([\s\S]*?)<\/footer>/)[1];
- assert.match(footer,/src="assets\/brand\/trifoti-logo-512\.webp"/);
+ assert.match(footer,/src="assets\/brand\/trifoti-logo-transparent-512\.webp"/);
  assert.match(footer,/width="512" height="512" alt="" loading="lazy"/);
  assert.match(footer,/sizes="\(max-width:480px\) 160px, 192px"/);
  assert.doesNotMatch(footer,/ТРИ<span>Ф<\/span>ОТИ/);
 });
-test('The logo stays proportionate and keeps its supplied background and colors',()=>{
+test('The logo stays proportionate and keeps its transparent background and original colors',()=>{
  for(const selector of ['.brand.brand-final .brand-final-image','.footer-brand-final img']){
   const start=css.indexOf(selector+'{');assert(start>=0);
   const rule=css.slice(start,css.indexOf('}',start));
@@ -53,11 +53,16 @@ test('The logo stays proportionate and keeps its supplied background and colors'
  assert.match(css,/@media\(max-width:800px\)\{\.brand\.brand-final\{width:60px;height:60px\}\}/);
 });
 test('The favicon also comes from the selected mark and has a fresh URL',()=>{
- assert.deepEqual(pngSize(bytes('assets/brand/trifoti-favicon-64.png')),[64,64]);
- assert.match(html,/<link rel="icon" href="assets\/brand\/trifoti-favicon-64\.png" type="image\/png" sizes="64x64">/);
+ assert.deepEqual(pngSize(bytes('assets/brand/trifoti-favicon-transparent-64.png')),[64,64]);
+ assert.match(html,/<link rel="icon" href="assets\/brand\/trifoti-favicon-transparent-64\.png" type="image\/png" sizes="64x64">/);
  assert.doesNotMatch(html,/assets\/favicon\.svg/);
 });
 test('The brand/layout stylesheet is versioned without changing app behavior',()=>{
  assert.match(html,/style\.css\?v=20261022-final-logo/);
  assert.match(html,/app\.js\?v=20261022-gallery-route-focus/);
 });
+
+ test('The background-removed master is RGBA with unchanged square geometry',()=>{
+ const png=bytes('assets/brand/trifoti-logo-transparent.png');
+ assert.deepEqual(pngSize(png),[1254,1254]);assert.equal(png[25],6);
+ });
