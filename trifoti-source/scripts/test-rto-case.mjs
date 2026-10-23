@@ -59,6 +59,6 @@ test('The new case uses the unchanged brief handoff without overwriting a chosen
  assert.deepEqual([...form.matchAll(/\bname="([^"]+)"/g)].map(x=>x[1]),['reference','name','direction','idea','budget','deadline']);
 });
 test('Returning visitors load the matching stylesheet, app and six-case data module',()=>{
- assert.match(html,/style\.css\?v=20261023-context-brief/);assert.match(html,/app\.js\?v=20261023-context-brief/);
+ assert.match(html,/style\.css\?v=20261023-bear-chapters/);assert.match(html,/app\.js\?v=20261023-bear-chapters/);
  assert.match(app,/project-data\.js\?v=20261022-rto/);
 });

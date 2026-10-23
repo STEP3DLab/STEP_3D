@@ -1,3 +1,4 @@
+import {mountGalleryChapters} from './gallery-chapters.js?v=20261023-bear-chapters';
 import {watchGalleryMedia} from './media-recovery.js?v=20261022-retry';
 import {createProjectNavigation,projectLink,copyProjectLink} from './project-navigation.js?v=20261022-case-links';
 import {thumbnailSource} from './media-utils.js?v=20261022-previews';
@@ -69,6 +70,7 @@ $$('[data-close]').forEach(b=>b.addEventListener('click',()=>document.getElement
 $$('dialog').forEach(dialog=>{keepDialogFocus(dialog);let backdropPressed=false;dialog.addEventListener('pointerdown',e=>{const r=dialog.getBoundingClientRect();backdropPressed=e.target===dialog&&(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)});dialog.addEventListener('click',e=>{if(backdropPressed&&e.target===dialog)dialog.close();backdropPressed=false})});
 const projectDialog=$('#project-dialog');
 let galleryProject=null,galleryIndex=0,slideRevision=0,projectOpener=null;
+let updateGalleryChapters=()=>{};
 function showSlide(index,retrying=false){
  const project=projects[galleryProject];if(!project?.media.length)return;
  galleryIndex=(index+project.media.length)%project.media.length;const item=project.media[galleryIndex];const viewer=$('#gallery-viewer');
@@ -79,6 +81,7 @@ function showSlide(index,retrying=false){
  $('#gallery-counter').textContent=`${String(galleryIndex+1).padStart(2,'0')} / ${String(project.media.length).padStart(2,'0')}`;
  $('#gallery-announcement').textContent=`${galleryIndex+1} из ${project.media.length}. ${item.caption}`;
  $$('.gallery-thumb').forEach((b,i)=>{b.classList.toggle('active',i===galleryIndex);b.setAttribute('aria-pressed',String(i===galleryIndex))});
+ updateGalleryChapters(galleryIndex);
  const thumbs=$('#gallery-thumbnails'),active=thumbs.children[galleryIndex];
  if(active&&thumbs.scrollWidth>thumbs.clientWidth){const left=active.offsetLeft-thumbs.offsetLeft;thumbs.scrollTo({left:Math.max(0,left-(thumbs.clientWidth-active.clientWidth)/2),behavior:'instant'})}
 }
@@ -88,6 +91,7 @@ function openProject(key){
  // the scroll container itself, or anything outside this replacement.
  const restoreFocus=projectDialog.open&&host.contains(document.activeElement)&&document.activeElement!==host;
  host.innerHTML='<div class="case-layout"><div class="case-intro"><span class="eyebrow" id="case-type"></span><h2 id="case-title"></h2><p id="case-description"></p></div><div class="case-gallery"><div class="gallery-viewer" id="gallery-viewer" tabindex="-1" role="group" aria-label="Медиа проекта"></div><div class="gallery-navigation"><button id="gallery-prev" class="round-button" aria-label="Предыдущий ракурс">←</button><span id="gallery-counter"></span><button id="gallery-next" class="round-button" aria-label="Следующий ракурс">→</button></div><p id="gallery-caption"></p><p id="gallery-status" role="status" aria-atomic="true"></p><button type="button" class="text-link gallery-retry" id="gallery-retry" aria-controls="gallery-viewer" hidden>Повторить загрузку</button><p id="gallery-announcement" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></p><div class="gallery-thumbnails" id="gallery-thumbnails"></div></div><div class="case-copy"><div id="case-provenance" class="case-provenance" hidden></div><div class="tags" id="case-tags"></div><a class="button button-dark" href="#contact" id="case-contact">Обсудить похожую идею <span class="direction-icon" aria-hidden="true"></span></a><div class="case-share"><button type="button" class="text-link case-share-button" id="case-share">Скопировать ссылку на проект</button><p class="form-note" id="case-share-status" role="status" aria-live="polite"></p><label class="case-share-fallback" id="case-share-fallback" hidden>Ссылка для копирования<input id="case-share-url" readonly></label></div></div></div>';
+ updateGalleryChapters=mountGalleryChapters({key,host:$('.case-gallery'),document,onSelect:showSlide});
  $('#case-type').textContent=p.type;$('#case-title').textContent=p.title;$('#case-description').textContent=p.description;
  if(p.attribution){const provenance=$('#case-provenance');provenance.hidden=false;const credit=document.createElement('p');credit.textContent=p.attribution;provenance.append(credit);for(const source of p.sources||[]){const link=document.createElement('a');link.href=source.url;link.textContent=source.label;link.target='_blank';link.rel='noopener noreferrer';provenance.append(link)}}
  p.tags.forEach(tag=>{const span=document.createElement('span');span.textContent=tag;$('#case-tags').append(span)});

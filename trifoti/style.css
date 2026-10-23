@@ -195,6 +195,14 @@ footer.site-footer{display:block;margin:0;padding:48px 4.5% 88px;background:#ebe
 .direction-icon::after{content:'';position:absolute;width:.5em;height:.5em;right:.1em;top:.1em;border-top:1.5px solid currentColor;border-right:1.5px solid currentColor}
 .direction-icon-down{transform:rotate(90deg)}
 
+/* Small explicit chapter jumps keep the complete bear gallery and native controls. */
+.gallery-chapters{margin-bottom:16px}
+.gallery-chapters-title{font-size:11px;letter-spacing:.06em;text-transform:uppercase;margin:0 0 9px;color:var(--muted)}
+.gallery-chapters-controls{display:flex;flex-wrap:wrap;gap:8px}
+.gallery-chapters-controls button{min-height:44px;min-width:64px;padding:10px 16px;border:1px solid var(--line);border-radius:24px;background:var(--paper);color:var(--ink);font:inherit;font-size:13px;cursor:pointer}
+.gallery-chapters-controls button[aria-pressed="true"]{background:var(--red);border-color:var(--red);color:white}
+.gallery-chapters-controls button:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+
 /* Context first in the document and on mobile; desktop keeps the media-led spread. */
 .case-layout{grid-template-areas:"media intro" "media details";grid-template-rows:auto 1fr;row-gap:16px}
 .case-intro{grid-area:intro;min-width:0;padding-top:40px}
