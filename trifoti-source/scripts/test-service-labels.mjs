@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {projects} from '../dist/project-data.js';
 const html=readFileSync(new URL('../dist/index.html',import.meta.url),'utf8');
-const links=[...html.matchAll(/<a\b([^>]*\bdata-service="([^"]+)"[^>]*)>([^<]*)<\/a>/g)];
+const links=[...html.matchAll(/<a\b([^>]*\bdata-service="([^"]+)"[^>]*)>([\s\S]*?)<\/a>/g)];
 const attr=(text,name)=>text.match(new RegExp(`\\b${name}="([^"]*)"`))?.[1];
 
 test('The four requested directions appear in their exact order',()=>{
@@ -42,10 +42,10 @@ test('All four service CTAs retain their visible label, target and contextual ac
  assert.equal(links.length,4);
  const names=new Set();
  for(const [,attrs,service,visible] of links){
-  assert.equal(visible,'Обсудить идею ↗');
+  const label=visible.replace(/<[^>]*>/g,'').trim();assert.equal(label,'Обсудить идею');
   assert.equal(attr(attrs,'href'),'#contact');
   const name=attr(attrs,'aria-label');
-  assert.ok(name.startsWith(visible));assert.ok(name.includes(service));names.add(name);
+  assert.ok(name.startsWith(label));assert.ok(name.includes(service));names.add(name);
  }
  assert.equal(names.size,4);
 });

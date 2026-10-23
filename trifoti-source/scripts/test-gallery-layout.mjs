@@ -48,6 +48,6 @@ test('Nested Close uses the same native close handler and dialog keyboard contro
  assert.match(app,/projectDialog.addEventListener\('close'/);
 });
 test('Both changed runtime resources have current release URLs',()=>{
- assert.match(html,/style\.css\?v=20261023-exhibition/);
- assert.match(html,/app\.js\?v=20261022-gallery-route-focus/);
+ assert.match(html,/style\.css\?v=20261023-vector-arrows/);
+ assert.match(html,/app\.js\?v=20261023-vector-arrows/);
 });

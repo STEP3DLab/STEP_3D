@@ -189,6 +189,12 @@ footer.site-footer{display:block;margin:0;padding:48px 4.5% 88px;background:#ebe
 /* Use a deeper brand red only where responsive type is ordinary-size text. */
 @media(max-width:800px){.service-list details[open] h3{color:var(--red-text)}}
 
+/* Decorative arrows drawn without a font dependency. */
+.direction-icon{display:inline-block;position:relative;width:1em;height:1em;flex-shrink:0;vertical-align:-.1em}
+.direction-icon::before{content:'';position:absolute;width:.8em;left:.1em;top:.5em;border-top:1.5px solid currentColor;transform:rotate(-45deg)}
+.direction-icon::after{content:'';position:absolute;width:.5em;height:.5em;right:.1em;top:.1em;border-top:1.5px solid currentColor;border-right:1.5px solid currentColor}
+.direction-icon-down{transform:rotate(90deg)}
+
 /* Exhibition layout: real work first, with the DOM and keyboard order kept together. */
 .hero{grid-template-rows:auto 1fr;column-gap:0}
 .hero-copy{grid-column:1;grid-row:1;padding-bottom:0}
