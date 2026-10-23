@@ -195,6 +195,26 @@ footer.site-footer{display:block;margin:0;padding:48px 4.5% 88px;background:#ebe
 .direction-icon::after{content:'';position:absolute;width:.5em;height:.5em;right:.1em;top:.1em;border-top:1.5px solid currentColor;border-right:1.5px solid currentColor}
 .direction-icon-down{transform:rotate(90deg)}
 
+/* Context first in the document and on mobile; desktop keeps the media-led spread. */
+.case-layout{grid-template-areas:"media intro" "media details";grid-template-rows:auto 1fr;row-gap:16px}
+.case-intro{grid-area:intro;min-width:0;padding-top:40px}
+.case-gallery{grid-area:media}
+.case-copy{grid-area:details;padding-top:0}
+.case-intro .eyebrow{font-size:9px;line-height:1.7}
+.case-intro h2{font-size:32px;line-height:1.25;letter-spacing:-.05em;margin:20px 0;overflow-wrap:anywhere}
+.case-intro>p{font-size:13px;line-height:1.9;color:var(--muted);margin-bottom:0}
+.brief-bridge{margin:0 5%;padding:40px clamp(20px,4vw,56px);border-top:2px solid var(--red);background:#f0eae4;display:flex;align-items:center;justify-content:space-between;gap:30px}
+.brief-bridge h2{font-size:clamp(28px,4vw,48px);line-height:1.12;letter-spacing:-.05em;margin:12px 0}
+.brief-bridge p:not(.eyebrow){max-width:52ch;font-size:14px;line-height:1.7;color:var(--muted);margin:0}
+.brief-bridge>.button{flex-shrink:0}
+@media(max-width:1100px){.case-intro h2{font-size:27px}}
+@media(max-width:800px){
+ .case-layout{grid-template-areas:"intro" "media" "details";grid-template-rows:auto;gap:20px}
+ .case-intro{padding-top:0}.case-intro h2{font-size:27px;margin:12px 0}.case-intro>p{line-height:1.7}
+ .brief-bridge{align-items:flex-start;flex-direction:column;padding:28px 20px;gap:20px}
+ .brief-bridge>.button{max-width:100%;white-space:normal;text-align:center}
+}
+
 /* Exhibition layout: real work first, with the DOM and keyboard order kept together. */
 .hero{grid-template-rows:auto 1fr;column-gap:0}
 .hero-copy{grid-column:1;grid-row:1;padding-bottom:0}

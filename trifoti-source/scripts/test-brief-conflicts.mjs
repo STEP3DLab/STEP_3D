@@ -87,5 +87,5 @@ test('Local submit remains independently available and prevents native transmiss
  const submit=app.slice(app.indexOf("form.addEventListener('submit'"),app.indexOf("$('#brief-text-fallback').addEventListener"));assert.match(submit,/e\.preventDefault\(\)/);assert.match(submit,/requestBriefDownload\(text\)/);assert.doesNotMatch(submit,/draftSession|saveDraft|fetch\(|XMLHttpRequest/);
 });
 test('Returning visitors receive both the new application and guarded helper',()=>{
- assert.match(html,/app\.js\?v=20261023-vector-arrows/);assert.match(app,/brief-utils\.js\?v=20261022-draft-conflict/);
+ assert.match(html,/app\.js\?v=20261023-context-brief/);assert.match(app,/brief-utils\.js\?v=20261022-draft-conflict/);
 });
