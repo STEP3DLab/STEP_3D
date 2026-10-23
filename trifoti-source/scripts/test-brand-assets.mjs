@@ -59,7 +59,7 @@ test('The favicon also comes from the selected mark and has a fresh URL',()=>{
 });
 test('The brand/layout stylesheet is versioned without changing app behavior',()=>{
  assert.match(html,/style\.css\?v=20261023-bear-chapters/);
- assert.match(html,/app\.js\?v=20261023-bear-chapters/);
+ assert.match(html,/app\.js\?v=20261023-viewport/);
 });
 
  test('The background-removed master is RGBA with unchanged square geometry',()=>{

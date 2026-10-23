@@ -17,9 +17,11 @@ function setup(reduce=false,options={}){
  v.readyState=options.readyState??0;v.networkState=options.networkState??2;v.error=options.error??null;
  const sources=[new Element(),new Element()];v.querySelectorAll=()=>sources;
  const timers=new Map();let timerId=0;
- vm.runInNewContext(code,{document:doc,matchMedia:()=>pref,setTimeout:fn=>{timers.set(++timerId,fn);return timerId},clearTimeout:id=>timers.delete(id)});
+ const connection=new EventTarget();connection.saveData=options.saveData??false;let observerCallback,observed;
+ const Observer=options.observer?class{constructor(callback,config){if(options.observerThrows)throw Error('unavailable');observerCallback=callback;assert.equal(config.threshold,0)}observe(target){observed=target}}:undefined;
+ vm.runInNewContext(code,{document:doc,navigator:{connection},IntersectionObserver:Observer,matchMedia:()=>pref,setTimeout:fn=>{timers.set(++timerId,fn);return timerId},clearTimeout:id=>timers.delete(id)});
  const fire=(el,type,props={})=>{const e=new Event(type,{cancelable:true});for(const [k,value]of Object.entries(props))Object.defineProperty(e,k,{value});el.dispatchEvent(e);return e};
- return {els,doc,v,fire,pref,sources,timers,flush:()=>{const pending=[...timers.values()];timers.clear();pending.forEach(fn=>fn())},click:()=>fire(els['rotate-toggle'],'click'),reduce:value=>{pref.matches=value;fire(pref,'change',{matches:value})},visibility:hidden=>{doc.hidden=hidden;fire(doc,'visibilitychange')}};
+ return {els,doc,v,fire,pref,sources,timers,intersect:value=>{assert.equal(observed,els['bear-stage']);observerCallback([{target:observed,isIntersecting:value}])},saveData:value=>{connection.saveData=value;fire(connection,'change')},flush:()=>{const pending=[...timers.values()];timers.clear();pending.forEach(fn=>fn())},click:()=>fire(els['rotate-toggle'],'click'),reduce:value=>{pref.matches=value;fire(pref,'change',{matches:value})},visibility:hidden=>{doc.hidden=hidden;fire(doc,'visibilitychange')}};
 }
 test('visible initial video plays; initial reduced motion stays paused',()=>{assert.equal(setup().v.paused,false);const s=setup(true);assert.equal(s.v.paused,true);assert.equal(s.els['rotate-toggle'].attrs['aria-pressed'],'false')});
 test('enabling reduced motion while open pauses, disabling it does not restart',()=>{const s=setup();s.reduce(true);assert.equal(s.v.paused,true);assert.equal(s.els['rotate-toggle'].attrs['aria-pressed'],'false');s.reduce(false);assert.equal(s.v.paused,true)});
@@ -55,4 +57,36 @@ test('source fallback exposes only supported keyboard shortcuts and reset stays 
 test('late rejected video play cannot pause the newly enabled fallback',async()=>{let reject;const s=setup(false,{play:()=>new Promise((_,r)=>{reject=r})});s.fire(s.sources[0],'error');s.fire(s.sources[1],'error');reject(new Error('old media failed'));await new Promise(setImmediate);assert.equal(s.els['rotate-toggle'].attrs['aria-pressed'],'true');assert.match(s.els['bear-gif'].src,/\.gif$/)});
 test('a new load attempt clears previously counted source errors',()=>{const s=setup();s.fire(s.sources[0],'error');s.fire(s.v,'loadstart');s.fire(s.sources[1],'error');s.flush();assert.equal(s.v.hidden,false)});
 test('fallback during drag preserves existing release and reduced-motion behavior',()=>{for(const reduce of [true,false]){const s=setup();s.fire(s.els['bear-stage'],'pointerdown',{button:0,isPrimary:true,clientX:20,pointerId:1});s.fire(s.v,'error');assert.match(s.els['bear-gif'].src,/poster\.webp$/);if(reduce)s.reduce(true);s.fire(s.els['bear-stage'],'pointerup');assert.equal(s.els['rotate-toggle'].attrs['aria-pressed'],String(!reduce));assert.match(s.els['bear-gif'].src,reduce?/poster\.webp$/:/\.gif$/)}});
-test('app and module cache URLs both advance while the stylesheet stays unchanged',()=>{const html=readFileSync(new URL('../dist/index.html',import.meta.url),'utf8'),app=readFileSync(new URL('../dist/app.js',import.meta.url),'utf8');assert.match(html,/app\.js\?v=20261023-bear-chapters/);assert.match(app,/bear-video\.js\?v=20261022-bear-fallback/);assert.match(html,/style\.css\?v=20261023-bear-chapters/)});
+test('app and module cache URLs both advance while the stylesheet stays unchanged',()=>{const html=readFileSync(new URL('../dist/index.html',import.meta.url),'utf8'),app=readFileSync(new URL('../dist/app.js',import.meta.url),'utf8');assert.match(html,/app\.js\?v=20261023-viewport/);assert.match(app,/bear-video\.js\?v=20261023-viewport/);assert.match(html,/style\.css\?v=20261023-bear-chapters/)});
+
+test('Observer waits for the first visible entry, then pauses offscreen without losing play intent',()=>{
+ const s=setup(false,{observer:true});assert.equal(s.v.paused,true);assert.equal(s.v.playCalls,0);
+ s.intersect(false);assert.equal(s.v.playCalls,0);s.intersect(true);assert.equal(s.v.paused,false);
+ s.v.currentTime=3;s.intersect(false);assert.equal(s.v.paused,true);assert.equal(s.v.currentTime,3);assert.equal(s.els['rotate-toggle'].attrs['aria-pressed'],'true');
+ s.intersect(true);assert.equal(s.v.paused,false);assert.equal(s.v.currentTime,3);
+ const calls=s.v.playCalls;s.intersect(true);assert.equal(s.v.playCalls,calls);
+});
+test('Viewport reentry never overrides manual pause, reset, hidden document or reduced motion',()=>{
+ for(const action of [s=>s.click(),s=>s.fire(s.els['bear-reset'],'click'),s=>s.reduce(true),s=>s.visibility(true)]){
+  const s=setup(false,{observer:true});s.intersect(true);action(s);s.intersect(false);s.intersect(true);assert.equal(s.v.paused,true);
+ }
+ const s=setup(true,{observer:true});s.intersect(true);assert.equal(s.v.paused,true);s.click();assert.equal(s.v.paused,false);s.intersect(false);s.intersect(true);assert.equal(s.v.paused,false);
+});
+test('Explicit play while offscreen waits for viewport and tab visibility; pause cancels it',()=>{
+ const s=setup(true,{observer:true});s.click();assert.equal(s.v.paused,true);s.visibility(true);s.intersect(true);assert.equal(s.v.paused,true);s.visibility(false);assert.equal(s.v.paused,false);
+ s.intersect(false);s.click();s.intersect(true);assert.equal(s.v.paused,true);
+});
+test('GIF fallback uses its static poster offscreen and resumes only existing intent',()=>{
+ const s=setup(false,{observer:true});s.intersect(true);s.fire(s.v,'error');assert.match(s.els['bear-gif'].src,/\.gif$/);s.intersect(false);assert.match(s.els['bear-gif'].src,/poster\.webp$/);s.intersect(true);assert.match(s.els['bear-gif'].src,/\.gif$/);s.click();s.intersect(false);s.intersect(true);assert.match(s.els['bear-gif'].src,/poster\.webp$/);
+});
+test('Save-Data suppresses initial autoplay and newly enabled mode cancels resume intent',()=>{
+ const s=setup(false,{observer:true,saveData:true});s.intersect(true);assert.equal(s.v.paused,true);s.saveData(false);s.intersect(false);s.intersect(true);assert.equal(s.v.paused,true);
+ s.click();assert.equal(s.v.paused,false);s.intersect(false);s.saveData(true);s.intersect(true);assert.equal(s.v.paused,true);
+ s.click();assert.equal(s.v.paused,false);
+});
+test('Unsupported or failed observer retains existing visibility and explicit pause behavior',()=>{
+ for(const options of [{},{observer:true,observerThrows:true}]){const s=setup(false,options);assert.equal(s.v.paused,false);s.visibility(true);assert.equal(s.v.paused,true);s.visibility(false);assert.equal(s.v.paused,false);s.click();s.visibility(true);s.visibility(false);assert.equal(s.v.paused,true)}
+});
+test('A stale play rejection after viewport pause cannot clear the preserved intent',async()=>{
+ let reject;const s=setup(false,{observer:true,play:()=>new Promise((_,r)=>reject=r)});s.intersect(true);s.intersect(false);reject(Error('stale'));await new Promise(setImmediate);assert.equal(s.els['rotate-toggle'].attrs['aria-pressed'],'true');assert.equal(s.v.paused,true);
+});

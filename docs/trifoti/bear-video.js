@@ -4,9 +4,11 @@ const image=document.getElementById('bear-gif');
 const toggle=document.getElementById('rotate-toggle');
 const keyboardHelp=document.getElementById('bear-keyboard-help');
 const motionPreference=matchMedia('(prefers-reduced-motion: reduce)');
+const connection=typeof navigator==='undefined'?null:navigator.connection;
 const sources=[...video.querySelectorAll('source')];
 const failedSources=new Set();
-let wantsPlayback=!motionPreference.matches;
+let wantsPlayback=!motionPreference.matches&&!connection?.saveData;
+let inViewport=typeof IntersectionObserver!=='function';
 let gifMode=false,dragging=false,lastX=0,resumeAfterDrag=false,playRequest=0,exhaustionCheck=null;
 
 function update(){
@@ -16,7 +18,7 @@ function update(){
 }
 async function syncPlayback(){
  const request=++playRequest;
- const canPlay=wantsPlayback&&!document.hidden&&!dragging;
+ const canPlay=wantsPlayback&&inViewport&&!document.hidden&&!dragging;
  update();
  if(gifMode){
   video.pause();
@@ -102,6 +104,22 @@ motionPreference.addEventListener('change',e=>{
  if(e.matches){resumeAfterDrag=false;pause()}
 });
 document.addEventListener('visibilitychange',syncPlayback);
+connection?.addEventListener?.('change',()=>{
+ // Like reduced motion, Save-Data disables automatic intent, not the explicit control.
+ if(connection.saveData){resumeAfterDrag=false;pause()}
+});
+// The stage persists for this document's lifetime. Observe it once rather than
+// polling scroll; with no observer support, retain the existing visibility guard.
+if(typeof IntersectionObserver==='function'){
+ try{
+  const observer=new IntersectionObserver(entries=>{
+   const entry=entries.filter(item=>item.target===stage).at(-1);
+   if(!entry||inViewport===entry.isIntersecting)return;
+   inViewport=entry.isIntersecting;syncPlayback();
+  },{threshold:0});
+  observer.observe(stage);
+ }catch{inViewport=true}
+}
 // The dynamic module may arrive after the browser has already exhausted both
 // sources. Keep empty/loading/ready media, and an explicit user abort, intact.
 if(video.readyState>=2)stage.dataset.renderer='video';
