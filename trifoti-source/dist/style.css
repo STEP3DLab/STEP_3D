@@ -189,6 +189,82 @@ footer.site-footer{display:block;margin:0;padding:48px 4.5% 88px;background:#ebe
 /* Use a deeper brand red only where responsive type is ordinary-size text. */
 @media(max-width:800px){.service-list details[open] h3{color:var(--red-text)}}
 
+/* Exhibition layout: real work first, with the DOM and keyboard order kept together. */
+.hero{grid-template-rows:auto 1fr;column-gap:0}
+.hero-copy{grid-column:1;grid-row:1;padding-bottom:0}
+.hero-art{grid-column:2;grid-row:1/3}
+.hero-followthrough{grid-column:1;grid-row:2;display:flex;flex-direction:column;padding-bottom:25px;min-width:0}
+.hero-followthrough .hero-signature{margin-top:auto}
+.projects{padding-top:64px;padding-bottom:76px;border-top:1px solid var(--line)}
+.projects-heading{align-items:start;gap:36px}
+.projects-heading .filters{padding-top:8px;max-width:640px}
+.project-grid{grid-template-columns:repeat(12,minmax(0,1fr));align-items:end;gap:52px 30px}
+.project-grid>.project-card{grid-column:span 6}
+.project-grid>[data-project="mascot"],.project-grid>[data-project="restoration"],.project-grid>[data-project="stdAwards"]{grid-column:span 7}
+.project-grid>[data-project="pink"],.project-grid>[data-project="gesture"],.project-grid>[data-project="rto-traveling-cup"]{grid-column:span 5}
+.project-grid .real-project .project-visual{height:auto;aspect-ratio:1;isolation:isolate}
+.project-grid [data-project="restoration"] .project-visual,.project-grid [data-project="stdAwards"] .project-visual{aspect-ratio:4/3}
+.project-grid .real-project img{object-fit:contain;transform:none;transition:transform .35s var(--ease)}
+.project-grid .project-title{position:relative;margin-top:0;padding:19px 0 0;border-top:2px solid var(--ink);gap:9px}
+.project-grid .real-project .project-title h3{font-family:Manrope,Arial,sans-serif;font-size:clamp(20px,2.1vw,30px);line-height:1.25;letter-spacing:-.035em;font-weight:650}
+.project-grid [data-project="mascot"] .project-title h3{font-size:clamp(25px,2.7vw,39px)}
+.project-grid .real-project .project-title>span{font-size:12px;line-height:1.6;max-width:50ch}
+.project-grid .project-tag{font-size:11px;line-height:1.5;left:16px;top:16px;max-width:calc(100% - 32px);background:var(--paper);backdrop-filter:none}
+.project-grid .media-count{font-size:11px;line-height:1.5;left:16px;bottom:16px;max-width:calc(100% - 84px);background:#20201e;color:white;padding:7px 10px}
+.project-grid .project-arrow{width:44px;height:44px;right:16px;bottom:16px;background:var(--paper);border-color:var(--ink)}
+.project-grid .project-card:focus-visible .project-arrow{background:var(--red);color:white;border-color:var(--red)}
+.project-grid .project-card:focus-visible .project-title{border-color:var(--red)}
+@media(hover:hover) and (prefers-reduced-motion:no-preference){
+ .project-grid .project-card:hover img{transform:scale(1.012)}
+ .project-grid .project-card:hover .project-title{border-color:var(--red)}
+}
+@media(max-width:900px){
+ .project-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:36px 24px;align-items:start}
+ .project-grid>.project-card{grid-column:auto}
+ .project-grid .real-project .project-visual{aspect-ratio:1}
+ .project-grid [data-project="mascot"] .project-title h3{font-size:24px}
+}
+@media(max-width:800px){
+ .hero{display:flex;flex-direction:column}
+ .hero-copy{padding-top:20px}
+ .hero .eyebrow{margin-bottom:14px;flex-wrap:wrap;row-gap:5px}
+ .hero h1{font-size:clamp(30px,11.8vw,88px);line-height:1.04}
+ .hero-description{font-size:13px;line-height:1.6;margin-top:16px}
+ .hero-art{min-height:0;width:100%;margin-top:18px;overflow:visible}
+ .art-caption{position:static;font-size:9px;margin-bottom:4px}
+ .bear-stage{position:relative;inset:auto;aspect-ratio:1;width:100%}
+ .art-orbit{width:70%;height:auto;aspect-ratio:1;top:45%}
+ .orbit-two{width:94%}
+ .art-bottom{position:relative;inset:auto;gap:12px;flex-wrap:wrap;margin-top:4px}
+ .model-note{position:static;display:block;margin-top:8px}
+ .hero-followthrough{padding-bottom:30px}
+ .hero-followthrough .hero-actions{margin-top:22px;gap:12px 22px}
+ .hero-followthrough .hero-actions .text-link{min-height:44px}
+ .projects{padding-top:38px;padding-bottom:48px}
+ .projects .section-top{margin-bottom:22px}
+ .projects-heading{gap:22px;margin-bottom:26px}
+ .projects-heading .filters{padding-top:0}
+}
+@media(max-width:600px){
+ .project-grid{grid-template-columns:minmax(0,1fr);gap:34px}
+ .project-grid>.project-card{grid-column:auto}
+ .project-grid .real-project .project-visual{aspect-ratio:1}
+ .project-grid [data-project="restoration"] .project-visual,.project-grid [data-project="stdAwards"] .project-visual{aspect-ratio:4/3}
+ .project-grid .real-project .project-title h3{font-size:22px;line-height:1.3}
+ .project-grid [data-project="mascot"] .project-title h3{font-size:27px}
+ .project-grid .project-title{padding-top:15px}
+ .project-grid .real-project .project-title>span{font-size:12px}
+ .projects-heading h2 br{display:none}
+ .projects-heading h2 .red::before{content:' '}
+ .projects-heading .filters{gap:7px}
+ .projects-heading .filters button{font-size:11px;padding:9px 12px}
+}
+@media(max-width:340px){
+ .manifesto-strip{flex-wrap:wrap}
+ .manifesto-strip a{display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;margin-left:auto}
+}
+@media(prefers-reduced-motion:reduce){.project-grid .project-card img{transform:none!important}}
+
 /* DOM order puts mobile disclosure links after their trigger; desktop visuals stay unchanged. */
 .header nav{order:1}.header-cta{order:2}.menu-button{order:3}
 
