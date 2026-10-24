@@ -33,10 +33,10 @@ test('Only case content scrolls, can shrink, and keeps previous content insets',
 });
 for(const wasOpen of [false,true])test(`Opening a case resets its new scroll area after modal initialization (already open: ${wasOpen})`,()=>{
  const events=[];
- const reset=app.match(/showSlide\(0\);if\(!projectDialog.open\)projectDialog.showModal\(\);[^\n]+/)[0];
+ const reset=app.match(/showSlide\(frameMemory.recall\(key,p.media.length\)\);if\(!projectDialog.open\)projectDialog.showModal\(\);[^\n]+/)[0];
  const host={set scrollTop(value){assert.equal(value,0);events.push('content-reset')}};
  const projectDialog={open:wasOpen,showModal(){this.open=true;events.push('show')},set scrollTop(value){assert.equal(value,0);events.push('outer-reset')}};
- vm.runInNewContext(reset,{showSlide:index=>{assert.equal(index,0);events.push('slide')},host,projectDialog});
+ vm.runInNewContext(reset,{key:"mascot",p:{media:[{}]},frameMemory:{recall:()=>0},showSlide:index=>{assert.equal(index,0);events.push('slide')},host,projectDialog});
  assert.deepEqual(events,wasOpen?['slide','content-reset','outer-reset']:['slide','show','content-reset','outer-reset']);
 });
 test('Nested Close uses the same native close handler and dialog keyboard controller',()=>{
@@ -48,8 +48,8 @@ test('Nested Close uses the same native close handler and dialog keyboard contro
  assert.match(app,/projectDialog.addEventListener\('close'/);
 });
 test('Both changed runtime resources have current release URLs',()=>{
- assert.match(html,/style\.css\?v=20261024-clear-navigation/);
- assert.match(html,/app\.js\?v=20261024-clear-navigation/);
+ assert.match(html,/style\.css\?v=20261024-gallery-browse/);
+ assert.match(html,/app\.js\?v=20261024-gallery-browse/);
 });
 
 test('Case context is unique and precedes media in document order',()=>{

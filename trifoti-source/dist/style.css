@@ -358,3 +358,8 @@ form .brief-counter[data-near-limit="true"]{color:#a91c24;font-weight:700}
 .header nav a[aria-current="location"]{color:var(--red-text);text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:6px}
 .gallery-photo-link:hover,.gallery-photo-link:focus-visible,.gallery-photo-link:active,.gallery-photo-link:visited{color:var(--red-text)}
 @media(max-width:800px){.site-footer .footer-column a{display:flex;align-items:center;min-height:44px;width:100%;padding:10px 0}.site-footer .footer-top{display:inline-flex;align-items:center;min-height:44px;min-width:44px;padding:10px 0}}
+
+/* Photo gestures leave vertical scrolling and native pinch zoom available. */
+.gallery-viewer img{touch-action:pan-y pinch-zoom}
+.case-navigation{display:flex;flex-wrap:wrap;gap:8px 24px;margin:24px 0}
+.case-navigation button{min-height:44px;text-align:left;max-width:100%;white-space:normal}

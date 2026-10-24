@@ -42,6 +42,14 @@ export function createProjectNavigation({keys, location, history, onOpen, onClos
     sync();
     return true;
   }
+  // Keep the original return destination while browsing adjacent cases.
+  function switchCase(key) {
+    if (!keys.includes(key) || !active) return false;
+    const owned = history.state?.[marker] === active;
+    history.replaceState(owned ? {...cleanState(), [marker]:key} : cleanState(), '', prefix + key);
+    sync();
+    return true;
+  }
   function closed() {
     // A Back/Forward/hash navigation already reconciled the dialog.
     const key = active;
@@ -59,5 +67,5 @@ export function createProjectNavigation({keys, location, history, onOpen, onClos
     if (location.hash !== hash) history.pushState(cleanState(), '', hash);
     sync();
   }
-  return {open, closed, sync, visit};
+  return {open, switchCase, closed, sync, visit};
 }

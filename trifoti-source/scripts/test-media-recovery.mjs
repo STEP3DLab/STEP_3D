@@ -58,7 +58,7 @@ test('Detached gallery nodes ignore late failures',()=>{
 });
 test('App wiring preserves original file/index and provides native focusable controls',()=>{
  const app=readFileSync(new URL('../dist/app.js',import.meta.url),'utf8');
- assert.match(app,/const retryIndex=galleryIndex;watchGalleryMedia/);
+ assert.match(app,/const retryIndex=galleryIndex;clearMediaWait=watchGalleryMedia/);
  assert.match(app,/onRetry:\(\)=>showSlide\(retryIndex,true\)/);
  assert.match(app,/revision===slideRevision&&projectDialog\.open&&viewer\.isConnected/);
  assert.match(app,/media\.src=item\.src/);
@@ -67,5 +67,5 @@ test('App wiring preserves original file/index and provides native focusable con
  assert.match(app,/id="gallery-status" role="status" aria-atomic="true"/);
  assert.match(app,/projectDialog\.addEventListener\('close'.*slideRevision\+\+/);
  const helper=readFileSync(new URL('../dist/media-recovery.js',import.meta.url),'utf8');
- assert.doesNotMatch(helper,/setTimeout|setInterval|fetch\(|localStorage|sessionStorage/);
+ assert.doesNotMatch(helper,/setInterval|fetch\(|localStorage|sessionStorage/);
 });

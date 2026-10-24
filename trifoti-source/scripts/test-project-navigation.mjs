@@ -84,3 +84,8 @@ test('Footer case links preserve modified navigation and remember their visible 
  assert(app.includes('event.preventDefault();projectOpener=link;caseNavigation.open('));
  assert(app.includes('projectOpener?.isConnected&&!projectOpener.hidden&&openerMatches?projectOpener:'));
 });
+
+test('Adjacent cases keep one gallery entry and original return route',()=>{const b=browser('https://example.test/#directions');b.nav.open('mascot');b.nav.switchCase('pink');b.nav.switchCase('stdAwards');assert.equal(b.history.length,2);assert.equal(b.rendered,'stdAwards');assert.equal(b.close(),'back');b.flush();assert.equal(b.location.hash,'#directions');b.history.forward();b.flush();assert.equal(b.rendered,'stdAwards')});
+test('Adjacent shared case closes safely',()=>{const b=browser('https://example.test/#project/mascot');b.nav.switchCase('pink');assert.equal(b.history.length,1);assert.equal(b.close(),'fallback');assert.equal(b.location.hash,'#projects');assert.equal(b.calls.backs,0)});
+test('Adjacent case to brief Back restores selection',()=>{const b=browser();b.nav.open('mascot');b.nav.switchCase('pink');b.nav.visit('#contact');b.flush();b.history.back();b.flush();assert.equal(b.rendered,'pink');b.close();b.flush();assert.equal(b.location.hash,'#projects')});
+test('Invalid or unopened adjacent case does not navigate',()=>{const b=browser();assert.equal(b.nav.switchCase('pink'),false);b.nav.open('mascot');assert.equal(b.nav.switchCase('missing'),false);assert.equal(b.location.hash,'#project/mascot')});

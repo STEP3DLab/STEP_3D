@@ -59,12 +59,12 @@ test('Integration preserves context-first intro, provenance, gallery chapters an
  assert.match(app,/\$\('#case-description'\).textContent=p.description/);
  assert.match(app,/link.target='_blank';link.rel='noopener noreferrer'/);
  assert.match(app,/updateGalleryChapters=mountGalleryChapters/);
- assert.match(app,/showSlide\(0\);if\(!projectDialog.open\)projectDialog.showModal\(\)/);
+ assert.match(app,/showSlide\(frameMemory.recall\(key,p.media.length\)\);if\(!projectDialog.open\)projectDialog.showModal\(\)/);
  const css=file('style.css').split('/* Short verified case facts')[1].split('/* Reflow the complete header')[0];
  assert.match(css,/overflow-wrap:anywhere/);assert.match(css,/\.case-section h3\{/);assert.match(css,/\.case-section p\{/);
  assert.doesNotMatch(css,/(?:^|[;{])height:|position:|animation|transition|overflow:hidden/);
 });
 test('Changed app, stylesheet and case data load as a matching cache release',()=>{
- assert.match(file('index.html'),/app\.js\?v=20261024-clear-navigation/);assert.match(file('index.html'),/style\.css\?v=20261024-clear-navigation/);
+ assert.match(file('index.html'),/app\.js\?v=20261024-gallery-browse/);assert.match(file('index.html'),/style\.css\?v=20261024-gallery-browse/);
  assert.match(file('app.js'),/project-data\.js\?v=20261024-case-story/);assert.match(file('app.js'),/case-sections\.js\?v=20261024-case-story/);
 });

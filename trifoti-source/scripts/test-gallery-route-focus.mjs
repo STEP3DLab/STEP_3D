@@ -1,3 +1,4 @@
+import {createFrameMemory,thumbnailKey,mountPhotoSwipe} from '../dist/gallery-interactions.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
@@ -44,13 +45,14 @@ function fixture(){
  const history={get state(){return entries[index].state},get length(){return entries.length},
   pushState(state,_,hash){entries.splice(++index);entries.push({state,hash});location.hash=hash},
   replaceState(state,_,hash){entries[index]={state,hash};location.hash=hash},back(){move(-1)},forward(){move(1)}};
- const context={mountCaseSections,mountGalleryChapters,updateGalleryChapters:()=>{},projects,projectDialog:dialog,document,galleryProject:null,galleryIndex:0,galleryArrow,projectLink,location,
+ const context={window:{},$$:()=>[],clearMediaWait:()=>{},frameMemory:createFrameMemory(),thumbnailKey,mountPhotoSwipe,mountCaseSections,mountGalleryChapters,updateGalleryChapters:()=>{},projects,projectDialog:dialog,document,galleryProject:null,galleryIndex:0,galleryArrow,projectLink,location,
   $:selector=>selector==='[data-close="project-dialog"]'?close:nodes.get(selector.slice(1)),
   thumbnailSource:item=>item.src,showSlide(value){slides++;context.galleryIndex=value},
  };
  vm.createContext(context);vm.runInContext(render,context);
  vm.runInContext(app.split('\n').find(line=>line.startsWith("projectDialog.addEventListener('keydown'")),context);
  nav=createProjectNavigation({keys:Object.keys(projects),location,history,onOpen:context.openProject,onClose:()=>{dialog.open=false}});
+ context.caseNavigation=nav;
  const direct=key=>{history.pushState(null,'','#project/'+key);nav.sync();nav.sync()};
  return{context,document,dialog,host,close,body,external,nodes,focusCalls,direct,history,nav,location,
   get shows(){return shows},get renders(){return renders},get slides(){return slides},
@@ -108,4 +110,30 @@ test('No focus change occurs on a non-case route, and a later opening remains na
  f.history.pushState(null,'','#contact');f.nav.sync();
  assert.equal(f.dialog.open,false);assert.equal(f.focusCalls.length,0);
  f.direct('stdAwards');assert.equal(f.shows,2);assert.equal(f.document.activeElement,f.close);
+});
+
+test('Actual adjacent controls replace case route and leave focus on visible fixed Close',()=>{
+ const f=fixture();f.nav.open('mascot');const first=f.nodes.get('case-next');first.focus();first.handlers.click();
+ const keys=Object.keys(projects),next=keys[(keys.indexOf('mascot')+1)%keys.length];
+ assert.equal(f.location.hash,'#project/'+next);assert.equal(f.history.length,2);
+ assert.equal(f.nodes.get('case-title').textContent,projects[next].title);
+ assert.equal(f.document.activeElement,f.close);
+ assert.equal(f.nodes.get('case-share-url').value,projectLink(f.location.href,next));
+ f.nodes.get('case-prev').handlers.click();assert.equal(f.location.hash,'#project/mascot');
+ assert.equal(f.document.activeElement,f.close);
+});
+test('Actual renderer recalls per-case frame and thumbnail arrows consume global navigation',()=>{
+ const f=fixture();f.context.frameMemory.remember('mascot',8);f.nav.open('mascot');assert.equal(f.context.galleryIndex,8);
+ const thumb=f.nodes.get('gallery-thumbnails').children[8];
+ const event={key:'ArrowRight',target:thumb,preventDefault(){this.defaultPrevented=true}};
+ const before=f.slides;thumb.handlers.keydown(event);f.dialog.handlers.keydown(event);
+ assert.equal(f.slides,before+1);assert.equal(f.context.galleryIndex,9);
+ assert.equal(f.document.activeElement,f.nodes.get('gallery-thumbnails').children[9]);
+ f.nav.switchCase('pink');assert.equal(f.context.galleryIndex,0);
+ f.nav.switchCase('mascot');assert.equal(f.context.galleryIndex,8);
+});
+
+test('Adjacent case handlers do not restore focus to controls below the reset viewport',()=>{
+ assert.match(app,/button.addEventListener\('click',\(\)=>caseNavigation.switchCase\(nextKey\)\)/);
+ assert.doesNotMatch(app,/switchCase\(nextKey\);\$\('#'\+id\).focus/);
 });
