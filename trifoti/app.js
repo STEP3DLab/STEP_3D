@@ -1,3 +1,4 @@
+import {initializeBriefTools} from './brief-tools.js?v=20261024-brief-tools';
 import {updateGalleryPhotoLink} from './gallery-photo-link.js?v=20261024-photo-details';
 import {updateBriefGuidance} from './brief-guidance.js?v=20261024-brief-guidance';
 import {mountCaseSections} from './case-sections.js?v=20261024-case-story';
@@ -5,7 +6,7 @@ import {mountGalleryChapters} from './gallery-chapters.js?v=20261023-bear-chapte
 import {watchGalleryMedia} from './media-recovery.js?v=20261022-retry';
 import {createProjectNavigation,projectLink,copyProjectLink} from './project-navigation.js?v=20261022-case-links';
 import {thumbnailSource} from './media-utils.js?v=20261022-previews';
-import {BRIEF_KEY,createBriefDraftSession,briefErrors,formatBrief,requestBriefDownload} from './brief-utils.js?v=20261022-draft-conflict';
+import {BRIEF_KEY,createBriefDraftSession,formatBrief,requestBriefDownload} from './brief-utils.js?v=20261024-brief-tools';
 import {keepDialogFocus,galleryArrow} from './dialog-controls.js?v=20261022-gallery';
 import {projects} from './project-data.js?v=20261024-case-story';
 const $=(s,root=document)=>root.querySelector(s);
@@ -46,25 +47,26 @@ const form=$('#brief-form'),draftSession=createBriefDraftSession(),recovered=dra
 const draftMessages={empty:'Черновик сохраняется в этом браузере.',restored:'Черновик восстановлен из этого браузера.',saved:'Черновик сохранён в этом браузере.',unavailable:'Автосохранение недоступно. Не закрывайте страницу, пока не скачаете или не скопируете бриф.',invalid:'Сохранённый черновик не удалось прочитать. Заполните бриф заново.',partial:'Часть черновика восстановлена. Проверьте поля перед скачиванием.',failed:'Черновик не удалось сохранить в браузере. Не закрывайте страницу: скачайте или скопируйте бриф.',conflict:'Черновик изменён в другой вкладке. Автосохранение здесь остановлено, чтобы не перезаписать другую версию. Ваши текущие поля не изменены: скачайте бриф или скопируйте текст ниже до обновления страницы. После обновления откроется сохранённая версия.'};
 function draftStatus(state){const status=$('#brief-draft-status');if(status.textContent!==draftMessages[state])status.textContent=draftMessages[state];status.dataset.state=['unavailable','invalid','partial','failed','conflict'].includes(state)?'error':'ready';if(state==='conflict'){$('#brief-text-fallback').hidden=false;$('#brief-text').value=formatBrief(Object.fromEntries(new FormData(form)))}}
 for(const [key,value] of Object.entries(recovered.draft)){const field=form.elements.namedItem(key);if(!field)continue;if(field.tagName==='SELECT'&&![...field.options].some(option=>option.value===value)){if(key==='direction'&&value==='3D-модель и производство')field.add(new Option(value+' (из прежнего черновика)',value));else{recovered.state='partial';continue}}field.value=value}
+let briefTools;
 function refreshBriefGuidance(){updateBriefGuidance({direction:form.elements.namedItem('direction').value,helper:$('#brief-idea-help')})}
-function saveDraft(){refreshBriefGuidance();const values=Object.fromEntries(new FormData(form));draftStatus(draftSession.save(values));$('#brief-status').textContent='';if(!$('#brief-text-fallback').hidden)$('#brief-text').value=formatBrief(values)}
+function saveDraft(){refreshBriefGuidance();briefTools?.refresh();const values=Object.fromEntries(new FormData(form));draftStatus(draftSession.save(values));$('#brief-status').textContent='';if(!$('#brief-text-fallback').hidden)$('#brief-text').value=formatBrief(values)}
 addEventListener('storage',event=>{if(event.key!==BRIEF_KEY&&event.key!==null)return;const state=draftSession.check();if(state)draftStatus(state)});
 function updateReference(){const title=form.elements.namedItem('reference').value;$('#brief-reference').hidden=!title;$('#brief-reference-title').textContent=title}
 function selectReference(title){form.elements.namedItem('reference').value=title;updateReference();saveDraft()}
 updateReference();refreshBriefGuidance();
 $('#clear-reference').addEventListener('click',()=>{selectReference('');form.elements.namedItem('name').focus()});
-form.addEventListener('input',()=>{for(const key of ['name','idea'])form.elements.namedItem(key).setCustomValidity('');saveDraft()});
+form.addEventListener('input',saveDraft);
 form.addEventListener('change',saveDraft);
 form.addEventListener('submit',e=>{
  e.preventDefault();const values=Object.fromEntries(new FormData(form));
- for(const [key,message] of Object.entries(briefErrors(values)))form.elements.namedItem(key).setCustomValidity(message);
- if(!form.reportValidity())return;
+ if(!briefTools.validate())return;
  const text=formatBrief(values),fallback=$('#brief-text-fallback'),preview=$('#brief-text'),status=$('#brief-status');preview.value=text;fallback.hidden=false;
  const result=requestBriefDownload(text);status.dataset.state=result==='started'?'ready':'error';
  status.textContent=result==='started'?'Скачивание брифа запрошено. Если файл не появился, откройте текст ниже и скопируйте его.':'Не удалось начать скачивание. Скопируйте готовый текст ниже, чтобы не потерять бриф.';
  if(result!=='started'){fallback.open=true;preview.focus();preview.select()}
 });
 $('#brief-text-fallback').addEventListener('toggle',()=>{if($('#brief-text-fallback').open)$('#brief-text').value=formatBrief(Object.fromEntries(new FormData(form)))});
+briefTools=initializeBriefTools({form,document,draftSession,draftStatus,onReset:()=>{updateReference();refreshBriefGuidance()}});
 // Keep the native submit button disabled until local-only handling is ready.
 draftStatus(recovered.state);
 $('#brief-save').disabled=false;

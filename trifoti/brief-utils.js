@@ -46,6 +46,12 @@ export function createBriefDraftSession(getStorage = () => localStorage) {
   return {
     recovered,
     check,
+    clear() {
+      const state = check(); if (state) return state;
+      try { getStorage().removeItem(BRIEF_KEY); } catch { return 'failed'; }
+      expected = null;
+      return 'empty';
+    },
     save(values) {
       const state = check(); if (state) return state;
       if (!saveBriefDraft(values, getStorage)) return 'failed';

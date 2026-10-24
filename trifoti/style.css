@@ -332,6 +332,17 @@ form .brief-idea-help{font-size:12px;line-height:1.6;margin:0 0 20px;overflow-wr
 .gallery-photo-link span{font-size:11px;color:var(--muted);text-decoration:none}
 .gallery-photo-link[hidden]{display:none}
 
+/* Local brief tools: persistent feedback and deliberate reset, no new fields. */
+form .brief-field-error{color:#a91c24;font-size:13px;line-height:1.5;margin:-10px 0 16px}
+form [aria-invalid="true"]{border-color:#a91c24}
+form .brief-counter{font-size:12px;text-align:right;margin:-10px 0 8px;color:#555}
+form .brief-counter[data-near-limit="true"]{color:#a91c24;font-weight:700}
+.brief-copy{margin:12px 0 0;min-height:44px}
+.brief-reset{margin-top:16px}.brief-reset>button{min-height:44px}
+.brief-reset-confirm{margin-top:12px;padding:16px;border:1px solid #a91c24;border-radius:12px}
+.brief-reset-confirm>p:first-child{font-weight:700;margin:0 0 8px}
+.brief-reset-actions{display:flex;align-items:center;flex-wrap:wrap;gap:12px}.brief-reset-actions button{min-height:44px;white-space:normal}
+
 /* Reflow the complete header at extreme zoom instead of clipping its controls. */
 @media(max-width:340px){
  html{scroll-padding-top:132px}
