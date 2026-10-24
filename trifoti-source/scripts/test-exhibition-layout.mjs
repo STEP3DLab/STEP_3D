@@ -56,8 +56,8 @@ test('Motion is optional, keyboard focus has equal emphasis and native navigatio
  assert.match(exhibition,/\.project-card:focus-visible \.project-arrow/);
  assert.match(exhibition,/\.project-card:focus-visible \.project-title/);
  assert.doesNotMatch(exhibition,/scroll-snap|scroll-timeline|animation:|cursor:none|position:fixed/);
- assert.match(html,/style\.css\?v=20261023-bear-chapters/);
- assert.match(html,/app\.js\?v=20261023-viewport/);
+ assert.match(html,/style\.css\?v=20261024-case-story/);
+ assert.match(html,/app\.js\?v=20261024-case-story/);
 });
 
  test('Narrow manifesto strip wraps without hiding horizontal overflow',()=>{

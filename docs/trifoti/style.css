@@ -318,6 +318,11 @@ footer.site-footer{display:block;margin:0;padding:48px 4.5% 88px;background:#ebe
 @media(max-width:800px){.brand.brand-final{width:60px;height:60px}}
 @media(max-width:480px){.site-footer .footer-brand-final{width:160px;height:160px}}
 
+/* Short verified case facts, only where the project has structured copy. */
+.case-sections{display:grid;gap:20px;margin:0 0 20px;overflow-wrap:anywhere}
+.case-section h3{font-size:13px;line-height:1.5;letter-spacing:0;margin:0 0 6px;color:var(--ink)}
+.case-section p{font-size:13px;line-height:1.8;margin:0;color:var(--muted)}
+
 /* Reflow the complete header at extreme zoom instead of clipping its controls. */
 @media(max-width:340px){
  html{scroll-padding-top:132px}

@@ -10,16 +10,16 @@ const hash=value=>createHash('sha256').update(value).digest('hex');
 const html=file('index.html').toString(),css=file('style.css').toString(),app=file('app.js').toString();
 const key='rto-traveling-cup',cup=projects[key];
 
-test('The five earlier project records remain byte-for-byte equivalent as data',()=>{
- const previous=Object.fromEntries(Object.entries(projects).filter(([id])=>id!==key));
- assert.equal(hash(JSON.stringify(previous)),'d6f523e5be57b57c01a59e758486d7e4684f29ce4b4422be2e1f4310ad813c8e');
+test('The four non-award project records remain byte-for-byte equivalent as data',()=>{
+ const previous=Object.fromEntries(Object.entries(projects).filter(([id])=>id!==key&&id!=='stdAwards'));
+ assert.equal(hash(JSON.stringify(previous)),'c2f57f44df92417486f83ca2b26b3595df800bff120ca0c8963d8f20e03cf050');
  assert.equal(Object.keys(projects).length,6);
 });
 test('The selected cup is the second awards case, with its exact title and verified result',()=>{
  assert.equal(cup.title,'Переходящий кубок Спартакиады РТО');
  assert.equal(cup.direction,'Сувениры, призы, награды');
  assert.equal(Object.values(projects).filter(p=>p.direction===cup.direction).length,2);
- assert.match(cup.description,/2026/);assert.match(cup.description,/Театр «Ленком Марка Захарова»/);
+ assert.match(cup.sections[1].text,/2026/);assert.match(cup.sections[1].text,/Театр «Ленком Марка Захарова»/);
  assert.equal(cup.media.length,3);
 });
 test('All three real photographs retain their supplied bytes and original gallery sources',()=>{
@@ -59,6 +59,6 @@ test('The new case uses the unchanged brief handoff without overwriting a chosen
  assert.deepEqual([...form.matchAll(/\bname="([^"]+)"/g)].map(x=>x[1]),['reference','name','direction','idea','budget','deadline']);
 });
 test('Returning visitors load the matching stylesheet, app and six-case data module',()=>{
- assert.match(html,/style\.css\?v=20261023-bear-chapters/);assert.match(html,/app\.js\?v=20261023-viewport/);
- assert.match(app,/project-data\.js\?v=20261022-rto/);
+ assert.match(html,/style\.css\?v=20261024-case-story/);assert.match(html,/app\.js\?v=20261024-case-story/);
+ assert.match(app,/project-data\.js\?v=20261024-case-story/);
 });

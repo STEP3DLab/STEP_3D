@@ -4,6 +4,7 @@ import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
 import {projects} from '../dist/project-data.js';
 import {createProjectNavigation,projectLink} from '../dist/project-navigation.js';
+import {mountCaseSections} from '../dist/case-sections.js';
 import {mountGalleryChapters} from '../dist/gallery-chapters.js';
 import {galleryArrow} from '../dist/dialog-controls.js';
 
@@ -17,7 +18,7 @@ function fixture(){
  const nodes=new Map(),focusCalls=[],document={activeElement:null};let shows=0,renders=0,slides=0;
  function node(id=''){
   return{id,children:[],parent:null,hidden:false,handlers:{},scrollTop:0,
-   append(child){child.parent=this;this.children.push(child)},
+   append(...children){for(const child of children){child.parent=this;this.children.push(child)}},
    prepend(child){child.parent=this;this.children.unshift(child)},
    contains(other){for(let current=other;current;current=current.parent)if(current===this)return true;return false},
    setAttribute(){},addEventListener(type,handler){this.handlers[type]=handler},
@@ -35,6 +36,7 @@ function fixture(){
   host.children.forEach(child=>child.parent=null);host.children=[];
   nodes.clear();nodes.set('project-content',host);
   const gallery=node('case-gallery');host.append(gallery);nodes.set('case-gallery',gallery);
+  const copy=node('case-copy');host.append(copy);nodes.set('case-copy',copy);
   for(const match of markup.matchAll(/id="([^"]+)"/g)){const element=node(match[1]);host.append(element);nodes.set(element.id,element)}
  }});
  const location={href:'https://example.test/trifoti/#projects',hash:'#projects'},entries=[{hash:location.hash,state:null}];let index=0,nav;
@@ -42,7 +44,7 @@ function fixture(){
  const history={get state(){return entries[index].state},get length(){return entries.length},
   pushState(state,_,hash){entries.splice(++index);entries.push({state,hash});location.hash=hash},
   replaceState(state,_,hash){entries[index]={state,hash};location.hash=hash},back(){move(-1)},forward(){move(1)}};
- const context={mountGalleryChapters,updateGalleryChapters:()=>{},projects,projectDialog:dialog,document,galleryProject:null,galleryIndex:0,galleryArrow,projectLink,location,
+ const context={mountCaseSections,mountGalleryChapters,updateGalleryChapters:()=>{},projects,projectDialog:dialog,document,galleryProject:null,galleryIndex:0,galleryArrow,projectLink,location,
   $:selector=>selector==='[data-close="project-dialog"]'?close:nodes.get(selector.slice(1)),
   thumbnailSource:item=>item.src,showSlide(value){slides++;context.galleryIndex=value},
  };
