@@ -327,6 +327,11 @@ footer.site-footer{display:block;margin:0;padding:48px 4.5% 88px;background:#ebe
 form .brief-idea-label{margin-bottom:8px}
 form .brief-idea-help{font-size:12px;line-height:1.6;margin:0 0 20px;overflow-wrap:anywhere}
 
+/* Native original-photo view keeps the case open in its existing tab. */
+.gallery-photo-link{display:inline-flex;align-items:center;flex-wrap:wrap;gap:4px 10px;min-height:44px;max-width:100%;padding:8px 0;color:var(--red);font-size:12px;line-height:1.5;text-decoration:underline;text-underline-offset:4px}
+.gallery-photo-link span{font-size:11px;color:var(--muted);text-decoration:none}
+.gallery-photo-link[hidden]{display:none}
+
 /* Reflow the complete header at extreme zoom instead of clipping its controls. */
 @media(max-width:340px){
  html{scroll-padding-top:132px}

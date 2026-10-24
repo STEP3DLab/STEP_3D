@@ -65,6 +65,6 @@ test('Integration preserves context-first intro, provenance, gallery chapters an
  assert.doesNotMatch(css,/(?:^|[;{])height:|position:|animation|transition|overflow:hidden/);
 });
 test('Changed app, stylesheet and case data load as a matching cache release',()=>{
- assert.match(file('index.html'),/app\.js\?v=20261024-brief-guidance/);assert.match(file('index.html'),/style\.css\?v=20261024-brief-guidance/);
+ assert.match(file('index.html'),/app\.js\?v=20261024-photo-details/);assert.match(file('index.html'),/style\.css\?v=20261024-photo-details/);
  assert.match(file('app.js'),/project-data\.js\?v=20261024-case-story/);assert.match(file('app.js'),/case-sections\.js\?v=20261024-case-story/);
 });
