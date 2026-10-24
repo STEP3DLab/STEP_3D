@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 const read=name=>readFileSync(new URL('../dist/'+name,import.meta.url),'utf8');
 const html=read('index.html'),app=read('app.js'),css=read('style.css');
-const form=html.match(/<form id="brief-form">(.*?)<\/form>/s)[1];
+const form=html.match(/<form id="brief-form"[^>]*>(.*?)<\/form>/s)[1];
 
 test('The sole native submit button starts disabled, including before module evaluation',()=>{
  const buttons=[...form.matchAll(/<button\b([^>]*)>/g)];
@@ -32,10 +32,10 @@ test('Readiness is activated only after prevention, local export and input handl
  assert.equal(app.match(/brief-save/g).length,1);
  assert.doesNotMatch(app,/\.submit\(\)|fetch\(|XMLHttpRequest|sendBeacon/);
 });
-test('Review control stays in normal flow at every height, not hidden or inaccessible',()=>{
+test('Editorial review uses normal flow when its explicit mode is enabled',()=>{
  const rule=css.match(/^\.review-launch\{([^}]*)\}/m)[1];
  assert.match(rule,/position:static/);assert.match(rule,/transform:none/);assert.match(rule,/width:max-content/);assert.match(rule,/max-width:calc\(100% - 32px\)/);
  assert.doesNotMatch(rule,/display:none|visibility:hidden|pointer-events:none/);
  assert.ok(html.indexOf('id="review-launch"')>html.indexOf('</footer>'));
- assert.match(html,/<button class="review-launch" id="review-launch">/);
+ assert.match(html,/<button class="review-launch" id="review-launch" hidden>/);
 });

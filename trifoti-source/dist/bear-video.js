@@ -15,6 +15,7 @@ function update(){
  toggle.textContent=wantsPlayback?'Ⅱ':'▷';
  toggle.setAttribute('aria-label',wantsPlayback?'Приостановить вращение':'Включить вращение');
  toggle.setAttribute('aria-pressed',String(wantsPlayback));
+ if(gifMode)document.querySelector('.drag-hint').textContent=wantsPlayback?'Скульптура · 360°':'▷ Запустить анимацию';
 }
 async function syncPlayback(){
  const request=++playRequest;
@@ -37,9 +38,11 @@ function togglePlayback(){wantsPlayback?pause():play()}
 function useFallback(){
  if(gifMode)return;
  if(exhaustionCheck!==null){clearTimeout(exhaustionCheck);exhaustionCheck=null}
+ // A failed lightweight video must not automatically download the much larger
+ // GIF. Keep the poster until an explicit play action, including after a drag.
+ wantsPlayback=false;resumeAfterDrag=false;
  gifMode=true;video.hidden=true;image.hidden=false;stage.dataset.renderer='gif';
- document.querySelector('.drag-hint').textContent='Скульптура · 360°';
- keyboardHelp.textContent='Пробел или Enter — включить или приостановить анимацию.';
+ keyboardHelp.textContent='Видео недоступно. Пробел или Enter — включить или приостановить анимацию.';
  stage.setAttribute('aria-keyshortcuts','Space Enter');
  syncPlayback();
 }

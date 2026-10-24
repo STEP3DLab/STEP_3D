@@ -33,7 +33,7 @@ test('All three real photographs retain their supplied bytes and original galler
 });
 test('The cup has one lazy dimensioned portfolio card, a footer link and an uncropped cover',()=>{
  assert.equal((html.match(/data-project="rto-traveling-cup"/g)||[]).length,1);
- assert.equal((html.match(/data-case-link href="#project\/rto-traveling-cup"/g)||[]).length,1);
+ assert.equal((html.match(/data-case-link="rto-traveling-cup" href="assets\/projects\/rto-traveling-cup\/trophy.webp"/g)||[]).length,1);
  const card=html.match(/<a href="[^"]+" class="project-card[^>]*data-project="rto-traveling-cup">(.*?)<\/a>/s)[1];
  assert.match(card,/width="1152" height="1536" loading="lazy" decoding="async"/);
  assert.match(card,/3 фото/);assert.match(css,/\.rto-card img\{object-fit:contain\}/);
@@ -55,10 +55,10 @@ test('The hyphenated case route and copy link work with the existing allowlist a
 });
 test('The new case uses the unchanged brief handoff without overwriting a chosen direction',()=>{
  assert.match(app,/if\(p.direction&&direction.selectedIndex===0\)direction.value=p.direction;selectReference\(p.title\)/);
- const form=html.match(/<form id="brief-form">(.*?)<\/form>/s)[1];
+ const form=html.match(/<form id="brief-form"[^>]*>(.*?)<\/form>/s)[1];
  assert.deepEqual([...form.matchAll(/\bname="([^"]+)"/g)].map(x=>x[1]),['reference','name','direction','idea','budget','deadline']);
 });
 test('Returning visitors load the matching stylesheet, app and six-case data module',()=>{
- assert.match(html,/style\.css\?v=20261024-team-profiles/);assert.match(html,/app\.js\?v=20261024-public-experience/);
+ assert.match(html,/style\.css\?v=20261024-audit-round2/);assert.match(html,/app\.js\?v=20261024-audit-round2/);
  assert.match(app,/project-data\.js\?v=20261024-case-story/);
 });

@@ -30,10 +30,11 @@ test('Footer has four useful groups and only real section or case destinations',
  assert.deepEqual([...footer.matchAll(/<h3>([^<]+)<\/h3>/g)].map(m=>m[1]),['Направления','Проекты','Об объединении','Начало работы']);
  const hrefs=[...footer.matchAll(/href="([^"]+)"/g)].map(m=>m[1]);
  for(const href of hrefs){
-  if(href.startsWith('#project/'))assert(Object.hasOwn(projects,href.slice(9)));
+  if(href.startsWith('assets/projects/'))assert(readFileSync(new URL('../dist/'+href,import.meta.url)).length>0);
   else assert(html.includes(`id="${href.slice(1)}"`));
  }
- assert.equal(hrefs.filter(x=>x.startsWith('#project/')).length,6);
+ assert.equal(hrefs.filter(x=>x.startsWith('assets/projects/')).length,6);
+ for(const [,key] of footer.matchAll(/data-case-link="([^"]+)"/g))assert(Object.hasOwn(projects,key));
  assert.equal(hrefs.filter(x=>x.startsWith('#service-')).length,4);
  assert(footer.includes('aria-label="Разделы сайта"'));assert(!hrefs.includes('#'));
 });
@@ -43,7 +44,7 @@ test('All four service CTAs retain their visible label, target and contextual ac
  const names=new Set();
  for(const [,attrs,service,visible] of links){
   const label=visible.replace(/<[^>]*>/g,'').trim();assert.equal(label,'Подготовить бриф');
-  assert.equal(attr(attrs,'href'),'#contact');
+  assert.equal(attr(attrs,'href'),'#brief-form');
   const name=attr(attrs,'aria-label');
   assert.ok(name.startsWith(label));assert.ok(name.includes(service));names.add(name);
  }
@@ -65,20 +66,21 @@ test('Only the existing name and idea fields are visibly and natively required',
  }
 });
 test('The brief retains its original six stored fields and local-only explanation',()=>{
- const form=html.match(/<form id="brief-form">(.*?)<\/form>/s)[1];
+ const form=html.match(/<form id="brief-form"[^>]*>(.*?)<\/form>/s)[1];
  assert.deepEqual([...form.matchAll(/\bname="([^"]+)"/g)].map(m=>m[1]),['reference','name','direction','idea','budget','deadline']);
  assert.match(form,/Бриф скачивается файлом, а не отправляется объединению/);
 });
 
-test('Portfolio filters use the current directions and honest case counts',()=>{
- const filters=[...html.matchAll(/<button[^>]+data-filter="([^"]+)"[^>]*>([^<]+)<\/button>/g)];
- assert.deepEqual(filters.map(m=>m[2]),['Все','Дизайн и архитектура','Скульптура','Бытовой дизайн','Сувениры, призы, награды']);
+test('Portfolio offers only populated filters while all four service directions remain available',()=>{
+ const filters=[...html.matchAll(/<button[^>]+data-filter="([^"]+)"[^>]*>(.*?)<\/button>/g)];
+ assert.deepEqual(filters.map(m=>m[1]),['all','sculpture','awards']);
  const cards=[...html.matchAll(/data-category="([^"]+)" data-project="([^"]+)"/g)];
- assert.deepEqual(filters.map(([,key])=>cards.filter(([,category])=>key==='all'||category.split(' ').includes(key)).length),[6,0,4,0,2]);
- assert(html.includes('id="project-empty" hidden'));assert(html.includes('Проекты этого направления пока не добавлены.'));
- assert(html.includes('id="empty-category-brief" href="#contact"'));
- const app=readFileSync(new URL('../dist/app.js',import.meta.url),'utf8');
- assert(app.includes("$('#project-empty').hidden=count>0"));assert(app.includes("b.setAttribute('aria-pressed',String(b===button))"));
+ for(const [,key,body] of filters){
+  const count=cards.filter(([,category])=>key==='all'||category.split(' ').includes(key)).length;
+  assert(count>0);assert(body.includes('class="filter-count">'+count));
+ }
+ assert(html.includes('href="#directions">Все направления работы'));
+ assert(html.includes('data-show-projects="sculpture"'));assert(html.includes('data-show-projects="awards"'));
 });
 
 test('Team presents the two researched profiles with portraits, attribution and source links',()=>{

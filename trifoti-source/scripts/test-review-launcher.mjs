@@ -23,7 +23,8 @@ test('Narrow and enlarged-text launchers can wrap without shrinking the touch ta
 test('The same native button and accessible label remain present once',()=>{
  assert.equal((html.match(/id="review-launch"/g)||[]).length,1);
  const button=html.match(/<button\b([^>]*id="review-launch"[^>]*)>(.*?)<\/button>/s);
- assert.ok(button);assert.doesNotMatch(button[1],/tabindex|hidden|disabled|aria-hidden/);
+ assert.ok(button);assert.match(button[1],/hidden/);assert.doesNotMatch(button[1],/tabindex|disabled|aria-hidden/);
+ assert.match(app,/get\('review'\)==='1'/);assert.match(app,/if\(reviewMode&&typeof/);
  assert.match(button[2],/Заметки по концепции/);assert.match(button[2],/Только в этом браузере/);
  assert.ok(!html.match(/<form[^>]*>.*?id="review-launch".*?<\/form>/s));
 });
@@ -35,6 +36,6 @@ test('Opening the notes dialog still uses the unchanged native modal path',()=>{
  assert.match(html,/<dialog[^>]*id="review-dialog"/);
 });
 test('Returning visitors receive the layout fix without replacing application logic',()=>{
- assert.match(html,/style\.css\?v=20261024-team-profiles/);
- assert.match(html,/app\.js\?v=20261024-public-experience/);
+ assert.match(html,/style\.css\?v=20261024-audit-round2/);
+ assert.match(html,/app\.js\?v=20261024-audit-round2/);
 });

@@ -16,10 +16,10 @@ function fixture(initial={}){
  const storage={getItem:key=>{assert.equal(key,BRIEF_KEY);return raw},setItem(key,value){raw=value},removeItem(key){assert.equal(key,BRIEF_KEY);raw=null}};
  node('brief-reset-confirm').hidden=true;
  const session=createBriefDraftSession(()=>storage),statuses=[];
- let copied=[],denied=false,resolve;
- const clipboard={async writeText(text){copied.push(text);if(denied)throw Error('denied');if(resolve===true)await new Promise(r=>resolve=r)}};
+ let copied=[],denied=false,resolve,reject;
+ const clipboard={async writeText(text){copied.push(text);if(denied)throw Error('denied');if(resolve===true)await new Promise((r,j)=>{resolve=r;reject=j})}};
  const tools=initializeBriefTools({form,document:{getElementById:node},draftSession:session,draftStatus:s=>statuses.push(s),onReset:()=>events.push('reset'),clipboard});
- return {node,fields,form,tools,session,statuses,events,copied,set denied(v){denied=v},set raw(v){raw=v},get raw(){return raw},get active(){return active},click:id=>node(id).handlers.click(),cleanup(){globalThis.FormData=NativeFormData},defer(){resolve=true},finish(){resolve()}};
+ return {node,fields,form,tools,session,statuses,events,copied,set denied(v){denied=v},set raw(v){raw=v},get raw(){return raw},get active(){return active},click:id=>node(id).handlers.click(),cleanup(){globalThis.FormData=NativeFormData},defer(){resolve=true},finish(){resolve()},fail(){reject(Error('denied'))}};
 }
 test('Idea count matches native maxlength units and only two warning thresholds',()=>{
  assert.deepEqual(ideaCount('abc'),{length:3,near:false,text:'3 / 4000',announcement:''});
@@ -33,11 +33,12 @@ test('Copy reports real success only after clipboard resolves and handles absent
  assert.equal(await copyBriefText('test',{writeText(){throw Error('denied')}}),false);
  let got='';assert.equal(await copyBriefText('text',{async writeText(value){got=value}}),true);assert.equal(got,'text');
 });
-test('Preview and copy are available without submitting or downloading',async()=>{
+test('Unfinished preview stays available; primary copy validates without submitting or downloading',async()=>{
  const f=fixture({idea:'Незавершённый замысел'});try{
   assert.equal(f.node('brief-text-fallback').hidden,false);assert.equal(f.node('brief-copy').disabled,false);assert.equal(f.form.noValidate,true);
   f.node('brief-text-fallback').open=true;f.tools.refresh();assert.match(f.node('brief-text').value,/Незавершённый замысел/);
-  await f.click('brief-copy');assert.match(f.copied[0],/Незавершённый замысел/);assert.match(f.node('brief-copy-status').textContent,/Бриф скопирован/);
+  await f.click('brief-copy');assert.equal(f.copied.length,0);assert.equal(f.active,f.fields.name);assert.match(f.node('brief-text').value,/Незавершённый замысел/);assert(f.node('brief-text-fallback').open);
+  f.fields.name.value='Тест';f.tools.refresh();await f.click('brief-copy');assert.match(f.copied[0],/Незавершённый замысел/);assert.match(f.node('brief-copy-status').textContent,/Бриф скопирован/);
   assert.equal(f.raw,null);
  }finally{f.cleanup()}
 });
@@ -53,10 +54,47 @@ test('Untouched required fields are not prematurely marked invalid',()=>{
  const f=fixture();try{f.tools.refresh();assert.equal(f.fields.name.attrs['aria-invalid'],undefined);f.fields.name.handlers.blur();assert.equal(f.fields.name.attrs['aria-invalid'],'true')}finally{f.cleanup()}
 });
 test('Denied clipboard exposes current text, selects it and never claims success',async()=>{
- const f=fixture({idea:'Мой текст'});try{f.denied=true;await f.click('brief-copy');assert.equal(f.node('brief-text-fallback').open,true);assert.equal(f.active,f.node('brief-text'));assert.equal(f.node('brief-text').selected,true);assert.match(f.node('brief-text').value,/Мой текст/);assert.match(f.node('brief-copy-status').textContent,/недоступно/);assert.equal(f.node('brief-copy').disabled,false)}finally{f.cleanup()}
+ const f=fixture({name:'Тест',idea:'Мой текст'});try{f.denied=true;await f.click('brief-copy');assert.equal(f.node('brief-text-fallback').open,true);assert.equal(f.active,f.node('brief-text'));assert.equal(f.node('brief-text').selected,true);assert.match(f.node('brief-text').value,/Мой текст/);assert.match(f.node('brief-copy-status').textContent,/недоступно/);assert.match(f.node('brief-copy-status').textContent,/в открытом блоке/);assert.equal(f.node('brief-copy').disabled,false)}finally{f.cleanup()}
 });
 test('Copy in flight cannot mislabel newer edited text as copied',async()=>{
- const f=fixture({idea:'Первая версия'});try{f.defer();const pending=f.click('brief-copy');assert.equal(f.node('brief-copy').disabled,true);f.fields.idea.value='Вторая версия';f.tools.refresh();f.finish();await pending;assert.match(f.node('brief-copy-status').textContent,/до последних изменений/)}finally{f.cleanup()}
+ const f=fixture({name:'Тест',idea:'Первая версия'});try{f.defer();const pending=f.click('brief-copy');assert.equal(f.node('brief-copy').disabled,true);f.fields.idea.value='Вторая версия';f.tools.refresh();f.finish();await pending;assert.match(f.node('brief-copy-status').textContent,/до последних изменений/)}finally{f.cleanup()}
+});
+test('Primary copy rejects whitespace-only required fields without touching clipboard or draft',async()=>{
+ const f=fixture({name:' ',idea:'\n'});try{
+  f.session.save({idea:'Сохранённый черновик'});const before=f.raw;f.node('brief-copy-status').textContent='Старый статус';
+  await f.click('brief-copy');assert.equal(f.copied.length,0);assert.equal(f.raw,before);assert.equal(f.active,f.fields.name);assert.equal(f.node('brief-copy').disabled,false);assert.equal(f.node('brief-copy-status').textContent,'');
+  for(const key of ['name','idea'])assert.equal(f.fields[key].attrs['aria-invalid'],'true');
+  f.fields.name.value='Тест';await f.click('brief-copy');assert.equal(f.active,f.fields.idea);assert.equal(f.copied.length,0);
+ }finally{f.cleanup()}
+});
+test('Copy remains pending until resolved, ignores duplicate clicks and leaves preview closed on success',async()=>{
+ const f=fixture({name:'Тест',idea:'Готовый замысел'});try{
+  f.defer();const pending=f.click('brief-copy');assert.equal(f.node('brief-copy-status').textContent,'Копируем текст…');assert.equal(f.node('brief-copy').disabled,true);
+  await f.click('brief-copy');assert.equal(f.copied.length,1);f.finish();await pending;
+  assert.equal(f.node('brief-copy').disabled,false);assert.equal(f.node('brief-text-fallback').open,false);assert.equal(f.node('brief-copy-status').textContent,'Бриф скопирован. Данные никуда не отправлены.');assert.equal(f.raw,null);
+ }finally{f.cleanup()}
+});
+test('Late clipboard rejection exposes the current text after an intervening edit',async()=>{
+ const f=fixture({name:'Тест',idea:'Первая версия'});try{
+  f.defer();const pending=f.click('brief-copy');f.fields.idea.value='Новая версия';f.tools.refresh();f.fail();await pending;
+  assert.match(f.node('brief-text').value,/Новая версия/);assert.doesNotMatch(f.node('brief-text').value,/Первая версия/);assert(f.node('brief-text-fallback').open);assert.equal(f.active,f.node('brief-text'));assert.match(f.node('brief-copy-status').textContent,/недоступно/);
+ }finally{f.cleanup()}
+});
+test('Reset during pending copy prevents late success or failure from restoring old status or focus',async()=>{
+ for(const outcome of ['finish','fail']){
+  const f=fixture({name:'Тест',idea:'Старый текст'});try{
+   f.defer();const pending=f.click('brief-copy');f.click('brief-new');f.click('brief-reset-yes');f[outcome]();await pending;
+   assert.equal(f.fields.idea.value,'');assert.equal(f.node('brief-copy-status').textContent,'');assert.equal(f.node('brief-copy').disabled,false);assert.equal(f.node('brief-text-fallback').open,false);assert.equal(f.active,f.fields.name);assert.doesNotMatch(f.node('brief-text').value,/Старый текст/);
+  }finally{f.cleanup()}
+ }
+});
+test('Copy and unfinished preview remain available during a latched storage conflict without overwriting it',async()=>{
+ const f=fixture({name:'Тест',idea:'Моя текущая версия'});try{
+  f.session.save({idea:'Прежняя версия'});f.raw='{"idea":"Другая вкладка"}';assert.equal(f.session.check(),'conflict');const other=f.raw;
+  await f.click('brief-copy');assert.match(f.copied[0],/Моя текущая версия/);assert.equal(f.raw,other);assert.equal(f.session.check(),'conflict');
+  f.fields.name.value='';f.fields.idea.value='Незавершённый черновик';f.node('brief-text-fallback').open=true;f.tools.refresh();
+  await f.click('brief-copy');assert.equal(f.copied.length,1);assert.match(f.node('brief-text').value,/Незавершённый черновик/);assert(f.node('brief-text-fallback').open);assert.equal(f.raw,other);
+ }finally{f.cleanup()}
 });
 test('Reset requires explicit confirmation and Cancel or Escape preserves all fields and storage',()=>{
  const f=fixture({name:'Тест',idea:'Не удалить',reference:'Медведь'});try{
@@ -93,6 +131,6 @@ test('Counter, errors and preview have descriptive relationships, reset is hidde
  assert.match(html,/id="brief-reset-confirm"[^>]*hidden/);assert.match(html,/id="brief-reset-controls" hidden/);assert.match(html,/id="brief-copy" disabled/);
 });
 test('Brief tools add no new form fields, storage keys, request or transmission path',()=>{
- const html=file('index.html'),form=html.match(/<form id="brief-form">([\s\S]*?)<\/form>/)[1];assert.deepEqual([...form.matchAll(/\bname="([^"]+)"/g)].map(m=>m[1]).sort(),['budget','deadline','direction','idea','name','reference']);
+ const html=file('index.html'),form=html.match(/<form id="brief-form"[^>]*>([\s\S]*?)<\/form>/)[1];assert.deepEqual([...form.matchAll(/\bname="([^"]+)"/g)].map(m=>m[1]).sort(),['budget','deadline','direction','idea','name','reference']);
  const module=file('brief-tools.js');assert.doesNotMatch(module,/fetch\(|XMLHttpRequest|sendBeacon|localStorage|sessionStorage|innerHTML/);assert.match(module,/draftSession\.clear\(\)/);
 });

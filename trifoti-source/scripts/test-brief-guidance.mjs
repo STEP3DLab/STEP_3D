@@ -44,12 +44,12 @@ test('Restore and every existing direction entry point refresh guidance',()=>{
  assert.match(app,/\$\('#brief-direction'\).value=a.dataset.service;saveDraft\(\)/);
 });
 test('Field schema, local download and conflict handling remain intact',()=>{
- const form=html.match(/<form id="brief-form">([\s\S]*?)<\/form>/)[1];
+ const form=html.match(/<form id="brief-form"[^>]*>([\s\S]*?)<\/form>/)[1];
  assert.deepEqual([...form.matchAll(/\bname="([^"]+)"/g)].map(m=>m[1]).sort(),['budget','deadline','direction','idea','name','reference']);
  assert.match(app,/const result=requestBriefDownload\(text\)/);assert.match(app,/draftSession\.check\(\)/);assert.match(app,/draftSession\.save\(values\)/);
  assert.match(form,/Бриф скачивается файлом, а не отправляется объединению/);
 });
 test('Guidance release has matching local app and stylesheet cache keys',()=>{
  assert.match(app,/brief-guidance\.js\?v=20261024-brief-guidance/);
- assert.match(html,/app\.js\?v=20261024-public-experience/);assert.match(html,/style\.css\?v=20261024-team-profiles/);
+ assert.match(html,/app\.js\?v=20261024-audit-round2/);assert.match(html,/style\.css\?v=20261024-audit-round2/);
 });

@@ -34,13 +34,18 @@ export function initializeBriefTools({form,document,draftSession,draftStatus,onR
  }
  for(const key of ['name','idea'])field(key).addEventListener('blur',()=>{touched.add(key);error(key)});
  copy.addEventListener('click',async()=>{
-  if(copying)return;const revision=++copyRevision,text=formatBrief(values());preview.value=text;
+  if(copying)return;
+  copyStatus.textContent='';
+  // The primary copy action exports a complete brief. The preview stays available
+  // independently so an unfinished draft can still be selected and preserved.
+  if(!validate())return;
+  const revision=++copyRevision,text=formatBrief(values());preview.value=text;
   copying=true;copy.disabled=true;copyStatus.textContent='Копируем текст…';
   const copied=await copyBriefText(text,clipboard);
   if(revision!==copyRevision)return;
   copying=false;copy.disabled=false;
   if(copied){copyStatus.textContent=formatBrief(values())===text?'Бриф скопирован. Данные никуда не отправлены.':'Скопирована версия до последних изменений. Скопируйте ещё раз, чтобы обновить текст.'}
-  else{preview.value=formatBrief(values());details.open=true;copyStatus.textContent='Автоматическое копирование недоступно. Выделите текст выше и скопируйте его вручную.';preview.focus();preview.select()}
+  else{preview.value=formatBrief(values());details.open=true;copyStatus.textContent='Автоматическое копирование недоступно. Выделите текст в открытом блоке и скопируйте его вручную.';preview.focus();preview.select()}
  });
  function closeConfirmation(){confirm.hidden=true;newButton.setAttribute('aria-expanded','false');newButton.focus()}
  newButton.addEventListener('click',()=>{

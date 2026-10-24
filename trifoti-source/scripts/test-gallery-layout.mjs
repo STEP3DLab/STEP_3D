@@ -48,8 +48,8 @@ test('Nested Close uses the same native close handler and dialog keyboard contro
  assert.match(app,/projectDialog.addEventListener\('close'/);
 });
 test('Both changed runtime resources have current release URLs',()=>{
- assert.match(html,/style\.css\?v=20261024-team-profiles/);
- assert.match(html,/app\.js\?v=20261024-public-experience/);
+ assert.match(html,/style\.css\?v=20261024-audit-round2/);
+ assert.match(html,/app\.js\?v=20261024-audit-round2/);
 });
 
 test('Case context is unique and precedes media in document order',()=>{
@@ -63,7 +63,7 @@ test('Case context is unique and precedes media in document order',()=>{
 });
 test('A clear local-download brief shortcut comes before the complete journal',()=>{
  const bridge=html.match(/<aside class="brief-bridge"[\s\S]*?<\/aside>/)[0];
- assert.match(bridge,/href="#contact">Подготовить бриф/);
+ assert.match(bridge,/href="#brief-form">Подготовить бриф/);
  assert.match(bridge,/без отправки/);
  assert(html.indexOf(bridge)<html.indexOf('id="journal"'));
  assert.equal((html.match(/class="journal-card"/g)||[]).length,3);

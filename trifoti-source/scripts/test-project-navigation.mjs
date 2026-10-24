@@ -70,7 +70,7 @@ test('Unavailable or rejected clipboard access reports failure for the visible f
 });
 test('Sharing is click-only, fallback is readonly and focus recovery excludes filtered-out cards',()=>{
   const app=readFileSync(new URL('../dist/app.js',import.meta.url),'utf8');
-  assert(app.includes("shareButton.addEventListener('click',async()=>"));assert(app.includes('<input id="case-share-url" readonly>'));assert(app.includes('card&&!card.hidden?card:'));assert(app.includes("caseNavigation.visit('#contact')"));assert(app.includes("if(!shareButton.isConnected)return"));
+  assert(app.includes("shareButton.addEventListener('click',async()=>"));assert(app.includes('<input id="case-share-url" readonly>'));assert(app.includes('card&&!card.hidden?card:'));assert(app.includes("caseNavigation.visit('#brief-form')"));assert(app.includes("if(!shareButton.isConnected)return"));
   const nav=readFileSync(new URL('../dist/project-navigation.js',import.meta.url),'utf8');assert(!/localStorage|sessionStorage|fetch\(/.test(nav));
 });
 test('First-screen studio introduction now targets the existing studio section',()=>{
@@ -80,8 +80,9 @@ test('First-screen studio introduction now targets the existing studio section',
 test('Footer case links preserve modified navigation and remember their visible trigger',()=>{
  const app=readFileSync(new URL('../dist/app.js',import.meta.url),'utf8');
  assert(app.includes("$$('a[data-case-link]')"));
- assert(app.includes('if(event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;'));
- assert(app.includes('event.preventDefault();projectOpener=link;caseNavigation.open('));
+ assert(app.includes("enhanceProjectCards($$('a[data-case-link]')"));
+ assert(app.includes('projectOpener=link;caseNavigation.open(link.dataset.caseLink)'));
+ assert(app.includes('projectOpener?.dataset.caseLink===galleryProject'));
  assert(app.includes('projectOpener?.isConnected&&!projectOpener.hidden&&openerMatches?projectOpener:'));
 });
 

@@ -37,7 +37,7 @@ assert(html.includes('data-filter="awards"'));
 assert(html.includes('aria-describedby="bear-keyboard-help"'));assert(ids.includes('bear-keyboard-help'));assert(html.includes('aria-controls="bear-video bear-gif"'));
 assert(html.includes('aria-labelledby="case-title"'));assert(html.includes('aria-labelledby="review-title"'));
 assert(html.includes('name="reference"'));assert(html.includes('не отправляется объединению'));
-const brief=html.match(/<form id="brief-form">([\s\S]*?)<\/form>/)[1];
+const brief=html.match(/<form id="brief-form"[^>]*>([\s\S]*?)<\/form>/)[1];
 assert.deepEqual([...brief.matchAll(/\bname="([^"]+)"/g)].map(match=>match[1]).sort(),['budget','deadline','direction','idea','name','reference']);
 assert(/<textarea id="brief-text" readonly/.test(brief),'Copy fallback must be readonly and have no storage field name');
 assert(brief.includes('id="brief-draft-status" role="status"'));

@@ -1,11 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import vm from 'node:vm';
+import {initializeHeaderNavigation} from '../dist/header-navigation.js';
 const html=readFileSync(new URL('../dist/index.html',import.meta.url),'utf8');
 const css=readFileSync(new URL('../dist/style.css',import.meta.url),'utf8');
-const app=readFileSync(new URL('../dist/app.js',import.meta.url),'utf8');
-const code=app.slice(app.indexOf("const menu=$('.menu-button')"),app.indexOf('let toastTimer;'));
+const code=readFileSync(new URL('../dist/header-navigation.js',import.meta.url),'utf8');
 
 function fixture(desktop=false){
  const listeners=new Map();
@@ -17,19 +16,20 @@ function fixture(desktop=false){
   addEventListener(type,fn){on(id,type,fn)},contains(other){while(other){if(other===this)return true;other=other.parent;}return false},
   closest(selector){return selector==='.header'&&header.contains(this)?header:null},
   focus(options){document.activeElement=this;this.focusOptions=options},
-  classList:{toggle(name,active){const classes=elements[id].classes;active?classes.add(name):classes.delete(name)}}};}
+  classList:{add(name){elements[id].classes.add(name)},toggle(name,active){const classes=elements[id].classes;active?classes.add(name):classes.delete(name)}}};}
  const header=element('header');const menu=element('menu',header);const nav=element('nav',header);
  const links=Array.from({length:5},(_,i)=>element('link'+i,nav));
  const brand=element('brand',header),cta=element('cta',header),hero=element('hero');
  const elements={header,menu,nav,brand,cta,hero,...Object.fromEntries(links.map(x=>[x.id,x]))};
  nav.querySelector=selector=>selector==='a[href]'?links[0]:null;
+ header.querySelector=selector=>({'.menu-button':menu,'#navigation':nav}[selector]);
+ header.querySelectorAll=selector=>{assert.equal(selector,'a');return [brand,...links,cta]};
  menu.attrs={'aria-expanded':'false','aria-label':'Открыть меню'};
+ document.querySelector=selector=>{assert.equal(selector,'.header');return header};
  document.addEventListener=(type,fn)=>on('document',type,fn);
  const media={matches:desktop,addEventListener(type,fn){assert.equal(type,'change');on('media',type,fn)}};
- const context={document,matchMedia:query=>{assert.equal(query,'(min-width: 801px)');return media},
-  $:selector=>({'.menu-button':menu,'#navigation':nav,'.header':header}[selector]),
-  $$:selector=>{assert.equal(selector,'.header a');return [brand,...links,cta]}};
- vm.runInNewContext(code,context);
+ const window={matchMedia:query=>{assert.equal(query,'(min-width: 801px)');return media}};
+ initializeHeaderNavigation({document,window});
  return {elements,document,media,links,listeners,emit,resize(matches){media.matches=matches;emit('media','change')},
   open(){menu.focus();emit('menu','click')},expanded(){return menu.attrs['aria-expanded']==='true'}};
 }

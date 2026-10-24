@@ -53,7 +53,7 @@ test('Visual current location has underline and accessible red; mobile footer ta
 });
 test('All brief routes name local preparation instead of conversation or sending',()=>{
  const html=file('index.html'),links=[...html.matchAll(/<a\b[^>]*href="#(?:contact|brief-form)"[^>]*>[\s\S]*?<\/a>/g)].map(x=>x[0]);
- assert.equal(links.length,11);for(const link of links){assert.match(link,/бриф|Бриф/);assert.doesNotMatch(link,/Обсудить|познакомимся|отправить/i)}
+ assert.equal(links.length,10);for(const link of links){assert.match(link,/бриф|Бриф/);assert.doesNotMatch(link,/Обсудить|познакомимся|отправить/i)}
  assert.match(html,/mobile-label">Бриф<\/span>/);assert.match(html,/aria-label="Подготовить бриф для скачивания, без отправки"/);
  assert.match(file('app.js'),/id="case-contact">Подготовить бриф по примеру/);
 });
