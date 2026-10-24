@@ -17,7 +17,7 @@ test('Unknown and restored legacy directions retain neutral fallback',()=>{
  for(const direction of ['',undefined,null,'Пока не знаю — давайте обсудим','3D-модель и производство','toString','__proto__'])assert.match(briefGuidance(direction),/^Можно начать с пары предложений:.*Остальное уточните позже/);
 });
 test('Persistent text is associated with the idea textarea and readable without JS',()=>{
- assert.match(html,/<textarea name="idea" aria-describedby="brief-idea-help brief-idea-counter brief-idea-error"[^>]*required/);
+ assert.match(html,/<textarea id="brief-idea" name="idea" aria-describedby="brief-idea-help brief-idea-counter brief-idea-error"[^>]*required/);
  assert.match(html,/<p id="brief-idea-help" class="form-note brief-idea-help" role="status" aria-atomic="true">/);
  assert.equal((html.match(/id="brief-idea-help"/g)||[]).length,1);assert.ok(html.includes(briefGuidance('')));
  assert.match(read('style.css'),/form \.brief-idea-help\{font-size:12px;line-height:1\.6;margin:0 0 20px;overflow-wrap:anywhere\}/);
@@ -36,7 +36,7 @@ test('Helper cannot modify fields, focus, validation, storage or export',()=>{
 });
 test('Restore and every existing direction entry point refresh guidance',()=>{
  assert.match(app,/function refreshBriefGuidance\(\)\{updateBriefGuidance\(\{direction:form.elements.namedItem\('direction'\).value,helper:\$\('#brief-idea-help'\)\}\)\}/);
- assert.match(app,/function saveDraft\(\)\{refreshBriefGuidance\(\);briefTools\?\.refresh\(\);const values=/);
+ assert.match(app,/function saveDraft\(\)\{refreshBriefGuidance\(\);briefTools\?\.refresh\(\);briefExperience\?\.refresh\(\);const values=/);
  assert.match(app,/updateReference\(\);refreshBriefGuidance\(\);/);
  assert.ok(app.indexOf('Object.entries(recovered.draft)')<app.indexOf('updateReference();refreshBriefGuidance();'));
  assert.match(app,/form.addEventListener\('change',saveDraft\)/);
@@ -51,5 +51,5 @@ test('Field schema, local download and conflict handling remain intact',()=>{
 });
 test('Guidance release has matching local app and stylesheet cache keys',()=>{
  assert.match(app,/brief-guidance\.js\?v=20261024-brief-guidance/);
- assert.match(html,/app\.js\?v=20261024-audit-round2/);assert.match(html,/style\.css\?v=20261024-audit-round2/);
+ assert.match(html,/app\.js\?v=20261024-ux25/);assert.match(html,/style\.css\?v=20261024-ux25/);
 });

@@ -9,7 +9,7 @@ export async function copyBriefText(text,clipboard){
 }
 
 // Enhances the existing local-only form. No additional fields, storage or requests.
-export function initializeBriefTools({form,document,draftSession,draftStatus,onReset,clipboard=globalThis.navigator?.clipboard}){
+export function initializeBriefTools({form,document,draftSession,draftStatus,onReset,onValidation=()=>{},clipboard=globalThis.navigator?.clipboard}){
  const get=id=>document.getElementById(id),field=key=>form.elements.namedItem(key);
  const values=()=>Object.fromEntries(new FormData(form));
  const preview=get('brief-text'),details=get('brief-text-fallback'),copy=get('brief-copy'),copyStatus=get('brief-copy-status');
@@ -22,6 +22,7 @@ export function initializeBriefTools({form,document,draftSession,draftStatus,onR
  }
  function refresh(){
   for(const key of touched)error(key);
+  onValidation([...touched].filter(key=>Boolean(briefErrors(values())[key])));
   const count=ideaCount(field('idea').value);counter.textContent=count.text;counter.dataset.nearLimit=String(count.near);
   if(limitStatus.textContent!==count.announcement)limitStatus.textContent=count.announcement;
   if(details.open)preview.value=formatBrief(values());
@@ -30,6 +31,7 @@ export function initializeBriefTools({form,document,draftSession,draftStatus,onR
  function validate(){
   let first;
   for(const key of ['name','idea']){touched.add(key);if(error(key)&&!first)first=field(key)}
+  onValidation(['name','idea'].filter(key=>Boolean(briefErrors(values())[key])));
   if(first){first.focus();return false}return true;
  }
  for(const key of ['name','idea'])field(key).addEventListener('blur',()=>{touched.add(key);error(key)});

@@ -19,6 +19,7 @@ function fixture(){
  const nodes=new Map(),focusCalls=[],document={activeElement:null};let shows=0,renders=0,slides=0;
  function node(id=''){
   return{id,children:[],parent:null,hidden:false,handlers:{},scrollTop:0,
+   replaceChildren(...children){this.children=[];this.append(...children)},
    append(...children){for(const child of children){child.parent=this;this.children.push(child)}},
    prepend(child){child.parent=this;this.children.unshift(child)},
    contains(other){for(let current=other;current;current=current.parent)if(current===this)return true;return false},
@@ -26,16 +27,16 @@ function fixture(){
    closest(){return null},focus(options){document.activeElement=this;focusCalls.push({node:this,options})},
   };
  }
- const body=node('body'),external=node('outside'),dialog=node('dialog'),host=node('project-content'),close=node('fixed-close');
+ const body=node('body'),external=node('outside'),dialog=node('dialog'),host=node('project-content'),close=node('fixed-close'),contextTitle=node('project-dialog-context');
  body.append(external);body.append(dialog);dialog.append(close);dialog.append(host);
  document.activeElement=external;document.createElement=()=>node();
  dialog.open=false;dialog.showModal=()=>{shows++;dialog.open=true;close.focus()};
- nodes.set('project-content',host);
+ nodes.set('project-content',host);nodes.set('project-dialog-context',contextTitle);
  Object.defineProperty(host,'innerHTML',{set(markup){
   renders++;
   if(document.activeElement!==host&&host.contains(document.activeElement))document.activeElement=body;
   host.children.forEach(child=>child.parent=null);host.children=[];
-  nodes.clear();nodes.set('project-content',host);
+  nodes.clear();nodes.set('project-content',host);nodes.set('project-dialog-context',contextTitle);
   const gallery=node('case-gallery');host.append(gallery);nodes.set('case-gallery',gallery);
   const copy=node('case-copy');host.append(copy);nodes.set('case-copy',copy);
   for(const match of markup.matchAll(/id="([^"]+)"/g)){const element=node(match[1]);host.append(element);nodes.set(element.id,element)}

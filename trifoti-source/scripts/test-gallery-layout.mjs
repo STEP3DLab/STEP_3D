@@ -6,10 +6,10 @@ const html=readFileSync(new URL('../dist/index.html',import.meta.url),'utf8');
 const css=readFileSync(new URL('../dist/style.css',import.meta.url),'utf8');
 const app=readFileSync(new URL('../dist/app.js',import.meta.url),'utf8');
 const dialog=html.match(/<dialog id="project-dialog"[^>]*>(.*?)<\/dialog>/s)[1];
-const layout=css.slice(css.indexOf('/* Keep Close outside the scrolling case'));
+const layout=css.slice(css.indexOf('/* Keep Close outside the scrolling case'),css.indexOf('/*',css.indexOf('/* Keep Close outside the scrolling case')+3));
 
 test('One explicit Close precedes and stays outside the scrolling case',()=>{
- assert.match(dialog,/^<div class="project-dialog-header"><button type="button" class="close-button" data-close="project-dialog" aria-label="Закрыть проект">×<\/button><\/div><div id="project-content"><\/div>$/);
+ assert.match(dialog,/^<div class="project-dialog-header"><p class="project-dialog-context" id="project-dialog-context"><\/p><button type="button" class="close-button" data-close="project-dialog" aria-label="Закрыть проект"><span>Закрыть<\/span><span aria-hidden="true">×<\/span><\/button><\/div><div id="project-content"><\/div>$/);
  assert.equal((dialog.match(/data-close=/g)||[]).length,1);
  assert.match(html,/<dialog id="project-dialog" class="project-dialog" aria-labelledby="case-title" aria-describedby="case-description">/);
 });
@@ -48,8 +48,8 @@ test('Nested Close uses the same native close handler and dialog keyboard contro
  assert.match(app,/projectDialog.addEventListener\('close'/);
 });
 test('Both changed runtime resources have current release URLs',()=>{
- assert.match(html,/style\.css\?v=20261024-audit-round2/);
- assert.match(html,/app\.js\?v=20261024-audit-round2/);
+ assert.match(html,/style\.css\?v=20261024-ux25/);
+ assert.match(html,/app\.js\?v=20261024-ux25/);
 });
 
 test('Case context is unique and precedes media in document order',()=>{

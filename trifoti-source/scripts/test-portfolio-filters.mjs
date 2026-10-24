@@ -81,3 +81,24 @@ test('Missing optional scaffold leaves the static portfolio untouched',()=>{
  }
  const f=fixture();f.buttons.shift();assert.equal(initializePortfolioFilters(f),false);assert.equal(f.visible().length,6);
 });
+
+test('URL filters restore on load and Back, preserve other query, hash and history state',()=>{
+ const f=fixture(),events={},state={caseToken:'preserve'};let href='https://example.test/trifoti/?review=1&filter=awards#projects';const writes=[];
+ const window={location:{get href(){return href}},history:{state,replaceState(value,_,url){assert.equal(value,state);writes.push(url);href=url}},addEventListener:(event,fn)=>events[event]=fn};
+ const controller=initializePortfolioFilters({...f,window});assert.deepEqual(f.active(),['awards']);assert.equal(writes.length,0);
+ controller.select('sculpture');let url=new URL(href);assert.equal(url.searchParams.get('review'),'1');assert.equal(url.searchParams.get('filter'),'sculpture');assert.equal(url.hash,'#projects');
+ controller.select('all');assert.equal(new URL(href).searchParams.has('filter'),false);
+ href='https://example.test/trifoti/?filter=awards#projects';events.popstate();assert.equal(f.visible().length,2);assert.equal(writes.length,2);
+ href='https://example.test/trifoti/?filter=unknown';events.popstate();assert.equal(f.visible().length,6);
+});
+test('Filter keyboard wraps, Home/End work and modified keystrokes leave selection unchanged',()=>{
+ const f=fixture();let focused=null;for(const b of f.buttons)b.focus=()=>focused=b;initializePortfolioFilters(f);
+ const key=(index,key,extra={})=>{let prevented=false;f.buttons[index].events.keydown[0]({key,preventDefault(){prevented=true},...extra});return prevented};
+ assert(key(0,'ArrowLeft'));assert.deepEqual(f.active(),['awards']);assert.equal(focused,f.buttons[2]);
+ assert(key(2,'Home'));assert.deepEqual(f.active(),['all']);assert(key(0,'End'));assert.deepEqual(f.active(),['awards']);
+ assert.equal(key(2,'ArrowLeft',{ctrlKey:true}),false);assert.deepEqual(f.active(),['awards']);assert.equal(key(2,'Tab'),false);
+});
+test('Reset restores all cards and returns focus before hiding itself',()=>{
+ const f=fixture();let focusBeforeHide=false;const reset={hidden:true,addEventListener(k,fn){this[k]=fn}};f.nodes['filter-reset']=reset;
+ f.buttons[0].focus=()=>focusBeforeHide=!reset.hidden;const c=initializePortfolioFilters(f);c.select('awards');assert(!reset.hidden);reset.click();assert(focusBeforeHide);assert(reset.hidden);assert.equal(f.visible().length,6);
+});
