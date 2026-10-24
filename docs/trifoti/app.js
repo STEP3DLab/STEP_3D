@@ -1,3 +1,4 @@
+import {updateBriefGuidance} from './brief-guidance.js?v=20261024-brief-guidance';
 import {mountCaseSections} from './case-sections.js?v=20261024-case-story';
 import {mountGalleryChapters} from './gallery-chapters.js?v=20261023-bear-chapters';
 import {watchGalleryMedia} from './media-recovery.js?v=20261022-retry';
@@ -44,11 +45,12 @@ const form=$('#brief-form'),draftSession=createBriefDraftSession(),recovered=dra
 const draftMessages={empty:'Черновик сохраняется в этом браузере.',restored:'Черновик восстановлен из этого браузера.',saved:'Черновик сохранён в этом браузере.',unavailable:'Автосохранение недоступно. Не закрывайте страницу, пока не скачаете или не скопируете бриф.',invalid:'Сохранённый черновик не удалось прочитать. Заполните бриф заново.',partial:'Часть черновика восстановлена. Проверьте поля перед скачиванием.',failed:'Черновик не удалось сохранить в браузере. Не закрывайте страницу: скачайте или скопируйте бриф.',conflict:'Черновик изменён в другой вкладке. Автосохранение здесь остановлено, чтобы не перезаписать другую версию. Ваши текущие поля не изменены: скачайте бриф или скопируйте текст ниже до обновления страницы. После обновления откроется сохранённая версия.'};
 function draftStatus(state){const status=$('#brief-draft-status');if(status.textContent!==draftMessages[state])status.textContent=draftMessages[state];status.dataset.state=['unavailable','invalid','partial','failed','conflict'].includes(state)?'error':'ready';if(state==='conflict'){$('#brief-text-fallback').hidden=false;$('#brief-text').value=formatBrief(Object.fromEntries(new FormData(form)))}}
 for(const [key,value] of Object.entries(recovered.draft)){const field=form.elements.namedItem(key);if(!field)continue;if(field.tagName==='SELECT'&&![...field.options].some(option=>option.value===value)){if(key==='direction'&&value==='3D-модель и производство')field.add(new Option(value+' (из прежнего черновика)',value));else{recovered.state='partial';continue}}field.value=value}
-function saveDraft(){const values=Object.fromEntries(new FormData(form));draftStatus(draftSession.save(values));$('#brief-status').textContent='';if(!$('#brief-text-fallback').hidden)$('#brief-text').value=formatBrief(values)}
+function refreshBriefGuidance(){updateBriefGuidance({direction:form.elements.namedItem('direction').value,helper:$('#brief-idea-help')})}
+function saveDraft(){refreshBriefGuidance();const values=Object.fromEntries(new FormData(form));draftStatus(draftSession.save(values));$('#brief-status').textContent='';if(!$('#brief-text-fallback').hidden)$('#brief-text').value=formatBrief(values)}
 addEventListener('storage',event=>{if(event.key!==BRIEF_KEY&&event.key!==null)return;const state=draftSession.check();if(state)draftStatus(state)});
 function updateReference(){const title=form.elements.namedItem('reference').value;$('#brief-reference').hidden=!title;$('#brief-reference-title').textContent=title}
 function selectReference(title){form.elements.namedItem('reference').value=title;updateReference();saveDraft()}
-updateReference();
+updateReference();refreshBriefGuidance();
 $('#clear-reference').addEventListener('click',()=>{selectReference('');form.elements.namedItem('name').focus()});
 form.addEventListener('input',()=>{for(const key of ['name','idea'])form.elements.namedItem(key).setCustomValidity('');saveDraft()});
 form.addEventListener('change',saveDraft);

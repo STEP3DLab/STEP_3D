@@ -56,7 +56,7 @@ test('Every service still selects one existing brief option',()=>{
  for(const [, ,service] of links)assert.ok(options.includes(service));
 });
 test('Only the existing name and idea fields are visibly and natively required',()=>{
- const labels=[...html.matchAll(/<label>([^<]*)<(input|textarea)\b([^>]*)>/g)];
+ const labels=[...html.matchAll(/<label(?:\s[^>]*)?>([^<]*)<(input|textarea)\b([^>]*)>/g)];
  const required=labels.filter(m=>/\brequired\b/.test(m[3]));
  assert.deepEqual(required.map(m=>attr(m[3],'name')),['name','idea']);
  for(const [,label] of required)assert.match(label,/\(обязательно\)$/);
