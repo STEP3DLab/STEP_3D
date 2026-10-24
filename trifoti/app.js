@@ -1,3 +1,4 @@
+import {enhanceProjectCards} from './project-card-links.js';
 import {createFrameMemory,thumbnailKey,mountPhotoSwipe} from './gallery-interactions.js?v=20261024-gallery-browse';
 import {initializeSectionNavigation} from './section-navigation.js?v=20261024-clear-navigation';
 import {initializeBriefTools} from './brief-tools.js?v=20261024-brief-tools';
@@ -121,7 +122,7 @@ function openProject(key){
  if(restoreFocus)$('[data-close="project-dialog"]',projectDialog).focus({preventScroll:true});
 }
 const caseNavigation=createProjectNavigation({keys:Object.keys(projects),location,history,onOpen:openProject,onClose:()=>{if(projectDialog.open)projectDialog.close()}});
-$$('[data-project]').forEach(card=>card.addEventListener('click',()=>{projectOpener=card;caseNavigation.open(card.dataset.project)}));
+enhanceProjectCards($$('[data-project]'),{dialog:projectDialog,onOpen:card=>{projectOpener=card;caseNavigation.open(card.dataset.project)}});
 $$('a[data-case-link]').forEach(link=>link.addEventListener('click',event=>{
  if(event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;
  event.preventDefault();projectOpener=link;caseNavigation.open(link.getAttribute('href').slice('#project/'.length));

@@ -93,3 +93,13 @@ test('Original photo action passes in normal, visited, hover, focus and active s
  assert.equal(states,normal);ordinary(states,paper,'photo action states');
  ordinary(declarations('.gallery-photo-link span').color,paper,'new tab hint');
 });
+
+test('Fedor role inherits accessible white on its actual red accent card',()=>{
+ const accent=declarations('.team-card-accent');
+ assert.equal(declarations('.team-card-accent .team-person p').color,'inherit');
+ assert.equal(accent.color,'white');
+ ordinary('#ffffff',accent.background,'Fedor small role text');
+ ordinary('#ffffff',accent.background,'Fedor source link');
+ assert(ratio('#ffffff',accent.background)>4.58);
+ assert.match(html,/<h3>Фёдор<\/h3><p>Скульптор<\/p>/);
+});

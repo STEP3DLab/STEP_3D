@@ -24,7 +24,7 @@ test('The same native button and accessible label remain present once',()=>{
  assert.equal((html.match(/id="review-launch"/g)||[]).length,1);
  const button=html.match(/<button\b([^>]*id="review-launch"[^>]*)>(.*?)<\/button>/s);
  assert.ok(button);assert.doesNotMatch(button[1],/tabindex|hidden|disabled|aria-hidden/);
- assert.match(button[2],/Концепт 01/);assert.match(button[2],/Структура и заметки/);
+ assert.match(button[2],/Заметки по концепции/);assert.match(button[2],/Только в этом браузере/);
  assert.ok(!html.match(/<form[^>]*>.*?id="review-launch".*?<\/form>/s));
 });
 test('The existing short-height footer spacing is retained',()=>{
@@ -35,6 +35,6 @@ test('Opening the notes dialog still uses the unchanged native modal path',()=>{
  assert.match(html,/<dialog[^>]*id="review-dialog"/);
 });
 test('Returning visitors receive the layout fix without replacing application logic',()=>{
- assert.match(html,/style\.css\?v=20261024-publication-tools/);
- assert.match(html,/app\.js\?v=20261024-publication-tools/);
+ assert.match(html,/style\.css\?v=20261024-public-experience/);
+ assert.match(html,/app\.js\?v=20261024-public-experience/);
 });

@@ -84,7 +84,7 @@ test('Portfolio filters use the current directions and honest case counts',()=>{
 test('Team presents exactly the four supplied first names and only the supplied design role',()=>{
  const team=html.match(/<div class="team-block" aria-labelledby="team"(.*?)<\/ul>/s)[1];
  assert.deepEqual([...team.matchAll(/<h3>([^<]+)<\/h3>/g)].map(m=>m[1]),['Фёдор','Оксана','Христина','Владимир']);
- assert.deepEqual([...team.matchAll(/<p>([^<]+)<\/p>/g)].map(m=>m[1]),['Дизайн']);
+ assert.deepEqual([...team.matchAll(/<p>([^<]+)<\/p>/g)].map(m=>m[1]),['Скульптор','Дизайн']);
  assert.doesNotMatch(team,/<img\b/);assert.equal((team.match(/class="team-monogram" aria-hidden="true"/g)||[]).length,4);
  assert(html.includes('<h2 id="team">Команда</h2>'));assert(html.includes('href="#team">Команда'));assert(!html.includes('Два взгляда.'));
 });

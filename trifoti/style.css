@@ -374,3 +374,20 @@ form .brief-counter[data-near-limit="true"]{color:#a91c24;font-weight:700}
 .publication-citation{grid-column:2;padding:16px;margin-top:12px;border:1px solid var(--line);min-width:0;font-size:12px;line-height:1.7}.publication-citation textarea{display:block;margin:8px 0;resize:vertical;min-height:130px}.publication-citation button{margin-top:10px}
 .publication-total{max-width:100%;overflow-wrap:anywhere}.publication-tools[hidden],.publication-copy[hidden],.publication-collapse[hidden],.publication-citation[hidden],#publication-copy-label[hidden],#publication-sort-note[hidden],#publication-empty[hidden]{display:none}
 @media(max-width:600px){.publication-total{display:block;margin-left:0}.publication-tools{align-items:stretch}.publication-tools label:nth-child(2){flex:1 1 190px}.publication-citation{margin-top:16px}}
+
+/* Real project links keep the established card appearance. */
+.project-card{display:block;color:inherit;text-decoration:none}
+.team-sources{display:inline-block;font-size:12px;line-height:1.6;min-height:44px;padding-block:10px;text-decoration:underline;text-underline-offset:3px;overflow-wrap:anywhere}
+
+/* System-palette support. Native forced-colors verification remains pending. */
+@media(forced-colors:active){
+ button,.button,select,input,textarea{border:1px solid ButtonText}
+ :is(a,button,input,textarea,select,summary):focus-visible{outline:3px solid Highlight;outline-offset:3px}
+ :is(button,[role="button"])[aria-pressed="true"],.gallery-thumb.active{outline:2px solid Highlight;outline-offset:2px;border-color:Highlight}
+ .header nav a[aria-current="location"]{color:LinkText;text-decoration:underline;text-decoration-thickness:3px}
+ form [aria-invalid="true"]{border:2px dashed CanvasText}
+ form .brief-field-error{color:CanvasText}
+ .project-arrow,.media-count,.project-tag{border:1px solid CanvasText}
+}
+/* The verified role sits on the red accent card, not the paper background. */
+.team-card-accent .team-person p{color:inherit}
