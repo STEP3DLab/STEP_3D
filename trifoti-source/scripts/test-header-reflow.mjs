@@ -4,7 +4,7 @@ import {readFileSync} from 'node:fs';
 const css=readFileSync(new URL('../dist/style.css',import.meta.url),'utf8');
 const html=readFileSync(new URL('../dist/index.html',import.meta.url),'utf8');
 const marker='/* Reflow the complete header at extreme zoom instead of clipping its controls. */';
-const reflow=css.slice(css.indexOf(marker)+marker.length).trim();
+const reflow=css.slice(css.indexOf(marker)+marker.length,css.indexOf('/* Describe location')).trim();
 const rule=selector=>{
  const match=[...reflow.matchAll(/([^{}]+)\{([^{}]*)\}/g)].find(m=>m[1].trim()===selector);
  assert(match,selector);
@@ -51,11 +51,11 @@ test('Expanded navigation starts below the entire header and retains a viewport-
  assert.match(css,/\.header nav\.open\{display:flex\}/);
  assert.equal(rule('html')['scroll-padding-top'],'132px');
 });
-test('The disclosure DOM order and existing labels remain unchanged',()=>{
+test('The disclosure DOM order remains unchanged and mobile CTA names the brief',()=>{
  const header=html.match(/<header class="header">([\s\S]*?)<\/header>/)[1];
  assert(header.indexOf('brand-full')<header.indexOf('class="menu-button"'));
  assert(header.indexOf('class="menu-button"')<header.indexOf('<nav'));
  assert(header.indexOf('</nav>')<header.indexOf('header-cta'));
  assert.equal((header.match(/<nav[\s\S]*?<\/nav>/)[0].match(/<a href=/g)||[]).length,5);
- assert.match(header,/<span class="mobile-label">Проект<\/span>/);
+ assert.match(header,/<span class="mobile-label">Бриф<\/span>/);
 });

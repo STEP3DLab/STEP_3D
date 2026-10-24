@@ -85,3 +85,11 @@ test('Stylesheet and application retain explicit cache version URLs',()=>{
  assert.match(html,/style\.css\?v=[^\"]+/);
  assert.match(html,/app\.js\?v=[^\"]+/);
 });
+
+test('Original photo action passes in normal, visited, hover, focus and active states',()=>{
+ const normal=declarations('.gallery-photo-link').color;
+ assert.equal(normal,'var(--red-text)');ordinary(normal,paper,'photo action');
+ const states=declarations('.gallery-photo-link:hover,.gallery-photo-link:focus-visible,.gallery-photo-link:active,.gallery-photo-link:visited').color;
+ assert.equal(states,normal);ordinary(states,paper,'photo action states');
+ ordinary(declarations('.gallery-photo-link span').color,paper,'new tab hint');
+});

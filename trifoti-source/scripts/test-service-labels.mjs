@@ -42,7 +42,7 @@ test('All four service CTAs retain their visible label, target and contextual ac
  assert.equal(links.length,4);
  const names=new Set();
  for(const [,attrs,service,visible] of links){
-  const label=visible.replace(/<[^>]*>/g,'').trim();assert.equal(label,'Обсудить идею');
+  const label=visible.replace(/<[^>]*>/g,'').trim();assert.equal(label,'Подготовить бриф');
   assert.equal(attr(attrs,'href'),'#contact');
   const name=attr(attrs,'aria-label');
   assert.ok(name.startsWith(label));assert.ok(name.includes(service));names.add(name);

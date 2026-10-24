@@ -1,3 +1,4 @@
+import {initializeSectionNavigation} from './section-navigation.js?v=20261024-clear-navigation';
 import {initializeBriefTools} from './brief-tools.js?v=20261024-brief-tools';
 import {updateGalleryPhotoLink} from './gallery-photo-link.js?v=20261024-photo-details';
 import {updateBriefGuidance} from './brief-guidance.js?v=20261024-brief-guidance';
@@ -27,6 +28,7 @@ desktopNavigation.addEventListener('change',()=>{
 });
 
 let toastTimer;
+initializeSectionNavigation({document,window});
 function toast(text){$('#toast').textContent=text;$('#toast').classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#toast').classList.remove('visible'),3200)}
 function download(text,name){const blob=new Blob(['\ufeff'+text],{type:'text/plain;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)}
 
@@ -36,7 +38,7 @@ function selectProjectFilter(button){
  $$('[data-category]').forEach(card=>card.hidden=filter!=='all'&&!card.dataset.category.split(' ').includes(filter));
  const count=$$('[data-category]').filter(card=>!card.hidden).length;
  $('#filter-status').textContent=`Показано проектов: ${count}`;$('#project-empty').hidden=count>0;
- $('#empty-category-brief').setAttribute('aria-label',`Обсудить идею (${button.dataset.direction||'Все направления'})`);
+ $('#empty-category-brief').setAttribute('aria-label',`Подготовить бриф (${button.dataset.direction||'Все направления'})`);
 }
 $$('[data-filter]').forEach(button=>button.addEventListener('click',()=>selectProjectFilter(button)));
 $$('[data-show-projects="all"]').forEach(link=>link.addEventListener('click',()=>selectProjectFilter($('[data-filter="all"]'))));
@@ -97,7 +99,7 @@ function openProject(key){
  // Only descendants are removed; do not steal focus from the fixed Close,
  // the scroll container itself, or anything outside this replacement.
  const restoreFocus=projectDialog.open&&host.contains(document.activeElement)&&document.activeElement!==host;
- host.innerHTML='<div class="case-layout"><div class="case-intro"><span class="eyebrow" id="case-type"></span><h2 id="case-title"></h2><p id="case-description"></p></div><div class="case-gallery"><div class="gallery-viewer" id="gallery-viewer" tabindex="-1" role="group" aria-label="Медиа проекта"></div><div class="gallery-navigation"><button id="gallery-prev" class="round-button" aria-label="Предыдущий ракурс">←</button><span id="gallery-counter"></span><button id="gallery-next" class="round-button" aria-label="Следующий ракурс">→</button></div><a class="gallery-photo-link" id="gallery-photo-link" target="_blank" rel="noopener noreferrer" hidden>Открыть фото крупно <span>в новой вкладке</span></a><p id="gallery-caption"></p><p id="gallery-status" role="status" aria-atomic="true"></p><button type="button" class="text-link gallery-retry" id="gallery-retry" aria-controls="gallery-viewer" hidden>Повторить загрузку</button><p id="gallery-announcement" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></p><div class="gallery-thumbnails" id="gallery-thumbnails"></div></div><div class="case-copy"><div id="case-provenance" class="case-provenance" hidden></div><div class="tags" id="case-tags"></div><a class="button button-dark" href="#contact" id="case-contact">Обсудить похожую идею <span class="direction-icon" aria-hidden="true"></span></a><div class="case-share"><button type="button" class="text-link case-share-button" id="case-share">Скопировать ссылку на проект</button><p class="form-note" id="case-share-status" role="status" aria-live="polite"></p><label class="case-share-fallback" id="case-share-fallback" hidden>Ссылка для копирования<input id="case-share-url" readonly></label></div></div></div>';
+ host.innerHTML='<div class="case-layout"><div class="case-intro"><span class="eyebrow" id="case-type"></span><h2 id="case-title"></h2><p id="case-description"></p></div><div class="case-gallery"><div class="gallery-viewer" id="gallery-viewer" tabindex="-1" role="group" aria-label="Медиа проекта"></div><div class="gallery-navigation"><button id="gallery-prev" class="round-button" aria-label="Предыдущий ракурс">←</button><span id="gallery-counter"></span><button id="gallery-next" class="round-button" aria-label="Следующий ракурс">→</button></div><a class="gallery-photo-link" id="gallery-photo-link" target="_blank" rel="noopener noreferrer" hidden>Открыть фото крупно <span>в новой вкладке</span></a><p id="gallery-caption"></p><p id="gallery-status" role="status" aria-atomic="true"></p><button type="button" class="text-link gallery-retry" id="gallery-retry" aria-controls="gallery-viewer" hidden>Повторить загрузку</button><p id="gallery-announcement" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></p><div class="gallery-thumbnails" id="gallery-thumbnails"></div></div><div class="case-copy"><div id="case-provenance" class="case-provenance" hidden></div><div class="tags" id="case-tags"></div><a class="button button-dark" href="#contact" id="case-contact">Подготовить бриф по примеру <span class="direction-icon" aria-hidden="true"></span></a><div class="case-share"><button type="button" class="text-link case-share-button" id="case-share">Скопировать ссылку на проект</button><p class="form-note" id="case-share-status" role="status" aria-live="polite"></p><label class="case-share-fallback" id="case-share-fallback" hidden>Ссылка для копирования<input id="case-share-url" readonly></label></div></div></div>';
  updateGalleryChapters=mountGalleryChapters({key,host:$('.case-gallery'),document,onSelect:showSlide});
  $('#case-type').textContent=p.type;$('#case-title').textContent=p.title;$('#case-description').textContent=p.description;
  mountCaseSections({project:p,host:$('.case-copy'),document});

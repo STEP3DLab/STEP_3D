@@ -58,8 +58,8 @@ test('The favicon also comes from the selected mark and has a fresh URL',()=>{
  assert.doesNotMatch(html,/assets\/favicon\.svg/);
 });
 test('The brand/layout stylesheet is versioned without changing app behavior',()=>{
- assert.match(html,/style\.css\?v=20261024-brief-tools/);
- assert.match(html,/app\.js\?v=20261024-brief-tools/);
+ assert.match(html,/style\.css\?v=20261024-clear-navigation/);
+ assert.match(html,/app\.js\?v=20261024-clear-navigation/);
 });
 
  test('The background-removed master is RGBA with unchanged square geometry',()=>{
