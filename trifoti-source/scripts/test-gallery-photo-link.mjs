@@ -47,6 +47,6 @@ test('Native action warns visibly about the new tab and has safe target semantic
  assert.match(file('style.css'),/\.gallery-photo-link\{[^}]*min-height:44px/);
  assert.match(file('style.css'),/\.gallery-photo-link\[hidden\]\{display:none\}/);
  assert.doesNotMatch(file('style.css'),/touch-action:none/);
- assert.match(file('index.html'),/style\.css\?v=20261024-public-experience/);
+ assert.match(file('index.html'),/style\.css\?v=20261024-team-profiles/);
  assert.match(file('index.html'),/app\.js\?v=20261024-public-experience/);
 });

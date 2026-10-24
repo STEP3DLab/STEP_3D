@@ -141,15 +141,28 @@ footer.site-footer{display:block;margin:0;padding:48px 4.5% 88px;background:#ebe
 .projects-heading .filters{flex-wrap:wrap;max-width:720px;justify-content:flex-end}.filters button{white-space:normal;max-width:100%;line-height:1.5}
 .project-empty{padding:30px;border:1px solid var(--line);margin:0 0 30px}.project-empty p{font-size:16px;line-height:1.6;margin-bottom:16px}
 @media(max-width:800px){.projects-heading .filters{justify-content:flex-start}.project-empty{padding:22px}.project-empty p{font-size:14px}}
-/* A typographic team portrait: only supplied names and the confirmed design role. */
-.team-block{margin-top:58px;scroll-margin-top:95px}.team-block>h3{font-family:Unbounded,Manrope,sans-serif;font-size:20px;font-weight:600;letter-spacing:-.03em;margin-bottom:24px}
-.team-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;list-style:none;margin:0;padding:0}
-.team-card{position:relative;overflow:hidden;padding:24px;border:1px solid var(--line);background:#efede8;display:flex;flex-direction:column;min-width:0}
-.team-index{font-size:10px;letter-spacing:.1em;opacity:.65}.team-monogram{font-family:Unbounded,Manrope,sans-serif;font-weight:750;font-size:clamp(84px,8vw,128px);line-height:1.1;letter-spacing:-.07em;margin:32px 0 28px}
-.team-person{min-height:56px;margin-top:auto}.team-person h3{font-family:Manrope,sans-serif;font-size:21px;font-weight:650;letter-spacing:-.02em;margin:0}.team-person p{font-size:12px;line-height:1.5;margin-top:5px;color:var(--muted)}
-.team-card-accent{background:var(--red);border-color:var(--red);color:white}
-@media(max-width:900px){.team-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.team-monogram{font-size:100px}}
-@media(max-width:480px){.team-block{margin-top:36px;scroll-margin-top:80px}.team-block>h3{font-size:17px}.team-grid{gap:12px}.team-card{padding:18px 16px}.team-monogram{font-size:72px;margin:26px 0 22px}.team-person{min-height:47px}.team-person h3{font-size:17px}.team-person p{font-size:11px}}
+/* Two source-backed profiles. Other members will be introduced later. */
+.team-block{margin-top:48px;scroll-margin-top:95px}
+.team-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:32px;list-style:none;margin:0;padding:0}
+.team-card{min-width:0;display:flex;flex-direction:column;border-top:3px solid var(--red);background:var(--paper)}
+.team-portrait{aspect-ratio:4/3;overflow:hidden;background:#e8e5df}
+.team-portrait img{display:block;width:100%;height:100%;object-fit:cover;object-position:center 32%}
+.team-card:first-child .team-portrait img{object-position:center 14%}
+.team-person{display:flex;flex-direction:column;flex:1;padding:24px 0 0;min-width:0}
+.team-kicker{display:flex;justify-content:space-between;gap:18px;font-size:10px;line-height:1.6;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:16px}
+.team-index{font-size:10px;letter-spacing:.1em;opacity:.65}
+.team-person h3{font-family:Unbounded,Manrope,sans-serif;font-size:clamp(22px,2.2vw,32px);font-weight:500;line-height:1.35;letter-spacing:-.045em;max-width:440px;min-height:2.7em;margin:0;text-wrap:balance;overflow-wrap:break-word}
+.team-role{font-size:14px;line-height:1.6;font-weight:650;color:var(--red-text);margin-top:12px;min-height:45px}
+.team-bio{margin-top:18px;margin-bottom:18px}
+.team-bio p{font-size:14px;line-height:1.8;color:var(--ink);margin:0}
+.team-bio p+p{margin-top:14px}
+.team-person>.team-sources{margin-top:auto;align-self:flex-start}
+.team-evidence{border-top:1px solid var(--line);margin-top:12px;font-size:12px;line-height:1.65;color:var(--muted)}
+.team-evidence summary{cursor:pointer;min-height:44px;padding:13px 0}
+.team-evidence ul{list-style:none;margin:0;padding:0 0 10px}
+.team-evidence a{display:flex;align-items:center;min-height:44px;padding:8px 0;color:var(--muted);text-decoration:underline;text-underline-offset:3px;overflow-wrap:anywhere}
+.team-evidence a:hover,.team-evidence a:focus-visible{color:var(--red-text)}
+@media(max-width:700px){.team-block{margin-top:34px;scroll-margin-top:80px}.team-grid{grid-template-columns:minmax(0,1fr);gap:44px}.team-person{padding-top:20px}.team-person h3{font-size:clamp(22px,6vw,32px);min-height:0}.team-role{min-height:0;margin-top:10px}.team-bio{margin-top:18px}.team-bio p{font-size:14px}.team-portrait{aspect-ratio:1}}
 .journal{padding-top:16px}.journal-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;margin-top:34px}.journal-card{min-width:0;border-top:1px solid var(--line);padding-top:14px}.journal-card>img{display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;background:#e8e5df}.journal-copy{padding:20px 0 0}.journal-label{font-size:10px!important;letter-spacing:.04em;color:var(--muted);margin-bottom:13px}.journal-copy h3{font-family:Unbounded,Manrope,sans-serif;font-size:19px;line-height:1.45;letter-spacing:-.035em;margin-bottom:14px}.journal-copy>p:not(.journal-label){font-size:13px;line-height:1.75;color:var(--muted)}.journal-copy .text-link{margin-top:22px}
 @media(max-width:800px){.journal-grid{grid-template-columns:1fr;gap:32px}.journal-card{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px}.journal-copy{padding:0}.journal-copy h3{font-size:17px}}
 @media(max-width:560px){.journal-card{display:block}.journal-copy{padding-top:18px}.journal-copy h3{font-size:19px}}
@@ -389,5 +402,3 @@ form .brief-counter[data-near-limit="true"]{color:#a91c24;font-weight:700}
  form .brief-field-error{color:CanvasText}
  .project-arrow,.media-count,.project-tag{border:1px solid CanvasText}
 }
-/* The verified role sits on the red accent card, not the paper background. */
-.team-card-accent .team-person p{color:inherit}

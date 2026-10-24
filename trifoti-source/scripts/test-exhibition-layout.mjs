@@ -56,7 +56,7 @@ test('Motion is optional, keyboard focus has equal emphasis and native navigatio
  assert.match(exhibition,/\.project-card:focus-visible \.project-arrow/);
  assert.match(exhibition,/\.project-card:focus-visible \.project-title/);
  assert.doesNotMatch(exhibition,/scroll-snap|scroll-timeline|animation:|cursor:none|position:fixed/);
- assert.match(html,/style\.css\?v=20261024-public-experience/);
+ assert.match(html,/style\.css\?v=20261024-team-profiles/);
  assert.match(html,/app\.js\?v=20261024-public-experience/);
 });
 
@@ -69,7 +69,7 @@ test('Motion is optional, keyboard focus has equal emphasis and native navigatio
 test('Decorative diagonal arrows are font-independent and hidden from assistive names',()=>{
  const app=readFileSync(new URL('../dist/app.js',import.meta.url),'utf8');
  const icons=[...html.matchAll(/<span class="direction-icon(?: direction-icon-down)?" aria-hidden="true"><\/span>/g)];
- assert.equal(icons.length,28);
+ assert.equal(icons.length,29);
  assert.equal((html.match(/direction-icon-down/g)||[]).length,1);
  assert.doesNotMatch(html,/[↗↘]/);assert.doesNotMatch(app,/[↗↘]/);
  assert.match(app,/<span class="direction-icon" aria-hidden="true"><\/span>/);

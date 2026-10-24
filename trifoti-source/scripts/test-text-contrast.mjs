@@ -71,7 +71,7 @@ test('Existing dark panels, success and error feedback already retain sufficient
  ordinary(declarations('#brief-status').color,paper,'success');
  ordinary(declarations('#brief-draft-status[data-state="error"],#brief-status[data-state="error"]').color,paper,'error');
 });
-test('Brand red, white button text, large headings and decorative team numerals are unchanged',()=>{
+test('Brand colors and white button text retain contrast; profile numerals remain decorative',()=>{
  assert.equal(variables['--red'],'#e71931');assert.equal(variables['--paper'],'#f5f3ee');
  assert.equal(variables['--ink'],'#20201e');assert.equal(variables['--line'],'#d8d6d0');
  assert.equal(declarations('.red').color,'var(--red)');
@@ -79,7 +79,7 @@ test('Brand red, white button text, large headings and decorative team numerals 
  assert.equal(declarations('.button').color,'white');
  ordinary('#fff','var(--red)','white button text');
  assert.equal(declarations('.team-index').opacity,'.65');
- assert.equal((html.match(/class="team-index" aria-hidden="true"/g)||[]).length,4);
+ assert.equal((html.match(/class="team-index" aria-hidden="true"/g)||[]).length,2);
 });
 test('Stylesheet and application retain explicit cache version URLs',()=>{
  assert.match(html,/style\.css\?v=[^\"]+/);
@@ -94,12 +94,10 @@ test('Original photo action passes in normal, visited, hover, focus and active s
  ordinary(declarations('.gallery-photo-link span').color,paper,'new tab hint');
 });
 
-test('Fedor role inherits accessible white on its actual red accent card',()=>{
- const accent=declarations('.team-card-accent');
- assert.equal(declarations('.team-card-accent .team-person p').color,'inherit');
- assert.equal(accent.color,'white');
- ordinary('#ffffff',accent.background,'Fedor small role text');
- ordinary('#ffffff',accent.background,'Fedor source link');
- assert(ratio('#ffffff',accent.background)>4.58);
- assert.match(html,/<h3>Фёдор<\/h3><p>Скульптор<\/p>/);
+test('Both profile roles, biography text and evidence links are readable on paper',()=>{
+ const background=declarations('.team-card').background;
+ ordinary(declarations('.team-role').color,background,'profile role');
+ ordinary(declarations('.team-bio p').color,background,'profile biography');
+ ordinary(declarations('.team-evidence a').color,background,'profile evidence links');
+ assert.equal((html.match(/class="team-role"/g)||[]).length,2);
 });

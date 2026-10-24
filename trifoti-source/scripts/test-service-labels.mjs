@@ -81,11 +81,13 @@ test('Portfolio filters use the current directions and honest case counts',()=>{
  assert(app.includes("$('#project-empty').hidden=count>0"));assert(app.includes("b.setAttribute('aria-pressed',String(b===button))"));
 });
 
-test('Team presents exactly the four supplied first names and only the supplied design role',()=>{
- const team=html.match(/<div class="team-block" aria-labelledby="team"(.*?)<\/ul>/s)[1];
- assert.deepEqual([...team.matchAll(/<h3>([^<]+)<\/h3>/g)].map(m=>m[1]),['Фёдор','Оксана','Христина','Владимир']);
- assert.deepEqual([...team.matchAll(/<p>([^<]+)<\/p>/g)].map(m=>m[1]),['Скульптор','Дизайн']);
- assert.doesNotMatch(team,/<img\b/);assert.equal((team.match(/class="team-monogram" aria-hidden="true"/g)||[]).length,4);
+test('Team presents the two researched profiles with portraits, attribution and source links',()=>{
+ const team=html.slice(html.indexOf('<div class="team-block"'),html.indexOf('</section>',html.indexOf('<div class="team-block"')));
+ assert.deepEqual([...team.matchAll(/<h3 id="team-[^"]+">([^<]+)<\/h3>/g)].map(m=>m[1]),['Фёдор Геннадьевич Паршин','Христина Анатольевна Понкратова']);
+ assert.equal((team.match(/<img\b/g)||[]).length,2);assert.doesNotMatch(team,/team-monogram|Оксана|Владимир/);
+ assert.match(team,/alt="Фёдор Геннадьевич Паршин"/);assert.match(team,/alt="Христина Анатольевна Понкратова"/);
+ assert.match(team,/dobrotorium\.ru\/people\/12/);assert.match(team,/technopark-rgsu\.ru\/skb\/laboratories\/industrial-design-engineering\//);
+ assert.match(team,/cttit\.ru\/news\/2024\/04\/reversivnyij-inzhiniring-itogi\.html/);assert.match(team,/medcollege\.medsi\.ru/);
  assert(html.includes('<h2 id="team">Команда</h2>'));assert(html.includes('href="#team">Команда'));assert(!html.includes('Два взгляда.'));
 });
 
