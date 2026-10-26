@@ -58,9 +58,9 @@ test('Unknown case links close an existing gallery gracefully without rewriting 
 test('Existing anchors remain native and do not acquire a case marker',()=>{
   for(const anchor of ['#projects','#brief','#contact','#studio','#home']){const b=browser('https://example.test/'+anchor);assert.equal(b.rendered,null);assert.equal(b.location.hash,anchor);assert.equal(b.calls.pushes,0)}
 });
-test('Public and alternate-host share links keep their current origin/path and omit unrelated query data',()=>{
+test('All shared links use canonical public origin/path and omit unrelated query data',()=>{
   assert.equal(projectLink('https://step3dlab.github.io/STEP_3D/trifoti/?version=old#projects','stdAwards'),'https://step3dlab.github.io/STEP_3D/trifoti/#project/stdAwards');
-  assert.equal(projectLink('https://preview.example.test/portfolios/trifoti/?anything=omit#home','mascot'),'https://preview.example.test/portfolios/trifoti/#project/mascot');
+  assert.equal(projectLink('https://preview.example.test/portfolios/trifoti/?anything=omit#home','mascot'),'https://step3dlab.github.io/STEP_3D/trifoti/#project/mascot');
 });
 test('Copy succeeds only after an explicit, successful clipboard write',async()=>{
   let copied;assert.equal(await copyProjectLink('https://example.test/#project/mascot',{async writeText(value){copied=value}}),true);assert.equal(copied,'https://example.test/#project/mascot');

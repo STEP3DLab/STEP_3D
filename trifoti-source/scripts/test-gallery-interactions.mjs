@@ -1,3 +1,4 @@
+import {mediaId} from '../dist/exploration-data.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createFrameMemory,thumbnailKey,mountPhotoSwipe} from '../dist/gallery-interactions.js';
@@ -24,7 +25,7 @@ test('Real slide renderer remembers photo/video, sets one thumbnail Tab stop, ca
  const viewer={children:[],replaceChildren(){this.children=[]},append(media){this.children.push(media)},isConnected:true};
  for(const id of ['gallery-caption','gallery-counter','gallery-announcement','gallery-status','gallery-retry','gallery-photo-link'])nodes.set(id,{});
  nodes.set('gallery-viewer',viewer);nodes.set('gallery-thumbnails',{children:thumbs,scrollWidth:0,clientWidth:100});
- const context={projects,galleryProject:'mascot',galleryIndex:0,slideRevision:0,projectDialog:{open:true},frameMemory:memory,
+ const context={mediaId,caseNavigation:{frame(){}},projects,galleryProject:'mascot',galleryIndex:0,slideRevision:0,projectDialog:{open:true},frameMemory:memory,
   clearMediaWait(){cleanups++},document:{createElement(tag){return{tag,setAttribute(){},pause(){paused++}}}},
   $:selector=>nodes.get(selector.slice(1)),$$:selector=>selector==='.gallery-thumb'?thumbs:viewer.children.filter(media=>media.tag==='video'),
   watchGalleryMedia(){return()=>{cleanups++}},updateGalleryPhotoLink(){},updateGalleryChapters(){}};

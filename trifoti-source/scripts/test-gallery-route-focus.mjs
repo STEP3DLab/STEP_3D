@@ -1,3 +1,5 @@
+import {mountRelated} from '../dist/exploration-panel.js';
+import {mediaIndex} from '../dist/exploration-data.js';
 import {createFrameMemory,thumbnailKey,mountPhotoSwipe} from '../dist/gallery-interactions.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -10,7 +12,7 @@ import {mountGalleryChapters} from '../dist/gallery-chapters.js';
 import {galleryArrow} from '../dist/dialog-controls.js';
 
 const app=readFileSync(new URL('../dist/app.js',import.meta.url),'utf8');
-const render=app.slice(app.indexOf('function openProject(key){'),app.indexOf('\nconst caseNavigation='));
+const render=app.slice(app.indexOf('function openProject(key,routeMedia){'),app.indexOf('\nconst caseNavigation='));
 
 // Execute the actual renderer. This small DOM model explicitly simulates the
 // browser dropping focus to BODY when innerHTML removes its active descendant.
@@ -46,7 +48,7 @@ function fixture(){
  const history={get state(){return entries[index].state},get length(){return entries.length},
   pushState(state,_,hash){entries.splice(++index);entries.push({state,hash});location.hash=hash},
   replaceState(state,_,hash){entries[index]={state,hash};location.hash=hash},back(){move(-1)},forward(){move(1)}};
- const context={window:{},$$:()=>[],clearMediaWait:()=>{},frameMemory:createFrameMemory(),thumbnailKey,mountPhotoSwipe,mountCaseSections,mountGalleryChapters,updateGalleryChapters:()=>{},projects,projectDialog:dialog,document,galleryProject:null,galleryIndex:0,galleryArrow,projectLink,location,
+ const context={mountRelated,mediaIndex,window:{},$$:()=>[],clearMediaWait:()=>{},frameMemory:createFrameMemory(),thumbnailKey,mountPhotoSwipe,mountCaseSections,mountGalleryChapters,updateGalleryChapters:()=>{},projects,projectDialog:dialog,document,galleryProject:null,galleryIndex:0,galleryArrow,projectLink,location,
   $:selector=>selector==='[data-close="project-dialog"]'?close:nodes.get(selector.slice(1)),
   thumbnailSource:item=>item.src,showSlide(value){slides++;context.galleryIndex=value},
  };

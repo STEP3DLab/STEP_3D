@@ -1,15 +1,13 @@
+import {parseCaseRoute,exactLink,mediaIndex} from './exploration-data.js';
 const prefix = '#project/';
 const marker = 'trifotiCase';
 
 export function projectKey(hash, keys) {
-  const key = hash.startsWith(prefix) ? hash.slice(prefix.length) : '';
+  const key = parseCaseRoute(hash)?.key || '';
   return keys.includes(key) ? key : null;
 }
-export function projectLink(href, key) {
-  const url = new URL(href);
-  url.search = '';
-  url.hash = prefix + key;
-  return url.href;
+export function projectLink(href, key, media) {
+  return exactLink(key, media);
 }
 export async function copyProjectLink(url, clipboard) {
   try {
@@ -21,7 +19,7 @@ export async function copyProjectLink(url, clipboard) {
 
 // One history entry per opened case. No storage, network or global event hooks.
 export function createProjectNavigation({keys, location, history, onOpen, onClose}) {
-  let active = null;
+  let active = null, activeRoute = '';
   const cleanState = () => {
     const state = history.state && typeof history.state === 'object' ? {...history.state} : {};
     delete state[marker];
@@ -29,15 +27,17 @@ export function createProjectNavigation({keys, location, history, onOpen, onClos
   };
   function sync() {
     const key = projectKey(location.hash, keys);
-    if (key === active) return;
+    if (key === active && location.hash === activeRoute) return;
+    activeRoute = location.hash;
     active = key;
-    if (key) onOpen(key);
+    if (key) onOpen(key,parseCaseRoute(location.hash)?.media);
     else onClose();
   }
-  function open(key) {
+  function open(key,media) {
     if (!keys.includes(key)) return false;
-    if (projectKey(location.hash, keys) !== key) {
-      history.pushState({...cleanState(), [marker]:key}, '', prefix + key);
+    const route = prefix + key + (media && mediaIndex(key,media)>=0 ? '/media/'+media : '');
+    if (location.hash !== route) {
+      history.pushState({...cleanState(), [marker]:key}, '', route);
     }
     sync();
     return true;
@@ -67,5 +67,11 @@ export function createProjectNavigation({keys, location, history, onOpen, onClos
     if (location.hash !== hash) history.pushState(cleanState(), '', hash);
     sync();
   }
-  return {open, switchCase, closed, sync, visit};
+  function frame(key,media) {
+    if(active!==key || mediaIndex(key,media)<0)return false;
+    const route=prefix+key+'/media/'+media;
+    if(location.hash!==route)history.replaceState(history.state,'',route);
+    activeRoute=route;return true;
+  }
+  return {open, switchCase, closed, sync, visit, frame};
 }
