@@ -36,6 +36,6 @@ test('Opening the notes dialog still uses the unchanged native modal path',()=>{
  assert.match(html,/<dialog[^>]*id="review-dialog"/);
 });
 test('Returning visitors receive the layout fix without replacing application logic',()=>{
- assert.match(html,/style\.css\?v=20261026-brief-preparation/);
- assert.match(html,/app\.js\?v=20261026-brief-preparation/);
+ assert.match(html,/style\.css\?v=20261026-trust/);
+ assert.match(html,/app\.js\?v=20261026-trust/);
 });

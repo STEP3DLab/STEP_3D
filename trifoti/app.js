@@ -2,7 +2,7 @@ import {mountBriefPreparation,appendSelectionReference} from './brief-preparatio
 import {initializeBriefExperience,initializeBackToTop} from './experience-ux.js?v=20261024-ux25';
 import {initializePortfolioFilters} from './portfolio-filters.js?v=20261024-ux25';
 import {mediaId,mediaIndex} from './exploration-data.js';
-import {mountExploration,mountRelated} from './exploration-panel.js?v=20261026-brief-preparation';
+import {mountExploration,mountRelated} from './exploration-panel.js?v=20261026-trust';
 import {enhanceProjectCards} from './project-card-links.js';
 import {createFrameMemory,thumbnailKey,mountPhotoSwipe} from './gallery-interactions.js?v=20261024-gallery-browse';
 import {initializeSectionNavigation} from './section-navigation.js?v=20261024-clear-navigation';

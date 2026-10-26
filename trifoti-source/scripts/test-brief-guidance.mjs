@@ -51,5 +51,5 @@ test('Field schema, local download and conflict handling remain intact',()=>{
 });
 test('Guidance release has matching local app and stylesheet cache keys',()=>{
  assert.match(app,/brief-guidance\.js\?v=20261024-brief-guidance/);
- assert.match(html,/app\.js\?v=20261026-brief-preparation/);assert.match(html,/style\.css\?v=20261026-brief-preparation/);
+ assert.match(html,/app\.js\?v=20261026-trust/);assert.match(html,/style\.css\?v=20261026-trust/);
 });
