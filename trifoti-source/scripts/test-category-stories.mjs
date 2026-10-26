@@ -2,6 +2,9 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
+import vm from 'node:vm';
+import {BRIEF_KEY,createBriefDraftSession,legacyDirections,formatBrief} from '../dist/brief-utils.js';
+import {revealService} from '../dist/section-navigation.js';
 import {projects} from '../dist/project-data.js';
 import {mediaId} from '../dist/exploration-data.js';
 import {storyCategories,storyFrames,categoryCount,parseStoryRoute,firstStoryRoute,storyRoute} from '../dist/category-stories-data.js';
@@ -86,7 +89,7 @@ test('Keyboard ignores video controls/shortcuts; photos have passive safe swipe 
  const f=mounted();f.open('sculpture');f.dialog.emit('keydown',{key:'ArrowRight',ctrlKey:true});assert.match(f.window.location.hash,/white-front$/);f.dialog.emit('keydown',{key:'ArrowRight'});assert.match(f.window.location.hash,/white-side$/);const host=f.nodes['story-media'],photo=host.children[0];host.emit('touchstart',{target:photo,touches:[{clientX:120,clientY:20}],timeStamp:0});host.emit('touchend',{target:photo,touches:[],changedTouches:[{clientX:30,clientY:22}],timeStamp:200});assert.match(f.window.location.hash,/red-profile$/);
 });
 test('Empty directions show no invented project/photo and route to the existing service',()=>{
- const f=mounted();const service=f.nodes['service-everyday']=new Node('details',f.document);service.id='service-everyday';service.summary=new Node('summary',f.document);f.open('modelmaking');assert.equal(f.nodes['story-media'].children.length,0);assert.equal(f.nodes['story-full-case'].hidden,true);assert.equal(f.nodes['story-direction'].hidden,false);assert.equal(f.nodes['story-credit'].textContent,'Пока нет опубликованных проектов');assert.equal(f.nodes['story-progress'].children.length,1);f.click('direction');assert(!f.dialog.open);assert(service.open);assert.equal(f.document.activeElement,service.summary);assert.equal(f.window.location.hash,'#service-everyday');
+ const f=mounted();const service=f.nodes['service-modelmaking']=new Node('details',f.document);service.id='service-modelmaking';service.summary=new Node('summary',f.document);f.open('modelmaking');assert.equal(f.nodes['story-media'].children.length,0);assert.equal(f.nodes['story-full-case'].hidden,true);assert.equal(f.nodes['story-direction'].hidden,false);assert.equal(f.nodes['story-credit'].textContent,'Пока нет опубликованных проектов');assert.equal(f.nodes['story-progress'].children.length,1);f.click('direction');assert(!f.dialog.open);assert(service.open);assert.equal(f.document.activeElement,service.summary);assert.equal(f.window.location.hash,'#service-modelmaking');
 });
 test('Stale media errors cannot overwrite newer frame; retry success restores visible focus',()=>{
  const f=mounted();f.open('awards');const old=f.nodes['story-media'].children[0];f.click('next');old.emit('error');assert(f.nodes['story-retry'].hidden);const active=f.nodes['story-media'].children[0];active.emit('error');assert(!f.nodes['story-retry'].hidden);f.nodes['story-retry'].focus();active.emit('load');assert(f.nodes['story-retry'].hidden);assert.equal(f.document.activeElement,f.nodes['story-media']);
@@ -111,8 +114,8 @@ test('Latest category labels/order are consistent across story tiles, services, 
  const html=read('index.html');for(const block of [html.match(/<nav class="hero-directions"[^>]*>(.*?)<\/nav>/s)[1],html.match(/<div class="service-list">(.*?)<\/section>/s)[1],html.match(/<select name="direction"[^>]*>(.*?)<\/select>/s)[1]]){let at=-1;for(const name of names){const next=block.indexOf(name,at+1);assert(next>at,name);at=next}}
  for(const file of ['index.html','catalog.html','information-pack.html','light.html'])assert.doesNotMatch(read(file),/Дизайн и архитектура|Бытовой дизайн|Сувениры, призы, награды/);
 });
-test('Old direction story links remain allowlisted aliases while fresh links are canonical',()=>{
- assert.equal(parseStoryRoute('#stories/design/intro').category,'interiors');assert.equal(parseStoryRoute('#stories/everyday/intro').category,'modelmaking');assert.equal(firstStoryRoute('design'),'#stories/interiors/intro');assert.equal(firstStoryRoute('everyday'),'#stories/modelmaking/intro');
+test('Interior story alias is retained, but old everyday links never mean modelmaking',()=>{
+ assert.equal(parseStoryRoute('#stories/design/intro').category,'interiors');assert.equal(parseStoryRoute('#stories/everyday/intro'),null);assert.equal(parseStoryRoute('#stories/modelmaking/intro').category,'modelmaking');assert.equal(firstStoryRoute('design'),'#stories/interiors/intro');assert.equal(firstStoryRoute('everyday'),null);assert.equal(firstStoryRoute('modelmaking'),'#stories/modelmaking/intro');
 });
 test('Legacy brief intent is retained without converting everyday design to modelmaking',async()=>{
  const {legacyDirections,readBriefDraft}=await import('../dist/brief-utils.js');for(const direction of legacyDirections){const draft=readBriefDraft(()=>({getItem:()=>JSON.stringify({direction,name:'Имя',idea:'Идея'})}));assert.equal(draft.draft.direction,direction)}assert.match(read('app.js'),/legacyDirections.includes\(value\)/);assert.match(read('app.js'),/из прежнего черновика/);
@@ -120,4 +123,44 @@ test('Legacy brief intent is retained without converting everyday design to mode
 test('Absolute artwork cannot be collapsed by text flex sizing; Top avoids the visible story grid',async()=>{
  const css=read('category-stories.css');assert.match(css,/\.category-tile-art\{position:absolute;inset:94px 14px 58px/);assert.match(css,/inset:54px 8px 40px/);assert.doesNotMatch(css,/category-tile-art\{[^}]*flex:1/);
  const {initializeBackToTop}=await import('../dist/experience-ux.js');let notify;const hero={},stories={},link={hidden:true,addEventListener(){}};initializeBackToTop({document:{activeElement:null,getElementById:id=>id==='home'?hero:id==='back-to-top'?link:null,querySelector:selector=>selector==='.category-stories'?stories:null},window:{IntersectionObserver:class{constructor(fn){notify=fn}observe(){}}}});notify([{target:hero,isIntersecting:false},{target:stories,isIntersecting:true}]);assert(link.hidden);notify([{target:stories,isIntersecting:false}]);assert(!link.hidden);
+});
+
+
+test('Legacy everyday deep links never open a story or rewrite the current history entry',()=>{
+ for(const hash of ['#service-everyday','#stories/everyday/intro']){
+  const f=mounted(hash);assert(!f.dialog.open);assert.equal(f.controller.isStory(),false);assert.equal(f.window.location.hash,hash);assert.equal(f.window.history.length,1);
+  for(const event of ['hashchange','popstate','hashchange'])f.window.emit(event);
+  assert(!f.dialog.open);assert.equal(f.window.location.hash,hash);assert.equal(f.window.history.length,1);
+ }
+});
+test('Legacy notice and canonical stories survive repeated Back/Forward without loops or added entries',()=>{
+ for(const hash of ['#service-everyday','#stories/everyday/intro']){
+  const f=mounted(hash);f.open('modelmaking');assert(f.dialog.open);assert.equal(f.window.location.hash,'#stories/modelmaking/intro');assert.equal(f.window.history.length,2);
+  for(let i=0;i<3;i++){
+   f.window.history.back();f.window.emit('popstate');f.window.emit('hashchange');assert(!f.dialog.open);assert.equal(f.window.location.hash,hash);assert.equal(f.window.index,0);
+   f.window.history.forward();f.window.emit('popstate');f.window.emit('hashchange');assert(f.dialog.open);assert.equal(f.window.location.hash,'#stories/modelmaking/intro');assert.equal(f.window.history.length,2);
+  }
+  f.click('close');f.window.emit('popstate');f.window.emit('hashchange');assert(!f.dialog.open);assert.equal(f.window.location.hash,hash);assert.equal(f.window.history.length,2);
+ }
+});
+
+test('Old-link load, reload, choices and Back/Forward preserve all six legacy brief fields without writing',()=>{
+ const html=read('index.html'),app=read('app.js'),restore=app.match(/for\(const \[key,value\] of Object.entries\(recovered.draft\)\)\{[^\n]+/)[0];
+ const options=[...html.match(/<select name="direction"[^>]*>(.*?)<\/select>/s)[1].matchAll(/<option>([^<]+)<\/option>/g)].map(m=>m[1]);
+ for(const direction of [...legacyDirections,'Предметы и интерьер'])for(const hash of ['#service-everyday','#stories/everyday/intro']){
+  const original={reference:'Ссылка и пояснение',name:'Тестовое имя',direction,idea:'Первая строка\nВторая строка',budget:'Не определён',deadline:'После согласования'},raw=JSON.stringify(original);let writes=0;
+  const storage={getItem(key){assert.equal(key,BRIEF_KEY);return raw},setItem(){writes++},removeItem(){writes++}};
+  const expected={...original,direction:direction==='Предметы и интерьер'?'Бытовой дизайн':direction};
+  for(let reload=0;reload<2;reload++){
+   const session=createBriefDraftSession(()=>storage),fields=Object.fromEntries(Object.keys(original).map(key=>[key,key==='direction'?{tagName:'SELECT',options:options.map(value=>({value})),add(option){this.options.push(option)},value:''}:{tagName:'INPUT',value:''}]));
+   vm.runInNewContext(restore,{recovered:session.recovered,form:{elements:{namedItem:key=>fields[key]}},legacyDirections,Option:class{constructor(text,value){this.text=text;this.value=value}}});
+   const values=()=>Object.fromEntries(Object.entries(fields).map(([key,field])=>[key,field.value])),f=mounted(hash);
+   for(const id of ['design','sculpture','awards','modelmaking'])f.nodes['service-'+id]={tagName:'DETAILS',open:false};
+   assert.deepEqual(values(),expected);assert.equal(revealService(hash,f.document),false);assert(!f.nodes['service-modelmaking'].open);
+   for(const id of ['design','sculpture','awards','modelmaking']){assert(revealService('#service-'+id,f.document));assert.deepEqual(values(),expected);assert.equal(writes,0)}
+   f.open('modelmaking');f.window.history.back();f.window.emit('popstate');f.window.emit('hashchange');f.window.history.forward();f.window.emit('popstate');f.window.emit('hashchange');f.click('close');f.window.emit('popstate');f.window.emit('hashchange');
+   assert.equal(f.window.location.hash,hash);assert.deepEqual(values(),expected);assert.equal(writes,0);assert.equal(storage.getItem(BRIEF_KEY),raw);assert.equal(session.check(),null);
+   const text=formatBrief(values());for(const value of Object.values(expected))assert(text.includes(value));
+  }
+ }
 });

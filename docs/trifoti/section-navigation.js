@@ -4,7 +4,7 @@ export function currentSection(sections,readingLine){
   .sort((a,b)=>b.top-a.top)[0]?.id||null;
 }
 export function revealService(hash,document){
- if(!/^#service-(design|sculpture|everyday|awards)$/.test(hash))return false;
+ if(!/^#service-(design|sculpture|modelmaking|awards)$/.test(hash))return false;
  const target=document.getElementById(hash.slice(1));
  if(!target||target.tagName!=='DETAILS')return false;
  target.open=true;

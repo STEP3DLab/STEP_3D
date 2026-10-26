@@ -12,7 +12,7 @@ test('Real projects follow the hero in the document, before all four directions'
  assert(html.indexOf('id="home"')<html.indexOf('id="projects"'));
  assert(html.indexOf('id="projects"')<html.indexOf('id="directions"'));
  assert.match(html,/01 \/ Проекты/);assert.match(html,/02 \/ Что создаём/);
- const directions=['service-design','service-sculpture','service-awards','service-everyday'].map(id=>html.indexOf(`id="${id}"`));
+ const directions=['service-design','service-sculpture','service-awards','service-modelmaking'].map(id=>html.indexOf(`id="${id}"`));
  assert(directions.every((n,i)=>n>0&&(!i||n>directions[i-1])));
 });
 test('Hero retains its complete copy, real bear and actions in logical narrow-screen order',()=>{
@@ -56,8 +56,8 @@ test('Motion is optional, keyboard focus has equal emphasis and native navigatio
  assert.match(exhibition,/\.project-card:focus-visible \.project-arrow/);
  assert.match(exhibition,/\.project-card:focus-visible \.project-title/);
  assert.doesNotMatch(exhibition,/scroll-snap|scroll-timeline|animation:|cursor:none|position:fixed/);
- assert.match(html,/style\.css\?v=20261026-selected-contrast/);
- assert.match(html,/app\.js\?v=20261026-directions/);
+ assert.match(html,/style\.css\?v=20261026-legacy-links/);
+ assert.match(html,/app\.js\?v=20261026-legacy-links/);
 });
 
  test('Narrow manifesto strip wraps without hiding horizontal overflow',()=>{

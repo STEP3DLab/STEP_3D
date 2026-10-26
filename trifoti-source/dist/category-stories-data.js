@@ -6,9 +6,9 @@ export const storyCategories=[
  {id:'interiors',title:'Дизайн интерьеров',service:'service-design',intro:'Дизайн интерьеров — от общего образа пространства до его деталей.'},
  {id:'sculpture',title:'Скульптура',service:'service-sculpture',cover:'mascot'},
  {id:'awards',title:'Сувениры и призы',service:'service-awards',cover:'stdAwards'},
- {id:'modelmaking',title:'Макетирование',service:'service-everyday',intro:'Макеты помогают представить идею в объёме. Начинаем с задачи, масштаба и нужной степени детализации.'}
+ {id:'modelmaking',title:'Макетирование',service:'service-modelmaking',intro:'Макеты помогают представить идею в объёме. Начинаем с задачи, масштаба и нужной степени детализации.'}
 ].map(category=>({...category,keys:Object.keys(projects).filter(key=>projects[key].direction===category.title)}));
-export const categoryAliases=Object.freeze({design:'interiors',everyday:'modelmaking'});
+export const categoryAliases=Object.freeze({design:'interiors'});
 export const storyCategory=id=>storyCategories.find(category=>category.id===(categoryAliases[id]||id));
 export function storyFrames(id){return (storyCategory(id)?.keys||[]).flatMap(key=>projects[key].media.map((item,index)=>({key,item,index,id:mediaId(item)})))}
 export function categoryCount(category){const frames=storyFrames(category.id);return `${category.keys.length} ${countedNoun(category.keys.length,'проект','проекта','проектов')} · ${frames.length} ${countedNoun(frames.length,'кадр','кадра','кадров')}`}

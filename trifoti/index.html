@@ -22,12 +22,12 @@
   <meta name="twitter:description" content="Искусство, дизайн и инженерия. От идеи до реального объекта.">
   <meta name="twitter:image" content="https://step3dlab.github.io/STEP_3D/trifoti/assets/brand/trifoti-logo-transparent.png">
   <link rel="icon" href="assets/brand/trifoti-favicon-transparent-64.png" type="image/png" sizes="64x64">
-  <link rel="stylesheet" href="style.css?v=20261026-selected-contrast&amp;portrait=20261026-background">
+  <link rel="stylesheet" href="style.css?v=20261026-legacy-links&amp;portrait=20261026-background">
   <link rel="stylesheet" href="category-stories.css?v=20261026-directions-r2">
   <script type="module" src="header-navigation.js?v=20261024-navigation-rounds"></script>
   <script type="importmap">{"imports":{"three":"./assets/vendor/three.module.js"}}</script>
   <script defer src="brief-guard.js?v=20261026-seven"></script>
-  <script type="module" src="app.js?v=20261026-directions"></script>
+  <script type="module" src="app.js?v=20261026-legacy-links"></script>
 </head>
 <body>
 <a class="skip" href="#main">Перейти к содержимому</a>
@@ -43,7 +43,7 @@
     <div class="eyebrow"><span class="red-dot"></span> Творческое объединение <span class="hero-location">Москва · 2026</span></div>
     <h1 aria-label="Пределов в творчестве не существует!"><span>Пределов</span><span class="red">в творчестве</span><span>не существует!</span></h1>
     <p class="hero-description">Воплощаем смелые идеи в дизайне и архитектуре интерьеров и экстерьеров, скульптуре и бытовом дизайне.</p>
-    <nav class="hero-directions" aria-label="Быстрый выбор направления"><a href="#service-design">Дизайн интерьеров</a><a href="#service-sculpture">Скульптура</a><a href="#service-awards">Сувениры и призы</a><a href="#service-everyday">Макетирование</a></nav>
+    <nav class="hero-directions" aria-label="Быстрый выбор направления"><a href="#service-design">Дизайн интерьеров</a><a href="#service-sculpture">Скульптура</a><a href="#service-awards">Сувениры и призы</a><a href="#service-modelmaking">Макетирование</a></nav>
 
   </div>
   <div class="hero-followthrough"><div class="hero-actions"><a class="button button-dark" href="#projects">Посмотреть проекты <span><span class="direction-icon direction-icon-down" aria-hidden="true"></span></span></a><a class="text-link" href="#studio">Познакомиться с объединением <span><span class="direction-icon" aria-hidden="true"></span></span></a></div>
@@ -67,7 +67,7 @@
     <a class="category-story-tile" data-story-category="interiors" href="#service-design"><span class="category-tile-progress" aria-hidden="true"><i></i><i></i><i></i></span><span class="category-tile-index">01 / О направлении</span><h3>Дизайн интерьеров</h3><span class="category-tile-art category-art-interiors" aria-hidden="true"><i></i><i></i></span><span class="category-tile-count">Пока нет проектов</span><span class="category-tile-cta">О направлении →</span></a>
     <a class="category-story-tile" data-story-category="sculpture" href="catalog.html#catalog-mascot"><span class="category-tile-progress" aria-hidden="true"><i></i><i></i><i></i></span><span class="category-tile-index">02 / Истории проектов</span><h3>Скульптура</h3><span class="category-tile-art " aria-hidden="true"><img src="assets/projects/bear/white-front.webp" alt="" width="480" height="480" loading="lazy" decoding="async"></span><span class="category-tile-count">5 проектов · 20 кадров</span><span class="category-tile-cta">Смотреть истории →</span></a>
     <a class="category-story-tile" data-story-category="awards" href="catalog.html#catalog-stdAwards"><span class="category-tile-progress" aria-hidden="true"><i></i><i></i><i></i></span><span class="category-tile-index">03 / Истории проектов</span><h3>Сувениры и призы</h3><span class="category-tile-art " aria-hidden="true"><img src="assets/projects/std-awards/award-series.webp" alt="" width="480" height="480" loading="lazy" decoding="async"></span><span class="category-tile-count">4 проекта · 10 кадров</span><span class="category-tile-cta">Смотреть истории →</span></a>
-    <a class="category-story-tile" data-story-category="modelmaking" href="#service-everyday"><span class="category-tile-progress" aria-hidden="true"><i></i><i></i><i></i></span><span class="category-tile-index">04 / О направлении</span><h3>Макетирование</h3><span class="category-tile-art category-art-modelmaking" aria-hidden="true"><i></i><i></i></span><span class="category-tile-count">Пока нет проектов</span><span class="category-tile-cta">О направлении →</span></a>
+    <a class="category-story-tile" data-story-category="modelmaking" href="#service-modelmaking"><span class="category-tile-progress" aria-hidden="true"><i></i><i></i><i></i></span><span class="category-tile-index">04 / О направлении</span><h3>Макетирование</h3><span class="category-tile-art category-art-modelmaking" aria-hidden="true"><i></i><i></i></span><span class="category-tile-count">Пока нет проектов</span><span class="category-tile-cta">О направлении →</span></a>
   </div>
   <!-- category-stories:end -->
   <p class="category-story-help">Нажмите на квадрат, чтобы открыть истории. Кадры переключаются только по вашему действию.</p>
@@ -96,11 +96,18 @@
 <section class="section directions section-anchor" id="directions" data-section="Направления">
   <div class="section-top"><span class="eyebrow">02 / Что создаём</span><span class="section-aside">От предмета на ладони<br>до объекта в пространстве</span></div>
   <div class="section-heading"><h2>Форма следует<br><span class="red">за вашей идеей.</span></h2><p>Подключаемся на этапе замысла или работаем с готовой концепцией. Подбираем материал, технологию и способ воплощения под задачу.</p></div>
+  <span id="service-everyday" class="legacy-direction-anchor" aria-hidden="true"></span>
+  <span id="stories/everyday/intro" class="legacy-direction-anchor" aria-hidden="true"></span>
+  <aside class="legacy-direction-choice" aria-labelledby="legacy-direction-title">
+    <h3 id="legacy-direction-title">Направления изменились</h3>
+    <p>Эта ссылка ведёт к прежнему разделу. Выберите одно из четырёх актуальных направлений.</p>
+    <nav aria-label="Актуальные направления"><a href="#service-design">Дизайн интерьеров</a><a href="#service-sculpture">Скульптура</a><a href="#service-awards">Сувениры и призы</a><a href="#service-modelmaking">Макетирование</a></nav>
+  </aside>
   <div class="service-list">
     <details id="service-design" open><summary><span class="service-number">01</span><h3>Дизайн интерьеров</h3><span class="service-short">Образ пространства</span><span class="plus">+</span></summary><div class="service-detail"><p>Дизайн интерьеров — от общего образа пространства до его деталей. Согласуем назначение помещения, планировку, характер и материалы под вашу задачу.</p><div class="tags"><span>Интерьер</span><span>Планировка</span><span>Пространство</span></div><div class="service-actions"><a class="text-link" href="#brief-form" data-service="Дизайн интерьеров" aria-label="Подготовить бриф (Дизайн интерьеров)">Подготовить бриф <span class="direction-icon" aria-hidden="true"></span></a></div></div></details>
     <details id="service-sculpture"><summary><span class="service-number">02</span><h3>Скульптура</h3><span class="service-short">Форма и характер</span><span class="plus">+</span></summary><div class="service-detail"><p>Авторская скульптура, объёмный персонаж или арт-объект для выставки, общественного либо частного пространства. Прорабатываем образ и соотносим его с размером, материалом и местом установки.</p><div class="tags"><span>Скульптура</span><span>Арт-объект</span><span>Персонаж</span></div><div class="service-actions"><a class="text-link" href="#brief-form" data-service="Скульптура" aria-label="Подготовить бриф (Скульптура)">Подготовить бриф <span class="direction-icon" aria-hidden="true"></span></a><a class="text-link service-examples" href="#projects" data-show-projects="sculpture">Примеры скульптур <span aria-hidden="true">↑</span></a></div></div></details>
     <details id="service-awards"><summary><span class="service-number">03</span><h3>Сувениры и призы</h3><span class="service-short">Памятные объекты</span><span class="plus">+</span></summary><div class="service-detail"><p>Сувенир, приз или награда с индивидуальным образом. Отталкиваемся от события и его смысла, согласуем форму, размер, материал и детали, которые сделают предмет узнаваемым.</p><div class="tags"><span>Сувениры</span><span>Призы</span><span>Награды</span></div><div class="service-actions"><a class="text-link" href="#brief-form" data-service="Сувениры и призы" aria-label="Подготовить бриф (Сувениры и призы)">Подготовить бриф <span class="direction-icon" aria-hidden="true"></span></a><a class="text-link service-examples" href="#projects" data-show-projects="awards">Примеры наград <span aria-hidden="true">↑</span></a></div></div></details>
-    <details id="service-everyday"><summary><span class="service-number">04</span><h3>Макетирование</h3><span class="service-short">Идея в масштабе</span><span class="plus">+</span></summary><div class="service-detail"><p>Макеты для представления и обсуждения идеи в объёме. Согласуем задачу, масштаб, степень детализации и материалы: что важно показать и как будет использоваться макет.</p><div class="tags"><span>Макет</span><span>Масштаб</span><span>Детали</span></div><div class="service-actions"><a class="text-link" href="#brief-form" data-service="Макетирование" aria-label="Подготовить бриф (Макетирование)">Подготовить бриф <span class="direction-icon" aria-hidden="true"></span></a></div></div></details>
+    <details id="service-modelmaking"><summary><span class="service-number">04</span><h3>Макетирование</h3><span class="service-short">Идея в масштабе</span><span class="plus">+</span></summary><div class="service-detail"><p>Макеты для представления и обсуждения идеи в объёме. Согласуем задачу, масштаб, степень детализации и материалы: что важно показать и как будет использоваться макет.</p><div class="tags"><span>Макет</span><span>Масштаб</span><span>Детали</span></div><div class="service-actions"><a class="text-link" href="#brief-form" data-service="Макетирование" aria-label="Подготовить бриф (Макетирование)">Подготовить бриф <span class="direction-icon" aria-hidden="true"></span></a></div></div></details>
   </div>
 </section>
 <section class="process section-anchor" id="process" data-section="Процесс">
@@ -212,7 +219,7 @@
       <li><a href="#service-design">Дизайн интерьеров</a></li>
       <li><a href="#service-sculpture">Скульптура</a></li>
       <li><a href="#service-awards">Сувениры и призы</a></li>
-      <li><a href="#service-everyday">Макетирование</a></li>
+      <li><a href="#service-modelmaking">Макетирование</a></li>
     </ul></div>
     <div class="footer-column"><h3>Проекты</h3><ul>
       <li><a data-case-link="mascot" href="assets/projects/bear/white-front.webp">Медведь. С характером.</a></li>

@@ -8,7 +8,7 @@ function fixture(hash=''){
  const on=(target,type,fn)=>{(listeners[target+type]??=[]).push(fn)};
  const emit=(target,type,event={})=>(listeners[target+type]||[]).forEach(fn=>fn(event));
  for(const id of ['projects','directions','process','studio','journal'])elements[id]={id,rect:{top:1000,bottom:2000},getBoundingClientRect(){return this.rect}};
- for(const id of ['design','sculpture','everyday','awards'])elements['service-'+id]={tagName:'DETAILS',open:id==='design'};
+ for(const id of ['design','sculpture','modelmaking','awards'])elements['service-'+id]={tagName:'DETAILS',open:id==='design'};
  const links=Object.keys(elements).slice(0,5).map(id=>({attrs:{href:'#'+id},getAttribute(k){return this.attrs[k]},setAttribute(k,v){this.attrs[k]=v},removeAttribute(k){delete this.attrs[k]}}));
  const document={body:{},getElementById:id=>elements[id],querySelectorAll:()=>links,querySelector:()=>({getBoundingClientRect:()=>({bottom:74})}),addEventListener:(type,fn)=>on('d',type,fn)};
  const window={innerHeight:800,location:{hash},requestAnimationFrame:fn=>frames.push(fn),addEventListener:(type,fn,options)=>{on('w',type,fn);if(type==='scroll')assert.equal(options.passive,true)}};
@@ -21,7 +21,7 @@ test('Reading-line selection follows geometry, not nav order; clears outside sec
  for(const line of [0,801,1000])assert.equal(currentSection(sections,line),null);
 });
 test('All initial service hashes open only their target, preserving design',()=>{
- for(const id of ['design','sculpture','everyday','awards']){const f=fixture('#service-'+id);assert(f.elements['service-'+id].open);assert(f.elements['service-design'].open)}
+ for(const id of ['design','sculpture','modelmaking','awards']){const f=fixture('#service-'+id);assert(f.elements['service-'+id].open);assert(f.elements['service-design'].open)}
 });
 test('Invalid and non-details targets are ignored',()=>{
  const f=fixture();for(const hash of ['#project/mascot','#service-nope','#service-%61wards','#service-awards?x','#contact',''])assert.equal(revealService(hash,f.document),false);
@@ -56,4 +56,29 @@ test('All brief routes name local preparation instead of conversation or sending
  assert.equal(links.length,10);for(const link of links){assert.match(link,/бриф|Бриф/);assert.doesNotMatch(link,/Обсудить|познакомимся|отправить/i)}
  assert.match(html,/mobile-label">Бриф<\/span>/);assert.match(html,/aria-label="Подготовить бриф для скачивания, без отправки"/);
  assert.match(file('app.js'),/id="case-contact">Подготовить бриф по примеру/);
+});
+
+
+test('Old everyday hashes never open modelmaking, including repeated native history events',()=>{
+ for(const hash of ['#service-everyday','#stories/everyday/intro']){
+  const f=fixture(hash);assert.equal(revealService(hash,f.document),false);assert(!f.elements['service-modelmaking'].open);
+  for(const type of ['hashchange','popstate','pageshow','hashchange']){f.emit('w',type);assert(!f.elements['service-modelmaking'].open);assert.equal(f.window.location.hash,hash)}
+  f.window.location.hash='#service-modelmaking';f.emit('w','hashchange');assert(f.elements['service-modelmaking'].open);
+ }
+});
+test('Legacy fragment anchors expose one native four-choice notice, never a fifth service or brief CTA',()=>{
+ const html=file('index.html'),css=file('style.css');
+ for(const id of ['service-everyday','stories/everyday/intro'])assert(html.includes('<span id="'+id+'" class="legacy-direction-anchor"'));
+ const notice=html.match(/<aside class="legacy-direction-choice"[^>]*>([\s\S]*?)<\/aside>/)[1];
+ assert.match(notice,/Направления изменились/);assert.match(notice,/прежнему разделу/);
+ assert.deepEqual([...notice.matchAll(/href="#service-([^"]+)"/g)].map(m=>m[1]),['design','sculpture','awards','modelmaking']);
+ assert.deepEqual([...notice.matchAll(/<a[^>]*>([^<]+)<\/a>/g)].map(m=>m[1]),['Дизайн интерьеров','Скульптура','Сувениры и призы','Макетирование']);
+ assert.doesNotMatch(notice,/data-service|#brief-form|Бытовой дизайн|<details/);
+ assert.doesNotMatch(html,/href="#service-everyday"|<details id="service-everyday"/);
+ assert.match(css,/\.legacy-direction-choice\{display:none/);assert.match(css,/\.legacy-direction-anchor:target~\.legacy-direction-choice\{display:block\}/);
+ assert.match(css,/\.legacy-direction-choice a\{[^}]*min-height:44px/);
+});
+test('Legacy-link dependency chain and stylesheet use a fresh matching release',()=>{
+ assert.match(file('index.html'),/app\.js\?v=20261026-legacy-links/);assert.match(file('index.html'),/style\.css\?v=20261026-legacy-links/);
+ for(const [name,modules] of [['app.js',['section-navigation','category-stories']],['category-stories.js',['category-stories-data','category-stories-navigation']],['category-stories-navigation.js',['category-stories-data']]])for(const module of modules)assert(file(name).includes(module+'.js?v=20261026-legacy-links'));
 });
