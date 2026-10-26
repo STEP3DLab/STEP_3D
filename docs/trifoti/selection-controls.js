@@ -1,4 +1,4 @@
-import {projects} from './project-data.js?v=20261024-case-story';
+import {projects} from './project-data.js?v=20261026-directions';
 export function bindSelectionButton({button,key,controller,status}){
  if(!projects[key])return ()=>{};
  button.hidden=false;button.type='button';button.setAttribute('aria-label','Добавить в подборку: '+projects[key].title);

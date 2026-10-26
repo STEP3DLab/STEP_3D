@@ -133,5 +133,30 @@
     "width": 1536,
     "height": 954,
     "sha256": "55e392067af80c6928dc312b9abce9db42e86cedb7bc0a97e60c8db6353532d3"
+  },
+  "assets/projects/feather-award/feather-front.jpg": {
+    "width": 1280,
+    "height": 720,
+    "sha256": "ba18d4970aff36caf22c3c854b3cece640c75fb2806e5b8351842bc557865cef"
+  },
+  "assets/projects/feather-award/feather-inscription.jpg": {
+    "width": 1280,
+    "height": 720,
+    "sha256": "3e6441a29c14d63bc468618e309286812b4e64decf5dee4264227fb1975f60f7"
+  },
+  "assets/projects/feather-award/feather-angle.jpg": {
+    "width": 1280,
+    "height": 720,
+    "sha256": "b3962b764a5ce41525aad5cc6b3cd7f900b689becc887a8414a7bdcc844fca4e"
+  },
+  "assets/projects/vmeste-prize/vmeste-prize.jpg": {
+    "width": 720,
+    "height": 1280,
+    "sha256": "b07bbe459027934410e5e9f60833704feda0a98a41027d90df4b287d3b45cea4"
+  },
+  "assets/projects/two-figure-composition/two-figure-composition.jpg": {
+    "width": 1280,
+    "height": 720,
+    "sha256": "d11683b2bf120911a3c9e40d6fb3edc585df43f05c4427e2c68bfb086cca6bb1"
   }
 }

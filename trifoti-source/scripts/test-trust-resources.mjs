@@ -28,16 +28,16 @@ test('Four glossary definitions have specific primary source URLs and no specula
  assert.match(trust,/не перечень оборудования или материалов/);
 });
 test('Attribution explicitly separates the collective, cup maker, awards team and sculptor sources',()=>{
- assert.equal(attributionNotes.length,4);assert.match(trust,/не означает авторство объединения/);assert.match(trust,/не его изготовитель/);assert.match(trust,/не приписывает ему все шесть кейсов/);assert.match(trust,/Публичное вручение не означает соавторство/);
+ assert.equal(attributionNotes.length,4);assert.match(trust,/не означает авторство объединения/);assert.match(trust,/не его изготовитель/);assert.match(trust,/не приписывает ему все кейсы/);assert.match(trust,/Публичное вручение не означает соавторство/);
 });
 test('Generated resources match final HTML and packet is readable with no JavaScript',()=>{
  assert(read('index.html').includes(trust));assert.equal(read('information-pack.html'),packet);
- assert.equal((packet.match(/data-pack-case=/g)||[]).length,6);assert.doesNotMatch(packet,/<article[^>]*hidden/);assert.match(packet,/Без JavaScript здесь показаны все шесть кейсов/);
+ assert.equal((packet.match(/data-pack-case=/g)||[]).length,Object.keys(projects).length);assert.doesNotMatch(packet,/<article[^>]*hidden/);assert.match(packet,/Без JavaScript здесь показаны все кейсы/);
  for(const html of [trust,packet]){const ids=[...html.matchAll(/\bid="([^"]+)"/g)].map(match=>match[1]);assert.equal(new Set(ids).size,ids.length);}
 });
 test('Packet preserves all source project descriptions and attribution without fabricated roles',()=>{
  for(const [key,p] of Object.entries(projects)){assert(packet.includes(p.description));assert(packet.includes(p.attribution||p.type));assert(packet.includes('#project/'+key));for(const source of p.sources||[])assert(packet.includes(source.url));}
- assert.equal((packet.match(/Персональные роли участников в этом кейсе не уточнены/g)||[]).length,4);
+ assert.equal((packet.match(/Персональные роли участников в этом кейсе не уточнены/g)||[]).length,Object.values(projects).filter(p=>!p.attribution).length);
  assert.doesNotMatch(packet,/имплант|образовани|основатель|директор ТРИФОТИ|художественный руководитель/i);
 });
 test('Packet preserves approved achievements and specific role-source labels without internal audit prose',()=>{

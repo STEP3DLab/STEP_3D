@@ -1,0 +1,42 @@
+[
+  {
+    "input": "04/1000024718.jpg",
+    "asset": "assets/projects/feather-award/feather-front.jpg",
+    "width": 1280,
+    "height": 720,
+    "sha256": "ba18d4970aff36caf22c3c854b3cece640c75fb2806e5b8351842bc557865cef",
+    "bytes": 92207
+  },
+  {
+    "input": "01/1000024722.jpg",
+    "asset": "assets/projects/feather-award/feather-inscription.jpg",
+    "width": 1280,
+    "height": 720,
+    "sha256": "3e6441a29c14d63bc468618e309286812b4e64decf5dee4264227fb1975f60f7",
+    "bytes": 103248
+  },
+  {
+    "input": "05/1000024720.jpg",
+    "asset": "assets/projects/feather-award/feather-angle.jpg",
+    "width": 1280,
+    "height": 720,
+    "sha256": "b3962b764a5ce41525aad5cc6b3cd7f900b689becc887a8414a7bdcc844fca4e",
+    "bytes": 71573
+  },
+  {
+    "input": "02/1000024721.jpg",
+    "asset": "assets/projects/vmeste-prize/vmeste-prize.jpg",
+    "width": 720,
+    "height": 1280,
+    "sha256": "b07bbe459027934410e5e9f60833704feda0a98a41027d90df4b287d3b45cea4",
+    "bytes": 241457
+  },
+  {
+    "input": "03/1000024719.jpg",
+    "asset": "assets/projects/two-figure-composition/two-figure-composition.jpg",
+    "width": 1280,
+    "height": 720,
+    "sha256": "d11683b2bf120911a3c9e40d6fb3edc585df43f05c4427e2c68bfb086cca6bb1",
+    "bytes": 196686
+  }
+]

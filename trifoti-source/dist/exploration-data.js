@@ -1,4 +1,4 @@
-import {projects} from './project-data.js?v=20261024-case-story';
+import {projects} from './project-data.js?v=20261026-directions';
 export const PUBLIC_SITE='https://step3dlab.github.io/STEP_3D/trifoti/';
 export const caseKeys=Object.keys(projects);
 // Asset basenames are permanent public media identifiers, not positional indexes.
@@ -21,6 +21,7 @@ export function exactLink(key,id){
  return PUBLIC_SITE+'#project/'+key+(id&&mediaIndex(key,id)>=0?'/media/'+id:'');
 }
 export const relatedWorks={
+ 'feather-award':[], 'vmeste-prize':[], 'two-figure-composition':[],
  mascot:[{key:'pink',reason:'Два персонажа: характер выражен через силуэт и мимику.'}],
  pink:[{key:'mascot',reason:'Два персонажа: характер выражен через силуэт и мимику.'}],
  stdAwards:[{key:'rto-traveling-cup',reason:'Скульптурные награды: форма предмета и его вручение.'}],

@@ -8,7 +8,7 @@ const badges=rules('.media-count'),arrow=rules('.project-arrow')[0];
 const captions=[...html.matchAll(/<span class="media-count">([^<]+)<\/span>/g)].map(m=>m[1]);
 
 test('All six existing captions are retained verbatim',()=>{
- assert.deepEqual(captions,['9 фото + видео','2 фото','Видео 360°','6 фото','3 фото · от замысла до вручения','3 фото · кубок и церемония']);
+ assert.deepEqual(captions.slice(0,6),['9 фото + видео','2 фото','Видео 360°','6 фото','3 фото · от замысла до вручения','3 фото · кубок и церемония']);
 });
 for(const [index,label] of ['desktop','narrow'].entries())test(`${label} badge reserves the actual arrow, insets and an eight-pixel gap`,()=>{
  const rule=badges[index],left=parseFloat(rule.left),right=parseFloat(arrow.right),width=parseFloat(arrow.width);
@@ -34,6 +34,6 @@ test('Typography, color, arrow size and visual state rules are unchanged',()=>{
 });
 test('Returning visitors load the badge stylesheet without replacing app or data modules',()=>{
  assert.match(html,/style\.css\?v=20261026-selected-contrast/);
- assert.match(html,/app\.js\?v=20261026-seven/);
+ assert.match(html,/app\.js\?v=20261026-directions/);
  assert.match(css,/@media\(max-width:380px\)\{[\s\S]*?\.project-grid\{grid-template-columns:1fr\}/);
 });

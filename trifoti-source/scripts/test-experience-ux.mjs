@@ -8,11 +8,11 @@ test('Readiness only counts nonblank required fields, not optional choices',()=>
  assert.deepEqual(briefCompletion({name:'Анна',idea:'Арт-объект'}),{done:2,text:'Можно сохранить · 2 из 2 обязательных полей'});
 });
 test('Prompts match the selected service and never insert invented project facts',()=>{
- assert(ideaPrompts('Сувениры, призы, награды').some(([label])=>label==='Тираж'));
- assert(ideaPrompts('Дизайн и архитектура').some(([label])=>label==='Пространство'));
- assert(ideaPrompts('Бытовой дизайн').some(([label])=>label==='Функция'));
+ assert(ideaPrompts('Сувениры и призы').some(([label])=>label==='Тираж'));
+ assert(ideaPrompts('Дизайн интерьеров').some(([label])=>label==='Пространство'));
+ assert(ideaPrompts('Макетирование').some(([label])=>label==='Масштаб'));
  assert.deepEqual(ideaPrompts('unknown'),ideaPrompts('Скульптура'));
- for(const direction of ['Скульптура','Дизайн и архитектура','Бытовой дизайн','Сувениры, призы, награды'])for(const [,value] of ideaPrompts(direction))assert(value.endsWith(': '));
+ for(const direction of ['Скульптура','Дизайн интерьеров','Макетирование','Сувениры и призы'])for(const [,value] of ideaPrompts(direction))assert(value.endsWith(': '));
 });
 test('Prompt insertion preserves existing text and respects native UTF-16 maxlength',()=>{
  assert.equal(appendIdeaPrompt('Моя идея','Размер: '),'Моя идея\nРазмер: ');
@@ -50,7 +50,7 @@ test('Restored optional values are discoverable, prompts preserve draft, height 
  }finally{f.cleanup()}
 });
 test('Direction changes rebuild relevant prompts without clearing text',()=>{
- const f=fixture();try{f.fields.idea.value='Сохранить';f.fields.direction.value='Дизайн и архитектура';f.experience.refresh();assert.equal(f.fields.idea.value,'Сохранить');assert.equal(f.get('brief-prompt-buttons').children[0].textContent,'+ Пространство')}finally{f.cleanup()}
+ const f=fixture();try{f.fields.idea.value='Сохранить';f.fields.direction.value='Дизайн интерьеров';f.experience.refresh();assert.equal(f.fields.idea.value,'Сохранить');assert.equal(f.get('brief-prompt-buttons').children[0].textContent,'+ Пространство')}finally{f.cleanup()}
 });
 test('Error summary shows only invalid fields and links focus the matching input',()=>{
  const f=fixture();try{
@@ -70,7 +70,7 @@ test('Print validates, uses current values as plain text and restores the screen
 });
 test('Back to top avoids covering brief/footer and never removes the focused control',()=>{
  let notify;const observed=[];const link={hidden:true,addEventListener(t,fn){this[t]=fn}},hero={},contact={},footer={};
- const document={activeElement:null,getElementById:id=>({'back-to-top':link,home:hero,contact}[id]),querySelector:()=>footer};
+ const document={activeElement:null,getElementById:id=>({'back-to-top':link,home:hero,contact}[id]),querySelector:selector=>selector==='.site-footer'?footer:null};
  initializeBackToTop({document,window:{IntersectionObserver:class{constructor(fn){notify=fn}observe(n){observed.push(n)}}}});
  assert.equal(observed.length,3);notify([{target:hero,isIntersecting:false}]);assert(!link.hidden);
  notify([{target:contact,isIntersecting:true}]);assert(link.hidden);notify([{target:contact,isIntersecting:false}]);assert(!link.hidden);

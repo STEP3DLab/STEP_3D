@@ -70,7 +70,7 @@ test('Unavailable or rejected clipboard access reports failure for the visible f
 });
 test('Sharing is click-only, fallback is readonly and focus recovery excludes filtered-out cards',()=>{
   const app=readFileSync(new URL('../dist/app.js',import.meta.url),'utf8');
-  assert(app.includes("shareButton.addEventListener('click',async()=>"));assert(app.includes('<input id="case-share-url" readonly>'));assert(app.includes('card&&!card.hidden?card:'));assert(app.includes("caseNavigation.visit('#brief-form')"));assert(app.includes("if(!shareButton.isConnected)return"));
+  assert(app.includes("shareButton.addEventListener('click',async()=>"));assert(app.includes('<input id="case-share-url" readonly>'));assert(app.includes('visiblePortfolioTarget(card)?card:'));assert(app.includes("caseNavigation.visit('#brief-form')"));assert(app.includes("if(!shareButton.isConnected)return"));
   const nav=readFileSync(new URL('../dist/project-navigation.js',import.meta.url),'utf8');assert(!/localStorage|sessionStorage|fetch\(/.test(nav));
 });
 test('First-screen studio introduction now targets the existing studio section',()=>{
@@ -83,7 +83,7 @@ test('Footer case links preserve modified navigation and remember their visible 
  assert(app.includes("enhanceProjectCards($$('a[data-case-link]')"));
  assert(app.includes('projectOpener=link;caseNavigation.open(link.dataset.caseLink)'));
  assert(app.includes('projectOpener?.dataset.caseLink===galleryProject'));
- assert(app.includes('projectOpener?.isConnected&&!projectOpener.hidden&&openerMatches?projectOpener:'));
+ assert(app.includes('visiblePortfolioTarget(projectOpener)&&openerMatches?projectOpener:'));
 });
 
 test('Adjacent cases keep one gallery entry and original return route',()=>{const b=browser('https://example.test/#directions');b.nav.open('mascot');b.nav.switchCase('pink');b.nav.switchCase('stdAwards');assert.equal(b.history.length,2);assert.equal(b.rendered,'stdAwards');assert.equal(b.close(),'back');b.flush();assert.equal(b.location.hash,'#directions');b.history.forward();b.flush();assert.equal(b.rendered,'stdAwards')});

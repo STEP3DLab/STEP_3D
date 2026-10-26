@@ -30,9 +30,9 @@ test('Unique manufacturing and ceremony facts remain explicitly attributed',()=>
  assert.deepEqual(std.sources.map(s=>s.url),['https://technopark-rgsu.ru/skb/news/nagrady-dlya-zvezd-teatra/','https://stdrf.ru/novosti/sostoyalos-vruchenie-premiy-predsedatelya-i-sopredsedatelya-std-rf/']);
 });
 test('All 25 media records and four other cases remain byte-equivalent as data',()=>{
- assert.equal(hash(Object.fromEntries(Object.entries(projects).map(([key,p])=>[key,p.media]))),'d5cf362fff1bde5d195ba44d8cd05dff1da6c6c3ac0db853d6b45feb832fc323');
- assert.equal(Object.values(projects).reduce((sum,p)=>sum+p.media.length,0),25);
- assert.equal(hash(Object.fromEntries(Object.entries(projects).filter(([key])=>!awards.includes(key)))),'c2f57f44df92417486f83ca2b26b3595df800bff120ca0c8963d8f20e03cf050');
+ assert.equal(hash(Object.fromEntries(Object.entries(projects).filter(([key])=>['stdAwards','mascot','pink','restoration','gesture','rto-traveling-cup'].includes(key)).map(([key,p])=>[key,p.media]))),'d5cf362fff1bde5d195ba44d8cd05dff1da6c6c3ac0db853d6b45feb832fc323');
+ assert.equal(['stdAwards','mascot','pink','restoration','gesture','rto-traveling-cup'].reduce((sum,key)=>sum+projects[key].media.length,0),25);
+ assert.equal(hash(Object.fromEntries(Object.entries(projects).filter(([key])=>['mascot','pink','restoration','gesture'].includes(key)))),'c2f57f44df92417486f83ca2b26b3595df800bff120ca0c8963d8f20e03cf050');
 });
 test('Sections use real headings and plain text before the unchanged source links and CTA',()=>{
  for(const key of awards){
@@ -65,6 +65,6 @@ test('Integration preserves context-first intro, provenance, gallery chapters an
  assert.doesNotMatch(css,/(?:^|[;{])height:|position:|animation|transition|overflow:hidden/);
 });
 test('Changed app, stylesheet and case data load as a matching cache release',()=>{
- assert.match(file('index.html'),/app\.js\?v=20261026-seven/);assert.match(file('index.html'),/style\.css\?v=20261026-selected-contrast/);
- assert.match(file('app.js'),/project-data\.js\?v=20261024-case-story/);assert.match(file('app.js'),/case-sections\.js\?v=20261024-case-story/);
+ assert.match(file('index.html'),/app\.js\?v=20261026-directions/);assert.match(file('index.html'),/style\.css\?v=20261026-selected-contrast/);
+ assert.match(file('app.js'),/project-data\.js\?v=20261026-directions/);assert.match(file('app.js'),/case-sections\.js\?v=20261024-case-story/);
 });

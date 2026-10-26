@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {ideaCount,copyBriefText,initializeBriefTools} from '../dist/brief-tools.js';
 import {BRIEF_KEY,createBriefDraftSession} from '../dist/brief-utils.js';
-const directions=['Пока не знаю — давайте обсудим','Дизайн и архитектура','Скульптура','Бытовой дизайн','Сувениры, призы, награды'];
+const directions=['Пока не знаю — давайте обсудим','Дизайн интерьеров','Скульптура','Сувениры и призы','Макетирование'];
 function fixture(initial={}){
  const nodes={},fields={},events=[];let active=null,raw=null;
  const node=id=>nodes[id]??=( {id,value:'',textContent:'',hidden:false,open:false,disabled:false,dataset:{},attrs:{},handlers:{},addEventListener(k,fn){this.handlers[k]=fn},setAttribute(k,v){this.attrs[k]=v},removeAttribute(k){delete this.attrs[k]},focus(){active=this},select(){this.selected=true}} );

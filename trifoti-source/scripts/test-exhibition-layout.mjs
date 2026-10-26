@@ -12,7 +12,7 @@ test('Real projects follow the hero in the document, before all four directions'
  assert(html.indexOf('id="home"')<html.indexOf('id="projects"'));
  assert(html.indexOf('id="projects"')<html.indexOf('id="directions"'));
  assert.match(html,/01 \/ Проекты/);assert.match(html,/02 \/ Что создаём/);
- const directions=['service-design','service-sculpture','service-everyday','service-awards'].map(id=>html.indexOf(`id="${id}"`));
+ const directions=['service-design','service-sculpture','service-awards','service-everyday'].map(id=>html.indexOf(`id="${id}"`));
  assert(directions.every((n,i)=>n>0&&(!i||n>directions[i-1])));
 });
 test('Hero retains its complete copy, real bear and actions in logical narrow-screen order',()=>{
@@ -28,10 +28,10 @@ test('Hero retains its complete copy, real bear and actions in logical narrow-sc
  assert.doesNotMatch(exhibition,/\.hero(?:-art)?\{[^}]*height:\d+(?:px|vh)/);
 });
 test('All six case buttons retain their natural DOM order and local image dimensions',()=>{
- assert.deepEqual([...cards.matchAll(/data-project="([^"]+)"/g)].map(m=>m[1]),['mascot','pink','gesture','restoration','stdAwards','rto-traveling-cup']);
- const images=[...cards.matchAll(/<img [^>]+>/g)].map(m=>m[0]);assert.equal(images.length,6);
+ assert.deepEqual([...cards.matchAll(/data-project="([^"]+)"/g)].map(m=>m[1]),['mascot','pink','gesture','restoration','stdAwards','rto-traveling-cup','feather-award','vmeste-prize','two-figure-composition']);
+ const images=[...cards.matchAll(/<img [^>]+>/g)].map(m=>m[0]);assert.equal(images.length,9);
  for(const img of images){assert.match(img,/width="\d+"/);assert.match(img,/height="\d+"/);assert.match(img,/loading="lazy"/);assert.match(img,/decoding="async"/);assert.match(img,/alt="[^"].*?"/)}
- assert.equal((cards.match(/class="media-count"/g)||[]).length,6);
+ assert.equal((cards.match(/class="media-count"/g)||[]).length,9);
 });
 test('Editorial desktop spans collapse without sparse fixed placements when filtering',()=>{
  assert.match(exhibition,/grid-template-columns:repeat\(12,minmax\(0,1fr\)\)/);
@@ -57,7 +57,7 @@ test('Motion is optional, keyboard focus has equal emphasis and native navigatio
  assert.match(exhibition,/\.project-card:focus-visible \.project-title/);
  assert.doesNotMatch(exhibition,/scroll-snap|scroll-timeline|animation:|cursor:none|position:fixed/);
  assert.match(html,/style\.css\?v=20261026-selected-contrast/);
- assert.match(html,/app\.js\?v=20261026-seven/);
+ assert.match(html,/app\.js\?v=20261026-directions/);
 });
 
  test('Narrow manifesto strip wraps without hiding horizontal overflow',()=>{
@@ -69,7 +69,7 @@ test('Motion is optional, keyboard focus has equal emphasis and native navigatio
 test('Decorative diagonal arrows are font-independent and hidden from assistive names',()=>{
  const app=readFileSync(new URL('../dist/app.js',import.meta.url),'utf8');
  const icons=[...html.matchAll(/<span class="direction-icon(?: direction-icon-down)?" aria-hidden="true"><\/span>/g)];
- assert.equal(icons.length,29);
+ assert.equal(icons.length,32);
  assert.equal((html.match(/direction-icon-down/g)||[]).length,1);
  assert.doesNotMatch(html,/[↗↘]/);assert.doesNotMatch(app,/[↗↘]/);
  assert.match(app,/<span class="direction-icon" aria-hidden="true"><\/span>/);

@@ -1,4 +1,4 @@
-import {briefErrors,formatBrief} from './brief-utils.js?v=20261024-brief-tools';
+import {briefErrors,formatBrief} from './brief-utils.js?v=20261026-directions';
 
 export function ideaCount(value,limit=4000){
  const length=value.length,remaining=limit-length;

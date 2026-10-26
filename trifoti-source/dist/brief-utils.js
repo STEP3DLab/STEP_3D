@@ -1,5 +1,6 @@
 // Uses only the existing local draft key and fields. Nothing is transmitted.
 export const BRIEF_KEY = 'trifoti-brief-v1';
+export const legacyDirections=Object.freeze(['Дизайн и архитектура','Бытовой дизайн','Сувениры, призы, награды','3D-модель и производство']);
 const fields = ['reference', 'name', 'direction', 'idea', 'budget', 'deadline'];
 const onlyFields = values => Object.fromEntries(fields.filter(key => typeof values[key] === 'string').map(key => [key, values[key]]));
 const previousDirections = new Map([

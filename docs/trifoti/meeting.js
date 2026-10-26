@@ -1,5 +1,5 @@
-import {projects} from './project-data.js?v=20261024-case-story';
-import {selectionIds} from './exploration-data.js';
+import {projects} from './project-data.js?v=20261026-directions';
+import {selectionIds} from './exploration-data.js?v=20261026-directions';
 import {createMediaSlot} from './portfolio-media.js?v=20261026-portfolio-tools';
 import {galleryArrow} from './dialog-controls.js?v=20261022-gallery';
 export function meetingFrames(ids){return selectionIds(ids.join(',')).flatMap(key=>projects[key].media.map((item,index)=>({key,item,index})))}

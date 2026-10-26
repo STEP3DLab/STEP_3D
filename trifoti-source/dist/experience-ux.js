@@ -1,4 +1,4 @@
-import {formatBrief} from './brief-utils.js?v=20261024-brief-tools';
+import {formatBrief} from './brief-utils.js?v=20261026-directions';
 
 export function briefCompletion(values){
  const done=['name','idea'].filter(key=>String(values[key]||'').trim()).length;
@@ -6,9 +6,9 @@ export function briefCompletion(values){
 }
 export function ideaPrompts(direction){
  const common=[['Назначение','Для кого и где: '],['Размер','Примерный размер: ']];
- if(direction==='Сувениры, призы, награды')return [...common,['Тираж','Количество изделий: '],['Повод','Событие и символика: ']];
- if(direction==='Дизайн и архитектура')return [['Пространство','Тип пространства: '],['Размер','Площадь или размеры: '],['Задача','Что хочется изменить: ']];
- if(direction==='Бытовой дизайн')return [...common,['Функция','Как будут пользоваться: ']];
+ if(direction==='Сувениры и призы')return [...common,['Тираж','Количество изделий: '],['Повод','Событие и символика: ']];
+ if(direction==='Дизайн интерьеров')return [['Пространство','Тип пространства: '],['Размер','Площадь или размеры: '],['Задача','Что хочется изменить: ']];
+ if(direction==='Макетирование')return [['Задача','Что нужно показать: '],['Масштаб','Масштаб или размеры макета: '],['Детали','Степень детализации: ']];
  return [...common,['Материал','Пожелания к материалу: '],['Образ','Характер и настроение: ']];
 }
 export function appendIdeaPrompt(value,prompt,limit=4000){
@@ -56,14 +56,14 @@ export function initializeBriefExperience({form,document,window,validate}){
  return {refresh,showErrors};
 }
 export function initializeBackToTop({document,window}){
- const link=document.getElementById('back-to-top'),hero=document.getElementById('home'),contact=document.getElementById('contact'),footer=document.querySelector('.site-footer');
+ const link=document.getElementById('back-to-top'),hero=document.getElementById('home'),contact=document.getElementById('contact'),footer=document.querySelector('.site-footer'),stories=document.querySelector('.category-stories');
  if(!link||!window.IntersectionObserver)return;
- let heroVisible=true,contactVisible=false,footerVisible=false;
+ let heroVisible=true,contactVisible=false,footerVisible=false,storiesVisible=false;
  const observer=new window.IntersectionObserver(entries=>{
-  for(const entry of entries){if(entry.target===hero)heroVisible=entry.isIntersecting;if(entry.target===contact)contactVisible=entry.isIntersecting;if(entry.target===footer)footerVisible=entry.isIntersecting}
+  for(const entry of entries){if(entry.target===hero)heroVisible=entry.isIntersecting;if(entry.target===contact)contactVisible=entry.isIntersecting;if(entry.target===footer)footerVisible=entry.isIntersecting;if(entry.target===stories)storiesVisible=entry.isIntersecting}
   // Keep a focused control present until the visitor moves away.
-  if(document.activeElement!==link)link.hidden=heroVisible||contactVisible||footerVisible;
+  if(document.activeElement!==link)link.hidden=heroVisible||contactVisible||footerVisible||storiesVisible;
  });
- for(const target of [hero,contact,footer])if(target)observer.observe(target);
- link.addEventListener('blur',()=>{link.hidden=heroVisible||contactVisible||footerVisible});
+ for(const target of [hero,contact,footer,stories])if(target)observer.observe(target);
+ link.addEventListener('blur',()=>{link.hidden=heroVisible||contactVisible||footerVisible||storiesVisible});
 }

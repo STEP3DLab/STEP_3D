@@ -8,14 +8,14 @@ const links=[...html.matchAll(/<a\b([^>]*\bdata-service="([^"]+)"[^>]*)>([\s\S]*
 const attr=(text,name)=>text.match(new RegExp(`\\b${name}="([^"]*)"`))?.[1];
 
 test('The four requested directions appear in their exact order',()=>{
- const expected=['Дизайн и архитектура','Скульптура','Бытовой дизайн','Сувениры, призы, награды'];
+ const expected=['Дизайн интерьеров','Скульптура','Сувениры и призы','Макетирование'];
  const section=html.match(/<div class="service-list">(.*?)<\/section>/s)[1];
  assert.deepEqual([...section.matchAll(/<h3>([^<]+)<\/h3>/g)].map(m=>m[1]),expected);
  assert.deepEqual(links.map(m=>m[2]),expected);
 });
 test('Existing real cases use fitting directions without inventing architecture cases',()=>{
- assert.deepEqual(Object.keys(projects).sort(),['gesture','mascot','pink','restoration','rto-traveling-cup','stdAwards']);
- assert.equal(projects.stdAwards.direction,'Сувениры, призы, награды');
+ assert.deepEqual(Object.keys(projects).sort(),['feather-award','gesture','mascot','pink','restoration','rto-traveling-cup','stdAwards','two-figure-composition','vmeste-prize']);
+ assert.equal(projects.stdAwards.direction,'Сувениры и призы');
  for(const key of ['gesture','mascot','pink','restoration'])assert.equal(projects[key].direction,'Скульптура');
 });
 test('Hero, identity and contact copy follow the latest wording with stable anchors',()=>{

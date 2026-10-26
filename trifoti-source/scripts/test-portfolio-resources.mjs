@@ -27,14 +27,14 @@ for(const [key,p] of Object.entries(projects))test('Static '+key+' preserves eve
  assert.match(html,/meta name="twitter:image:alt"/);assert.match(html,/<script type="module" src="\.\.\/static-case-context.js/);
 });
 test('Catalog includes all six cases with exact descriptions, covers, citations and no video payload',()=>{
- const html=outputs.get('catalog.html');assert.equal((html.match(/class="catalog-case"/g)||[]).length,6);assert.doesNotMatch(html,/<video/);
+ const html=outputs.get('catalog.html');assert.equal((html.match(/class="catalog-case"/g)||[]).length,Object.keys(projects).length);assert.doesNotMatch(html,/<video/);
  for(const [key,p] of Object.entries(projects)){assert(html.includes(p.description));assert(html.includes(p.attribution||p.type));assert(html.includes(p.media[0].poster||p.media[0].src));assert(html.includes(casePath(key)));for(const source of p.sources||[])assert(html.includes(source.url));}
  const css=read('portfolio-resources.css');assert.match(css,/@page\{size:A4/);assert.match(css,/break-before:page/);assert.match(css,/attr\(href\)/);assert.match(css,/height:auto;max-height:none;overflow:visible/);
  assert.equal(read('catalog.js').match(/window.print\(\)/g).length,1);
 });
 test('Text-only lightweight markup requests no media, fonts, app or bear and retains 25 original links',()=>{
  const html=outputs.get('light.html');assert.doesNotMatch(html,/<img|<video|<source|preload|app\.js|bear-video/);
- assert.equal((html.match(/data-light-case=/g)||[]).length,6);
+ assert.equal((html.match(/data-light-case=/g)||[]).length,Object.keys(projects).length);
  for(const p of Object.values(projects))for(const item of p.media)assert(html.includes('href="https://step3dlab.github.io/STEP_3D/trifoti/'+item.src+'"'));
  assert.match(html,/index.html#brief-form/);assert.match(html,/index.html#project\//);
  for(const file of ['portfolio-media.js','light-view.js','meeting.js'])assert.doesNotMatch(read(file),/localStorage|sessionStorage|fetch\(|sendBeacon|setInterval|autoplay\s*=/);

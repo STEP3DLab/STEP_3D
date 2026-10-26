@@ -1,25 +1,26 @@
-import {appendSelectionReference,mountReferenceManager} from './reference-manager.js?v=20261026-seven';
+import {initializePortfolioDisclosure,visiblePortfolioTarget} from './portfolio-disclosure.js?v=20261026-directions';
+import {appendSelectionReference,mountReferenceManager} from './reference-manager.js?v=20261026-directions';
 import {mountPhotoDetail} from './gallery-photo-detail.js?v=20261026-seven';
-import {modeLinks} from './view-context.js?v=20261026-seven';
+import {modeLinks} from './view-context.js?v=20261026-directions';
 import {optionalModule,optionalFallback} from './optional-module.js?v=20261026-seven';
-import {initializeBriefExperience,initializeBackToTop} from './experience-ux.js?v=20261024-ux25';
-import {initializePortfolioFilters} from './portfolio-filters.js?v=20261026-seven';
-import {mediaId,mediaIndex} from './exploration-data.js';
-import {mountRelated} from './related-works.js?v=20261026-seven';
+import {initializeBriefExperience,initializeBackToTop} from './experience-ux.js?v=20261026-directions';
+import {initializePortfolioFilters} from './portfolio-filters.js?v=20261026-directions';
+import {mediaId,mediaIndex} from './exploration-data.js?v=20261026-directions';
+import {mountRelated} from './related-works.js?v=20261026-directions';
 import {enhanceProjectCards} from './project-card-links.js';
 import {createFrameMemory,thumbnailKey,mountPhotoSwipe} from './gallery-interactions.js?v=20261024-gallery-browse';
 import {initializeSectionNavigation} from './section-navigation.js?v=20261024-clear-navigation';
-import {initializeBriefTools} from './brief-tools.js?v=20261024-ux25';
+import {initializeBriefTools} from './brief-tools.js?v=20261026-directions';
 import {updateGalleryPhotoLink} from './gallery-photo-link.js?v=20261024-photo-details';
-import {updateBriefGuidance} from './brief-guidance.js?v=20261024-brief-guidance';
+import {updateBriefGuidance} from './brief-guidance.js?v=20261026-directions';
 import {mountCaseSections} from './case-sections.js?v=20261024-case-story';
 import {mountGalleryChapters} from './gallery-chapters.js?v=20261023-bear-chapters';
 import {watchGalleryMedia} from './media-recovery.js?v=20261024-gallery-browse';
-import {createProjectNavigation,projectLink,copyProjectLink} from './project-navigation.js?v=20261024-explore';
-import {thumbnailSource} from './media-utils.js?v=20261022-previews';
-import {BRIEF_KEY,createBriefDraftSession,formatBrief,requestBriefDownload} from './brief-utils.js?v=20261024-brief-tools';
+import {createProjectNavigation,projectLink,copyProjectLink} from './project-navigation.js?v=20261026-directions';
+import {thumbnailSource} from './media-utils.js?v=20261026-directions';
+import {BRIEF_KEY,legacyDirections,createBriefDraftSession,formatBrief,requestBriefDownload} from './brief-utils.js?v=20261026-directions';
 import {keepDialogFocus,galleryArrow} from './dialog-controls.js?v=20261022-gallery';
-import {projects} from './project-data.js?v=20261024-case-story';
+import {projects} from './project-data.js?v=20261026-directions';
 const $=(s,root=document)=>root.querySelector(s);
 const $$=(s,root=document)=>[...root.querySelectorAll(s)];
 let toastTimer,bindSelectionButton;
@@ -28,6 +29,7 @@ function toast(text){$('#toast').textContent=text;$('#toast').classList.add('vis
 function download(text,name){const blob=new Blob(['\ufeff'+text],{type:'text/plain;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)}
 
 initializePortfolioFilters({document,window});
+initializePortfolioDisclosure({document,window});
 initializeBackToTop({document,window});
 $('#empty-category-brief').addEventListener('click',()=>{const direction=$('[data-filter][aria-pressed="true"]').dataset.direction;if(direction){$('#brief-direction').value=direction;saveDraft()}});
 $$('[data-service]').forEach(a=>a.addEventListener('click',()=>{$('#brief-direction').value=a.dataset.service;saveDraft()}));
@@ -35,7 +37,7 @@ $$('[data-service]').forEach(a=>a.addEventListener('click',()=>{$('#brief-direct
 const form=$('#brief-form'),draftSession=createBriefDraftSession(),recovered=draftSession.recovered;
 const draftMessages={empty:'Черновик сохраняется в этом браузере.',restored:'Черновик восстановлен из этого браузера.',saved:'Черновик сохранён в этом браузере.',unavailable:'Автосохранение недоступно. Не закрывайте страницу, пока не скачаете или не скопируете бриф.',invalid:'Сохранённый черновик не удалось прочитать. Заполните бриф заново.',partial:'Часть черновика восстановлена. Проверьте поля перед скачиванием.',failed:'Черновик не удалось сохранить в браузере. Не закрывайте страницу: скачайте или скопируйте бриф.',conflict:'Черновик изменён в другой вкладке. Автосохранение здесь остановлено, чтобы не перезаписать другую версию. Ваши текущие поля не изменены: скачайте бриф или скопируйте текст ниже до обновления страницы. После обновления откроется сохранённая версия.'};
 function draftStatus(state){const status=$('#brief-draft-status');if(status.textContent!==draftMessages[state])status.textContent=draftMessages[state];status.dataset.state=['unavailable','invalid','partial','failed','conflict'].includes(state)?'error':'ready';if(state==='conflict'){$('#brief-text-fallback').hidden=false;$('#brief-text').value=formatBrief(Object.fromEntries(new FormData(form)))}}
-for(const [key,value] of Object.entries(recovered.draft)){const field=form.elements.namedItem(key);if(!field)continue;if(field.tagName==='SELECT'&&![...field.options].some(option=>option.value===value)){if(key==='direction'&&value==='3D-модель и производство')field.add(new Option(value+' (из прежнего черновика)',value));else{recovered.state='partial';continue}}field.value=value}
+for(const [key,value] of Object.entries(recovered.draft)){const field=form.elements.namedItem(key);if(!field)continue;if(field.tagName==='SELECT'&&![...field.options].some(option=>option.value===value)){if(key==='direction'&&legacyDirections.includes(value))field.add(new Option(value+' (из прежнего черновика)',value));else{recovered.state='partial';continue}}field.value=value}
 let briefTools,briefExperience,briefPreparation;
 function refreshBriefGuidance(){updateBriefGuidance({direction:form.elements.namedItem('direction').value,helper:$('#brief-idea-help')})}
 function saveDraft(){refreshBriefGuidance();briefTools?.refresh();briefExperience?.refresh();briefPreparation?.refresh();const values=Object.fromEntries(new FormData(form));draftStatus(draftSession.save(values));$('#brief-status').textContent='';if(!$('#brief-text-fallback').hidden)$('#brief-text').value=formatBrief(values)}
@@ -63,11 +65,12 @@ briefExperience=initializeBriefExperience({form,document,window,validate:()=>bri
 // Keep the native submit button disabled until local-only handling is ready.
 draftStatus(recovered.state);
 $('#brief-save').disabled=false;
-optionalModule({load:()=>import('./brief-preparation.js?v=20261026-seven'),mount:({mountBriefPreparation})=>{briefPreparation=mountBriefPreparation({form,document,window})},onError:()=>{const note=document.createElement('p');note.className='form-note';note.textContent='Подсказки не загрузились. Бриф можно заполнить, скачать и скопировать без них.';form.querySelector('.brief-intro').after(note)}})();
+optionalModule({load:()=>import('./brief-preparation.js?v=20261026-directions'),mount:({mountBriefPreparation})=>{briefPreparation=mountBriefPreparation({form,document,window})},onError:()=>{const note=document.createElement('p');note.className='form-note';note.textContent='Подсказки не загрузились. Бриф можно заполнить, скачать и скопировать без них.';form.querySelector('.brief-intro').after(note)}})();
 
 $$('[data-close]').forEach(b=>b.addEventListener('click',()=>document.getElementById(b.dataset.close).close()));
-$$('dialog').forEach(dialog=>{keepDialogFocus(dialog);let backdropPressed=false;dialog.addEventListener('pointerdown',e=>{const r=dialog.getBoundingClientRect();backdropPressed=e.target===dialog&&(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)});dialog.addEventListener('click',e=>{if(backdropPressed&&e.target===dialog)dialog.close();backdropPressed=false})});
+$$('dialog').forEach(dialog=>{if(dialog.id!=='category-story-dialog')keepDialogFocus(dialog);let backdropPressed=false;dialog.addEventListener('pointerdown',e=>{const r=dialog.getBoundingClientRect();backdropPressed=e.target===dialog&&(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)});dialog.addEventListener('click',e=>{if(backdropPressed&&e.target===dialog)dialog.close();backdropPressed=false})});
 const projectDialog=$('#project-dialog');
+let categoryStories=null;
 let galleryProject=null,galleryIndex=0,slideRevision=0,projectOpener=null,photoDetail=null,exploration=null,selectionSummary=null,unbindCaseSelection=()=>{};
 let updateGalleryChapters=()=>{},clearMediaWait=()=>{};
 const frameMemory=createFrameMemory();
@@ -92,6 +95,7 @@ function showSlide(index,retrying=false,updateRoute=true){
  if(active&&thumbs.scrollWidth>thumbs.clientWidth){const left=active.offsetLeft-thumbs.offsetLeft;thumbs.scrollTo({left:Math.max(0,left-(thumbs.clientWidth-active.clientWidth)/2),behavior:'instant'})}
 }
 function openProject(key,routeMedia){
+ categoryStories?.sync();
  galleryProject=key;const p=projects[galleryProject];const host=$('#project-content');
  const caseKeys=[...new Set($$('[data-project]').map(card=>card.dataset.project).filter(projectKey=>projects[projectKey]))];if(!caseKeys.length)caseKeys.push(...Object.keys(projects));
  $('#project-dialog-context').textContent=`${caseKeys.indexOf(key)+1} / ${caseKeys.length} · ${p.title}`;
@@ -121,8 +125,8 @@ function openProject(key,routeMedia){
  if(restoreFocus)$('[data-close="project-dialog"]',projectDialog).focus({preventScroll:true});
 }
 const caseNavigation=createProjectNavigation({keys:Object.keys(projects),location,history,onOpen:openProject,onClose:()=>{if(projectDialog.open)projectDialog.close()}});
-const explorationHost=document.createElement('div');$('#projects').append(explorationHost);
-optionalModule({load:()=>Promise.all([import('./exploration-panel.js?v=20261026-seven'),import('./selection-controls.js?v=20261026-seven')]),mount:([{mountExploration},selectionTools])=>{
+const explorationHost=$('#portfolio-exploration');
+optionalModule({load:()=>Promise.all([import('./exploration-panel.js?v=20261026-directions'),import('./selection-controls.js?v=20261026-directions')]),mount:([{mountExploration},selectionTools])=>{
  bindSelectionButton=selectionTools.bindSelectionButton;const mountSelectionSummary=selectionTools.mountSelectionSummary;
  exploration=mountExploration({host:explorationHost,document,location,history,clipboard:navigator.clipboard,onBrief:keys=>{
  const reference=form.elements.namedItem('reference'),result=appendSelectionReference(reference.value,keys);
@@ -142,8 +146,9 @@ enhanceProjectCards($$('a[data-case-link]'),{dialog:projectDialog,onOpen:link=>{
 addEventListener('popstate',caseNavigation.sync);addEventListener('hashchange',caseNavigation.sync);
 projectDialog.addEventListener('cancel',event=>{if(photoDetail?.reset())event.preventDefault()});
 projectDialog.addEventListener('keydown',e=>{if(photoDetail?.key(e))return;if(!projectDialog.open||projects[galleryProject]?.media.length<2)return;const step=galleryArrow(e);if(step){e.preventDefault();showSlide(galleryIndex+step)}});
-projectDialog.addEventListener('close',()=>{if(projectDialog.open)return;photoDetail?.reset();slideRevision++;clearMediaWait();$$('video',projectDialog).forEach(v=>v.pause());const mode=caseNavigation.closed();if(mode!=='route'){const card=$(`[data-project="${galleryProject}"]`),openerMatches=projectOpener?.closest('.exploration-panel')||projectOpener?.dataset.project===galleryProject||projectOpener?.dataset.caseLink===galleryProject||projectOpener?.getAttribute('href')==='#project/'+galleryProject,target=projectOpener?.isConnected&&!projectOpener.hidden&&openerMatches?projectOpener:card&&!card.hidden?card:$('[data-filter][aria-pressed="true"]');target?.focus({preventScroll:mode!=='fallback'})}});
+projectDialog.addEventListener('close',()=>{if(projectDialog.open)return;photoDetail?.reset();slideRevision++;clearMediaWait();$$('video',projectDialog).forEach(v=>v.pause());const mode=caseNavigation.closed();if(mode!=='route'){const card=$(`[data-project="${galleryProject}"]`),openerMatches=projectOpener?.closest('.exploration-panel')||projectOpener?.dataset.project===galleryProject||projectOpener?.dataset.caseLink===galleryProject||projectOpener?.getAttribute('href')==='#project/'+galleryProject||projectOpener?.dataset.storyCategory,target=visiblePortfolioTarget(projectOpener)&&openerMatches?projectOpener:visiblePortfolioTarget(card)?card:$('#all-projects-summary');target?.focus({preventScroll:mode!=='fallback'})}});
 caseNavigation.sync();
+optionalModule({load:()=>import('./category-stories.js?v=20261026-directions'),mount:({mountCategoryStories})=>{categoryStories=mountCategoryStories({document,window,beforeOpen:()=>caseNavigation.sync(),onFullCase:(key,id,tile)=>{projectOpener=tile;caseNavigation.sync()}})},onError:()=>{const help=$('.category-story-help');help.textContent='Истории не загрузились. Квадраты открывают каталог с работами или описание направления.'}})();
 import('./bear-video.js?v=20261024-ux25').catch(()=>{const status=$('#bear-keyboard-help');if(status)status.textContent='Анимация не загрузилась. Доступен статичный постер настоящей скульптуры.';$$('#rotate-toggle, #bear-reset').forEach(button=>button.disabled=true)});
 
 // Editorial tools are an explicit local mode, separate from the visitor experience.

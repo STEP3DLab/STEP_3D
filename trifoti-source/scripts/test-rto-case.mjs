@@ -11,14 +11,14 @@ const html=file('index.html').toString(),css=file('style.css').toString(),app=fi
 const key='rto-traveling-cup',cup=projects[key];
 
 test('The four non-award project records remain byte-for-byte equivalent as data',()=>{
- const previous=Object.fromEntries(Object.entries(projects).filter(([id])=>id!==key&&id!=='stdAwards'));
+ const previous=Object.fromEntries(Object.entries(projects).filter(([id])=>['mascot','pink','restoration','gesture'].includes(id)));
  assert.equal(hash(JSON.stringify(previous)),'c2f57f44df92417486f83ca2b26b3595df800bff120ca0c8963d8f20e03cf050');
- assert.equal(Object.keys(projects).length,6);
+ assert.equal(Object.keys(projects).length,9);
 });
 test('The selected cup is the second awards case, with its exact title and verified result',()=>{
  assert.equal(cup.title,'Переходящий кубок Спартакиады РТО');
- assert.equal(cup.direction,'Сувениры, призы, награды');
- assert.equal(Object.values(projects).filter(p=>p.direction===cup.direction).length,2);
+ assert.equal(cup.direction,'Сувениры и призы');
+ assert.equal(Object.values(projects).filter(p=>p.direction===cup.direction).length,4);
  assert.match(cup.sections[1].text,/2026/);assert.match(cup.sections[1].text,/Театр «Ленком Марка Захарова»/);
  assert.equal(cup.media.length,3);
 });
@@ -59,6 +59,6 @@ test('The new case uses the unchanged brief handoff without overwriting a chosen
  assert.deepEqual([...form.matchAll(/\bname="([^"]+)"/g)].map(x=>x[1]),['reference','name','direction','idea','budget','deadline']);
 });
 test('Returning visitors load the matching stylesheet, app and six-case data module',()=>{
- assert.match(html,/style\.css\?v=20261026-selected-contrast/);assert.match(html,/app\.js\?v=20261026-seven/);
- assert.match(app,/project-data\.js\?v=20261024-case-story/);
+ assert.match(html,/style\.css\?v=20261026-selected-contrast/);assert.match(html,/app\.js\?v=20261026-directions/);
+ assert.match(app,/project-data\.js\?v=20261026-directions/);
 });

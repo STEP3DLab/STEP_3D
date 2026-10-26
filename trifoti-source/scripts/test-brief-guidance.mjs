@@ -4,14 +4,14 @@ import {readFileSync} from 'node:fs';
 import {briefGuidance,updateBriefGuidance} from '../dist/brief-guidance.js';
 const read=name=>readFileSync(new URL('../dist/'+name,import.meta.url),'utf8');
 const html=read('index.html'),app=read('app.js'),module=read('brief-guidance.js');
-const directions=['Дизайн и архитектура','Скульптура','Бытовой дизайн','Сувениры, призы, награды'];
+const directions=['Дизайн интерьеров','Скульптура','Сувениры и призы','Макетирование'];
 test('Four directions receive distinct, short optional prompts',()=>{
  assert.equal(new Set(directions.map(briefGuidance)).size,4);
  directions.forEach(direction=>{assert.match(briefGuidance(direction),/^Если уже знаете,/);assert.ok(briefGuidance(direction).length<180)});
- assert.match(briefGuidance(directions[0]),/пространства.*размеры.*интерьере или экстерьере/);
+ assert.match(briefGuidance(directions[0]),/помещения.*размеры.*интерьере/);
  assert.match(briefGuidance(directions[1]),/образ.*размер.*место установки/);
- assert.match(briefGuidance(directions[2]),/использовать.*размеры и свойства/);
- assert.match(briefGuidance(directions[3]),/повод.*кому.*тираж.*символике/);
+ assert.match(briefGuidance(directions[3]),/макете.*масштаб.*детализации/);
+ assert.match(briefGuidance(directions[2]),/повод.*кому.*тираж.*символике/);
 });
 test('Unknown and restored legacy directions retain neutral fallback',()=>{
  for(const direction of ['',undefined,null,'Пока не знаю — давайте обсудим','3D-модель и производство','toString','__proto__'])assert.match(briefGuidance(direction),/^Можно начать с пары предложений:.*Остальное уточните позже/);
@@ -50,6 +50,6 @@ test('Field schema, local download and conflict handling remain intact',()=>{
  assert.match(form,/Бриф скачивается файлом, а не отправляется объединению/);
 });
 test('Guidance release has matching local app and stylesheet cache keys',()=>{
- assert.match(app,/brief-guidance\.js\?v=20261024-brief-guidance/);
- assert.match(html,/app\.js\?v=20261026-seven/);assert.match(html,/style\.css\?v=20261026-selected-contrast/);
+ assert.match(app,/brief-guidance\.js\?v=20261026-directions/);
+ assert.match(html,/app\.js\?v=20261026-directions/);assert.match(html,/style\.css\?v=20261026-selected-contrast/);
 });

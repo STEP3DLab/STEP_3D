@@ -1,4 +1,4 @@
-import {parseCaseRoute,exactLink,mediaIndex} from './exploration-data.js';
+import {parseCaseRoute,exactLink,mediaIndex} from './exploration-data.js?v=20261026-directions';
 const prefix = '#project/';
 const marker = 'trifotiCase';
 

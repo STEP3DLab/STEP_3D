@@ -18,7 +18,7 @@ test('All 23 existing photographs link to their real original, not a thumbnail',
   assert(existsSync(new URL('../dist/'+f.attrs.get('href'),import.meta.url)));
   assert.equal(f.attrs.get('aria-label'),`Открыть фото крупно в новой вкладке: ${item.caption}`);
  }
- assert.equal(count,23);
+ assert.equal(count,Object.values(projects).flatMap(p=>p.media).filter(m=>m.type!=='video').length);
 });
 test('Changing photographs replaces the destination without changing media data or focus',()=>{
  const f=fixture(),items=projects.restoration.media,original=JSON.stringify(items);f.document.activeElement=f.link;
@@ -48,5 +48,5 @@ test('Native action warns visibly about the new tab and has safe target semantic
  assert.match(file('style.css'),/\.gallery-photo-link\[hidden\]\{display:none\}/);
  assert.doesNotMatch(file('style.css'),/touch-action:none/);
  assert.match(file('index.html'),/style\.css\?v=20261026-selected-contrast/);
- assert.match(file('index.html'),/app\.js\?v=20261026-seven/);
+ assert.match(file('index.html'),/app\.js\?v=20261026-directions/);
 });

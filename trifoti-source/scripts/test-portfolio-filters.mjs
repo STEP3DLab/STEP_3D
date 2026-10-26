@@ -11,7 +11,7 @@ function fixture(categories=['sculpture','sculpture','sculpture','sculpture','aw
   focus(){throw new Error('Filtering must not move focus')},scrollIntoView(){throw new Error('Native anchors own scroll')}
  });
  const buttons=['all','sculpture','awards'].map(key=>{
-  const button=node({filter:key,direction:{sculpture:'Скульптура',awards:'Сувениры, призы, награды'}[key]});
+  const button=node({filter:key,direction:{sculpture:'Скульптура',awards:'Сувениры и призы'}[key]});
   button.classList.owner=button;button.badge=node();button.querySelector=selector=>selector==='.filter-count'?button.badge:null;
   button.setAttribute('aria-pressed',String(key==='all'));return button;
  });
@@ -32,7 +32,7 @@ test('Portfolio starts with all real cards, live counts and no focus or scroll',
 
 test('Services choose the matching collection and all-projects link restores all six',()=>{
  const f=fixture();initializePortfolioFilters(f);
- for(const [key,count,status] of [['sculpture',4,'4 проекта · Скульптура'],['awards',2,'2 проекта · Сувениры, призы, награды'],['all',6,'6 проектов']]){
+ for(const [key,count,status] of [['sculpture',4,'4 проекта · Скульптура'],['awards',2,'2 проекта · Сувениры и призы'],['all',6,'6 проектов']]){
   const event={button:0,preventDefault(){throw new Error('Do not replace native anchor navigation')}};
   f.links.find(link=>link.dataset.showProjects===key).click(event);
   assert.equal(f.visible().length,count);assert.deepEqual(f.active(),[key]);assert.equal(f.status.textContent,status);assert(f.empty.hidden);
@@ -57,8 +57,8 @@ test('Counts come from scoped cards, support multiple categories, and never dupl
 
 test('Known empty category keeps an honest fallback; invalid key preserves the current state',()=>{
  const f=fixture(['sculpture']);const controller=initializePortfolioFilters(f);
- assert(controller.select('awards'));assert.equal(f.visible().length,0);assert(!f.empty.hidden);assert.equal(f.status.textContent,'0 проектов · Сувениры, призы, награды');
- assert.equal(f.emptyBrief.getAttribute('aria-label'),'Подготовить бриф (Сувениры, призы, награды)');
+ assert(controller.select('awards'));assert.equal(f.visible().length,0);assert(!f.empty.hidden);assert.equal(f.status.textContent,'0 проектов · Сувениры и призы');
+ assert.equal(f.emptyBrief.getAttribute('aria-label'),'Подготовить бриф (Сувениры и призы)');
  assert.equal(controller.select('unknown'),false);assert.deepEqual(f.active(),['awards']);
  controller.select('all');assert(f.empty.hidden);assert.equal(f.status.textContent,'1 проект');
 });

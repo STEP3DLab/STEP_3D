@@ -7,7 +7,7 @@ import {exactLink} from '../dist/exploration-data.js';
 import {formatBrief} from '../dist/brief-utils.js';
 
 test('Preparation directions match the existing service order, with optional source materials',()=>{
- assert.deepEqual(preparationDirections.map(d=>d.name),['Дизайн и архитектура','Скульптура','Бытовой дизайн','Сувениры, призы, награды']);
+ assert.deepEqual(preparationDirections.map(d=>d.name),['Дизайн интерьеров','Скульптура','Сувениры и призы','Макетирование']);
  for(const direction of preparationDirections){assert.equal(preparationMaterials(direction.name).length,3);assert(direction.question.endsWith('?'))}
  assert.deepEqual(preparationMaterials('unknown'),preparationMaterials('__proto__'));assert.equal(ideaQuestions.length,4);
 });
@@ -35,13 +35,13 @@ function fixture(){
 }
 test('Preparation changes only the existing direction field on an explicit button and accepts uncertainty',()=>{
  const f=fixture();assert.equal(f.inserted.id,'brief-preparation');assert.equal(f.inserted.open,false);
- f.find('Бытовой дизайн').listeners.click();assert.equal(f.direction.value,'Бытовой дизайн');
- assert(f.nodes.some(n=>n.textContent==='Выбрано: Бытовой дизайн. Поле направления можно изменить в любой момент.'));
+ f.find('Макетирование').listeners.click();assert.equal(f.direction.value,'Макетирование');
+ assert(f.nodes.some(n=>n.textContent==='Выбрано: Макетирование. Поле направления можно изменить в любой момент.'));
  f.find('Пока не знаю').listeners.click();assert.equal(f.direction.selectedIndex,0);
 });
 test('Checklist ticks remain in memory per direction and reset with new brief; self-check never edits draft',()=>{
  const f=fixture(),list=f.nodes.find(n=>n.className==='brief-checklist');const first=list.children[0].children[0];first.checked=true;first.listeners.change();
- f.find('Бытовой дизайн').listeners.click();assert.equal(list.children[0].children[0].checked,false);
+ f.find('Макетирование').listeners.click();assert.equal(list.children[0].children[0].checked,false);
  f.find('Скульптура').listeners.click();assert.equal(list.children[0].children[0].checked,true);
  f.controller.reset();assert.equal(list.children[0].children[0].checked,false);
  for(const input of f.nodes.filter(n=>n.tag==='input')){assert.equal(input.name,undefined);assert.equal(input.required,undefined)}

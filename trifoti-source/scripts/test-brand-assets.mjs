@@ -59,7 +59,7 @@ test('The favicon also comes from the selected mark and has a fresh URL',()=>{
 });
 test('The brand/layout stylesheet is versioned without changing app behavior',()=>{
  assert.match(html,/style\.css\?v=20261026-selected-contrast/);
- assert.match(html,/app\.js\?v=20261026-seven/);
+ assert.match(html,/app\.js\?v=20261026-directions/);
 });
 
  test('The background-removed master is RGBA with unchanged square geometry',()=>{

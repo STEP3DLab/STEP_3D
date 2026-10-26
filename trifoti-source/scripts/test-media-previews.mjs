@@ -17,7 +17,7 @@ const webpSize = bytes => {
 };
 
 test('Every multi-item case has a real, dimensioned lightweight preview for every slide', () => {
-  assert.equal(items.length, 24);
+  assert.equal(items.length, 27);
   for (const item of items) {
     const preview = thumbnailSource(item);
     assert(preview.startsWith('assets/previews/')); assert(preview.endsWith('-thumb.webp'));
@@ -44,11 +44,11 @@ test('The main gallery still uses original files; single-item cases do not build
 });
 test('Portfolio and journal images stay lazy while original project sources remain unchanged', () => {
   const html=file('index.html').toString();
-  assert.equal((html.match(/class="project-card/g)||[]).length,6);
+  assert.equal((html.match(/class="project-card/g)||[]).length,Object.keys(projects).length);
   for (const project of Object.values(projects)) for(const item of project.media) {
     assert(item.src.startsWith('assets/projects/')); assert(!item.src.includes('/previews/'));
   }
   const cards=html.match(/<img src="assets\/projects\/[^>]+>/g);
-  assert.equal(cards.length,9);
+  assert.equal(cards.length,Object.keys(projects).length+5);
   for(const image of cards) assert(image.includes('loading="lazy"'));
 });

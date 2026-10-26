@@ -8,7 +8,7 @@ const html=read('index.html'),css=read('style.css');
 const manifest=JSON.parse(readFileSync(new URL('./responsive-images.json',import.meta.url),'utf8'));
 function setup(supported=true){let opens=0,prevented=0;const card={attrs:{},setAttribute(k,v){this.attrs[k]=v},addEventListener(k,f){this.click=f}};enhanceProjectCards([card],{dialog:{id:'project-dialog',...(supported?{showModal(){}}:{})},onOpen:c=>{assert.equal(c,card);opens++}});return{card,event:extra=>({button:0,preventDefault(){prevented++},...extra}),counts:()=>[opens,prevented]}}
 test('Six native cards link to complete generated pages without JS-only semantics',()=>{
- const cards=[...html.matchAll(/<a href="([^"]+)" class="project-card[^>]*>([\s\S]*?)<\/a>/g)];assert.equal(cards.length,6);
+ const cards=[...html.matchAll(/<a href="([^"]+)" class="project-card[^>]*>([\s\S]*?)<\/a>/g)];assert.equal(cards.length,9);
  for(const [,href,body] of cards){assert.match(href,/^cases\/[a-zA-Z0-9-]+\.html$/);assert.match(body,/<img src="assets\/projects\//);assert.match(body,/<h3>/);assert.match(body,/alt="[^" ]/)}
  assert.doesNotMatch(html,/<button class="project-card/);
 });

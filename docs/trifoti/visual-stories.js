@@ -1,6 +1,6 @@
-import {projects} from './project-data.js?v=20261024-case-story';
-import {mediaId,exactLink} from './exploration-data.js';
-import {thumbnailSource} from './media-utils.js';
+import {projects} from './project-data.js?v=20261026-directions';
+import {mediaId,exactLink} from './exploration-data.js?v=20261026-directions';
+import {thumbnailSource} from './media-utils.js?v=20261026-directions';
 
 // Editorial views of existing assets. These are not production timelines.
 export const visualStories=[
@@ -33,7 +33,7 @@ export function mountVisualStories({host,document,onOpen,part='all'}){
   previous.addEventListener('click',()=>{index=(index+group.ids.length-1)%group.ids.length;update()});next.addEventListener('click',()=>{index=(index+1)%group.ids.length;update()});update();return card;
  }
  if(part!=='atlas')for(const story of visualStories)disclosure(story.title,body=>{body.append(el('p',story.note,'form-note'));const grid=el('div',null,story.groups.length===2?'visual-story-grid':'visual-story-single');for(const group of story.groups)grid.append(viewer(story.key,group));body.append(grid);attribution(body,story.key)});
- if(part!=='stories'){const atlas=disclosure('Атлас: 23 фотографии и 2 видео',body=>{
+ if(part!=='stories'){const atlas=disclosure(`Атлас: ${atlasFrames('all','photo').length} фото и ${atlasFrames('all','video').length} видео`,body=>{
   body.append(el('p','Миниатюры всех кадров: нажмите, чтобы открыть полный кадр с подписью. Видео показаны постерами и запускаются только в галерее по вашему нажатию.','form-note'));
   const filters=el('div',null,'visual-atlas-filters');const projectLabel=el('label','Работа'),projectSelect=el('select'),kindLabel=el('label','Тип материала'),kindSelect=el('select');
   for(const [value,text] of [['all','Все работы'],...Object.entries(projects).map(([key,p])=>[key,p.title])]){const option=el('option',text);option.value=value;projectSelect.append(option)}

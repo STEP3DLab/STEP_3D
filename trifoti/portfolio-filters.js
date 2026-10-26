@@ -1,5 +1,5 @@
 const instances=new WeakMap();
-const labels={sculpture:'Скульптура',awards:'Сувениры, призы, награды'};
+const labels={sculpture:'Скульптура',awards:'Сувениры и призы'};
 
 function projectCount(count){
  const last=count%10,lastTwo=count%100;
