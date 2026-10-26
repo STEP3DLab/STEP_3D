@@ -36,7 +36,7 @@ test('Helper cannot modify fields, focus, validation, storage or export',()=>{
 });
 test('Restore and every existing direction entry point refresh guidance',()=>{
  assert.match(app,/function refreshBriefGuidance\(\)\{updateBriefGuidance\(\{direction:form.elements.namedItem\('direction'\).value,helper:\$\('#brief-idea-help'\)\}\)\}/);
- assert.match(app,/function saveDraft\(\)\{refreshBriefGuidance\(\);briefTools\?\.refresh\(\);briefExperience\?\.refresh\(\);const values=/);
+ assert.match(app,/function saveDraft\(\)\{refreshBriefGuidance\(\);briefTools\?\.refresh\(\);briefExperience\?\.refresh\(\);briefPreparation\?\.refresh\(\);const values=/);
  assert.match(app,/updateReference\(\);refreshBriefGuidance\(\);/);
  assert.ok(app.indexOf('Object.entries(recovered.draft)')<app.indexOf('updateReference();refreshBriefGuidance();'));
  assert.match(app,/form.addEventListener\('change',saveDraft\)/);
@@ -51,5 +51,5 @@ test('Field schema, local download and conflict handling remain intact',()=>{
 });
 test('Guidance release has matching local app and stylesheet cache keys',()=>{
  assert.match(app,/brief-guidance\.js\?v=20261024-brief-guidance/);
- assert.match(html,/app\.js\?v=20261026-team-profiles/);assert.match(html,/style\.css\?v=20261026-stories/);
+ assert.match(html,/app\.js\?v=20261026-brief-preparation/);assert.match(html,/style\.css\?v=20261026-brief-preparation/);
 });

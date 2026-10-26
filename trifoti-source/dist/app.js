@@ -1,7 +1,8 @@
+import {mountBriefPreparation,appendSelectionReference} from './brief-preparation.js?v=20261026-brief-preparation';
 import {initializeBriefExperience,initializeBackToTop} from './experience-ux.js?v=20261024-ux25';
 import {initializePortfolioFilters} from './portfolio-filters.js?v=20261024-ux25';
 import {mediaId,mediaIndex} from './exploration-data.js';
-import {mountExploration,mountRelated} from './exploration-panel.js?v=20261026-stories';
+import {mountExploration,mountRelated} from './exploration-panel.js?v=20261026-brief-preparation';
 import {enhanceProjectCards} from './project-card-links.js';
 import {createFrameMemory,thumbnailKey,mountPhotoSwipe} from './gallery-interactions.js?v=20261024-gallery-browse';
 import {initializeSectionNavigation} from './section-navigation.js?v=20261024-clear-navigation';
@@ -32,9 +33,9 @@ const form=$('#brief-form'),draftSession=createBriefDraftSession(),recovered=dra
 const draftMessages={empty:'Черновик сохраняется в этом браузере.',restored:'Черновик восстановлен из этого браузера.',saved:'Черновик сохранён в этом браузере.',unavailable:'Автосохранение недоступно. Не закрывайте страницу, пока не скачаете или не скопируете бриф.',invalid:'Сохранённый черновик не удалось прочитать. Заполните бриф заново.',partial:'Часть черновика восстановлена. Проверьте поля перед скачиванием.',failed:'Черновик не удалось сохранить в браузере. Не закрывайте страницу: скачайте или скопируйте бриф.',conflict:'Черновик изменён в другой вкладке. Автосохранение здесь остановлено, чтобы не перезаписать другую версию. Ваши текущие поля не изменены: скачайте бриф или скопируйте текст ниже до обновления страницы. После обновления откроется сохранённая версия.'};
 function draftStatus(state){const status=$('#brief-draft-status');if(status.textContent!==draftMessages[state])status.textContent=draftMessages[state];status.dataset.state=['unavailable','invalid','partial','failed','conflict'].includes(state)?'error':'ready';if(state==='conflict'){$('#brief-text-fallback').hidden=false;$('#brief-text').value=formatBrief(Object.fromEntries(new FormData(form)))}}
 for(const [key,value] of Object.entries(recovered.draft)){const field=form.elements.namedItem(key);if(!field)continue;if(field.tagName==='SELECT'&&![...field.options].some(option=>option.value===value)){if(key==='direction'&&value==='3D-модель и производство')field.add(new Option(value+' (из прежнего черновика)',value));else{recovered.state='partial';continue}}field.value=value}
-let briefTools,briefExperience;
+let briefTools,briefExperience,briefPreparation;
 function refreshBriefGuidance(){updateBriefGuidance({direction:form.elements.namedItem('direction').value,helper:$('#brief-idea-help')})}
-function saveDraft(){refreshBriefGuidance();briefTools?.refresh();briefExperience?.refresh();const values=Object.fromEntries(new FormData(form));draftStatus(draftSession.save(values));$('#brief-status').textContent='';if(!$('#brief-text-fallback').hidden)$('#brief-text').value=formatBrief(values)}
+function saveDraft(){refreshBriefGuidance();briefTools?.refresh();briefExperience?.refresh();briefPreparation?.refresh();const values=Object.fromEntries(new FormData(form));draftStatus(draftSession.save(values));$('#brief-status').textContent='';if(!$('#brief-text-fallback').hidden)$('#brief-text').value=formatBrief(values)}
 addEventListener('storage',event=>{if(event.key!==BRIEF_KEY&&event.key!==null)return;const state=draftSession.check();if(state)draftStatus(state)});
 function updateReference(){const title=form.elements.namedItem('reference').value;$('#brief-reference').hidden=!title;$('#brief-reference-title').textContent=title}
 function selectReference(title){form.elements.namedItem('reference').value=title;updateReference();saveDraft()}
@@ -51,8 +52,9 @@ form.addEventListener('submit',e=>{
  if(result!=='started'){fallback.open=true;preview.focus();preview.select()}
 });
 $('#brief-text-fallback').addEventListener('toggle',()=>{if($('#brief-text-fallback').open)$('#brief-text').value=formatBrief(Object.fromEntries(new FormData(form)))});
-briefTools=initializeBriefTools({form,document,draftSession,draftStatus,onValidation:keys=>briefExperience?.showErrors(keys),onReset:()=>{updateReference();refreshBriefGuidance();briefExperience?.refresh()}});
+briefTools=initializeBriefTools({form,document,draftSession,draftStatus,onValidation:keys=>briefExperience?.showErrors(keys),onReset:()=>{updateReference();refreshBriefGuidance();briefExperience?.refresh();briefPreparation?.reset()}});
 briefExperience=initializeBriefExperience({form,document,window,validate:()=>briefTools.validate()});
+briefPreparation=mountBriefPreparation({form,document,window});
 // Keep the native submit button disabled until local-only handling is ready.
 draftStatus(recovered.state);
 $('#brief-save').disabled=false;
@@ -109,7 +111,14 @@ function openProject(key,routeMedia){
  if(restoreFocus)$('[data-close="project-dialog"]',projectDialog).focus({preventScroll:true});
 }
 const caseNavigation=createProjectNavigation({keys:Object.keys(projects),location,history,onOpen:openProject,onClose:()=>{if(projectDialog.open)projectDialog.close()}});
-const exploration=mountExploration({host:$('#projects'),document,location,history,clipboard:navigator.clipboard,onOpen:(key,id,opener)=>{projectOpener=opener;caseNavigation.open(key,id)}});
+const exploration=mountExploration({host:$('#projects'),document,location,history,clipboard:navigator.clipboard,onBrief:keys=>{
+ const reference=form.elements.namedItem('reference'),result=appendSelectionReference(reference.value,keys);
+ if(result.tooLong)return 'В брифе уже много референсов. Сначала уберите ненужные через «Убрать выбранный проект из брифа».';
+ selectReference(result.value);caseNavigation.visit('#brief-form');form.scrollIntoView({block:'start'});
+ requestAnimationFrame(()=>form.elements.namedItem('idea').focus({preventScroll:true}));
+ $('#brief-status').textContent=result.added?'Подборка добавлена к отправной точке. Ваше описание сохранено, бриф не отправлен.':'Эти работы уже есть в отправной точке. Бриф не отправлен.';
+ return null;
+},onOpen:(key,id,opener)=>{projectOpener=opener;caseNavigation.open(key,id)}});
 addEventListener('popstate',exploration.sync);addEventListener('hashchange',exploration.sync);
 enhanceProjectCards($$('[data-project]'),{dialog:projectDialog,onOpen:card=>{projectOpener=card;caseNavigation.open(card.dataset.project)}});
 enhanceProjectCards($$('a[data-case-link]'),{dialog:projectDialog,onOpen:link=>{projectOpener=link;caseNavigation.open(link.dataset.caseLink)}});
