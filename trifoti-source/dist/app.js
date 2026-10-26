@@ -131,7 +131,7 @@ if(reviewMode&&typeof $('#review-dialog')?.showModal==='function'){
 }
 
 // Optional catalogue enhancement: source links stay usable if this module fails.
-import('./publication-filters.js?v=20261024-publication-tools').then(({initializePublicationFilters})=>initializePublicationFilters({document})).catch(()=>{
+import('./publication-filters.js?v=20261026-team-profiles').then(({initializePublicationFilters})=>initializePublicationFilters({document})).catch(()=>{
  $$('#publication-catalog [data-publication-category]').forEach(entry=>entry.hidden=false);
  const filters=$('#publication-filters');if(filters)filters.hidden=true;
  $$('#publication-tools, #publication-collapse, #publication-citation, #publication-sort-note, #publication-empty, [data-publication-copy]').forEach(control=>control.hidden=true);

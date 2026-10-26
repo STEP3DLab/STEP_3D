@@ -89,7 +89,11 @@ test('Team presents the two researched profiles with portraits, attribution and 
  assert.equal((team.match(/<img\b/g)||[]).length,2);assert.doesNotMatch(team,/team-monogram|Оксана|Владимир/);
  assert.match(team,/alt="Фёдор Геннадьевич Паршин"/);assert.match(team,/alt="Христина Анатольевна Понкратова"/);
  assert.match(team,/dobrotorium\.ru\/people\/12/);assert.match(team,/technopark-rgsu\.ru\/skb\/laboratories\/industrial-design-engineering\//);
- assert.match(team,/cttit\.ru\/news\/2024\/04\/reversivnyij-inzhiniring-itogi\.html/);assert.match(team,/medcollege\.medsi\.ru/);
+ assert.match(team,/cttit\.ru\/news\/2024\/04\/reversivnyij-inzhiniring-itogi\.html/);assert.doesNotMatch(team,/имплант|Окончил|мастерскую|образование|medcollege\.medsi\.ru/i);
+ assert.match(team,/Скульптор, заслуженный художник Крыма/);
+ assert.match(team,/Чемпион БРИКС и чемпион Хайтек/);
+ assert.match(team,/Подготовила нескольких чемпионов России/);
+ assert.match(team,/реверсивном инжиниринге и аддитивном производстве/);
  assert(html.includes('<h2 id="team">Команда</h2>'));assert(html.includes('href="#team">Команда'));assert(!html.includes('Два взгляда.'));
 });
 

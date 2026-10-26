@@ -34,6 +34,6 @@ test('Typography, color, arrow size and visual state rules are unchanged',()=>{
 });
 test('Returning visitors load the badge stylesheet without replacing app or data modules',()=>{
  assert.match(html,/style\.css\?v=20261026-stories/);
- assert.match(html,/app\.js\?v=20261026-stories/);
+ assert.match(html,/app\.js\?v=20261026-team-profiles/);
  assert.match(css,/@media\(max-width:380px\)\{[\s\S]*?\.project-grid\{grid-template-columns:1fr\}/);
 });

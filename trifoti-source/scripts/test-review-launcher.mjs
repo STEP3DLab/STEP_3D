@@ -37,5 +37,5 @@ test('Opening the notes dialog still uses the unchanged native modal path',()=>{
 });
 test('Returning visitors receive the layout fix without replacing application logic',()=>{
  assert.match(html,/style\.css\?v=20261026-stories/);
- assert.match(html,/app\.js\?v=20261026-stories/);
+ assert.match(html,/app\.js\?v=20261026-team-profiles/);
 });
