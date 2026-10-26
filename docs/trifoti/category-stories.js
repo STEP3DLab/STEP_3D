@@ -26,7 +26,10 @@ export function mountCategoryStories({document,window,onFullCase=()=>{},beforeOp
   get('retry').hidden=true;get('original').hidden=!frame;
   if(frame){get('original').href=frame.item.src;get('original').textContent=frame.item.type==='video'?'Открыть исходное видео ↗':'Открыть исходное фото ↗';slot.show(frame.item,{video:frame.item.type==='video'});get('media').classList.remove('story-intro-art')}
   else{slot.clear();get('media').classList.add('story-intro-art');get('media').dataset.direction=category.id}
+  // A new frame starts at its image, even after using the lower controls on a short screen.
+  if(dialog.open&&dialog.scrollTop>0&&[get('prev'),get('next'),get('restart')].includes(document.activeElement))get('media').focus({preventScroll:true});
   if(!dialog.open)dialog.showModal();
+  dialog.scrollTop=0;
   // Do not leave keyboard focus on a control hidden by a boundary transition.
   if(document.activeElement?.hidden||document.activeElement?.disabled)get('restart').hidden?get('close').focus():get('restart').focus();
  }

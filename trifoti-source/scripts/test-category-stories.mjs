@@ -56,6 +56,7 @@ test('A deep story-to-case transition cannot send close offsite or create an unn
 });
 class Node{
  constructor(tag,document){this.tagName=tag.toUpperCase();this.document=document;this.children=[];this.dataset={};this.attrs={};this.listeners={};this.hidden=false;this.disabled=false;this.open=false;this.isConnected=true;this.className='';this.textContent='';this.classList={add:name=>{this.className+=' '+name},remove:name=>{this.className=this.className.replace(name,'')}}}
+ get scrollTop(){return this._scrollTop||0}set scrollTop(value){if(this.tagName!=='DIALOG'||this.open)this._scrollTop=value}
  addEventListener(type,fn){(this.listeners[type]??=[]).push(fn)}
  emit(type,extra={}){const event={button:0,target:this,key:'',preventDefault(){this.defaultPrevented=true},...extra};for(const fn of this.listeners[type]||[])fn(event);return event}
  append(...nodes){for(const node of nodes){node.parentElement=this;this.children.push(node)}}replaceChildren(...nodes){this.children=[];this.append(...nodes)}
@@ -120,8 +121,9 @@ test('Interior story alias is retained, but old everyday links never mean modelm
 test('Legacy brief intent is retained without converting everyday design to modelmaking',async()=>{
  const {legacyDirections,readBriefDraft}=await import('../dist/brief-utils.js');for(const direction of legacyDirections){const draft=readBriefDraft(()=>({getItem:()=>JSON.stringify({direction,name:'Имя',idea:'Идея'})}));assert.equal(draft.draft.direction,direction)}assert.match(read('app.js'),/legacyDirections.includes\(value\)/);assert.match(read('app.js'),/из прежнего черновика/);
 });
-test('Absolute artwork cannot be collapsed by text flex sizing; Top avoids the visible story grid',async()=>{
- const css=read('category-stories.css');assert.match(css,/\.category-tile-art\{position:absolute;inset:94px 14px 58px/);assert.match(css,/inset:54px 8px 40px/);assert.doesNotMatch(css,/category-tile-art\{[^}]*flex:1/);
+test('Full-tile artwork and honest, clickable direction covers survive the narrow layout',async()=>{
+ const css=read('category-stories.css'),html=read('index.html');assert.match(css,/\.category-tile-art\{position:absolute;inset:0;/);assert.match(css,/\.category-tile-art img\{[^}]*width:100%;height:100%;object-fit:contain/);assert.doesNotMatch(css,/mix-blend-mode|category-tile-progress|box-shadow/);assert.doesNotMatch(css,/category-tile-art\{[^}]*flex:1/);assert.match(css,/\.category-story-tile h3\{font-size:14px;line-height:1\.22/);assert.match(css,/overflow-wrap:normal;word-break:normal/);assert.doesNotMatch(html,/category-tile-progress/);assert.equal((html.match(/class="category-tile-cta">Смотреть/g)||[]).length,2);assert.equal((html.match(/class="category-tile-cta">О направлении/g)||[]).length,2);
+ for(const id of ['interiors','modelmaking']){const tile=html.match(new RegExp('<a class="category-story-tile is-intro" data-story-category="'+id+'".*?</a>'))[0];assert.doesNotMatch(tile,/<img/);assert.match(tile,/Пока нет проектов/)}
  const {initializeBackToTop}=await import('../dist/experience-ux.js');let notify;const hero={},stories={},link={hidden:true,addEventListener(){}};initializeBackToTop({document:{activeElement:null,getElementById:id=>id==='home'?hero:id==='back-to-top'?link:null,querySelector:selector=>selector==='.category-stories'?stories:null},window:{IntersectionObserver:class{constructor(fn){notify=fn}observe(){}}}});notify([{target:hero,isIntersecting:false},{target:stories,isIntersecting:true}]);assert(link.hidden);notify([{target:stories,isIntersecting:false}]);assert(!link.hidden);
 });
 
@@ -163,4 +165,22 @@ test('Old-link load, reload, choices and Back/Forward preserve all six legacy br
    const text=formatBrief(values());for(const value of Object.values(expected))assert(text.includes(value));
   }
  }
+});
+
+
+test('Dark viewer prioritizes the intact original with compact chrome and scroll-safe controls',()=>{
+ const css=read('category-stories.css'),html=read('index.html');assert.match(css,/width:min\(900px,calc\(100% - 32px\)\)/);assert.match(css,/max-height:calc\(100dvh - 32px\)/);assert.match(css,/background:#1b1d1c;color:#f7f5f0;overflow:auto/);assert.match(css,/\.category-story-dialog::backdrop\{background:#080a09c9/);assert.match(css,/height:min\(60dvh,620px\);min-height:260px/);assert.match(css,/\.story-media\{height:58dvh;min-height:280px/);assert.match(css,/@media\(max-height:500px\)\{\.story-media\{height:320px;min-height:280px/);assert.match(css,/env\(safe-area-inset-bottom\)/);assert.match(css,/env\(safe-area-inset-top\)/);assert.match(css,/\.story-media img,\.story-media video\{[^}]*object-fit:contain/);assert.doesNotMatch(css,/34dvh|object-fit:cover|line-clamp/);
+ const top=html.match(/<header class="story-top">(.*?)<\/header>/s)[1];for(const id of ['progress','category','counter','close'])assert(top.includes('id="story-'+id+'"'));assert(html.indexOf('id="story-media"')<html.indexOf('class="story-rail"'));assert.match(css,/\.story-actions a\{min-height:44px/);assert.match(css,/\.story-controls button,#story-retry\{min-height:44px/);assert.match(css,/#story-status:empty\{display:none\}/);
+});
+
+test('Manual next and previous begin at the new frame rather than a scrolled caption rail',()=>{
+ const f=mounted();f.open('awards');f.dialog.scrollTop=420;f.nodes['story-next'].focus();f.click('next');assert.equal(f.dialog.scrollTop,0);assert.equal(f.document.activeElement,f.nodes['story-media']);assert.match(f.window.location.hash,/award-ceremony$/);f.dialog.scrollTop=520;f.click('prev');assert.equal(f.dialog.scrollTop,0);assert.match(f.window.location.hash,/award-series$/);assert.equal(f.window.history.length,2);
+});
+
+test('Story polish changes both entry and optional module URLs without invalidating legacy imports',()=>{
+ assert.match(read('index.html'),/app\.js\?v=20261026-legacy-links&amp;stories=20261026-story-polish/);assert.match(read('index.html'),/category-stories\.css\?v=20261026-story-polish/);assert.match(read('app.js'),/category-stories\.js\?v=20261026-legacy-links&stories=20261026-story-polish/);
+});
+
+test('Reopening a previously scrolled hidden dialog resets after it has a visible scroll box',()=>{
+ const f=mounted();f.open('awards');f.dialog.scrollTop=420;f.click('close');assert(!f.dialog.open);assert.equal(f.dialog.scrollTop,420);f.open('sculpture');assert(f.dialog.open);assert.equal(f.dialog.scrollTop,0);assert.equal(f.nodes['story-title'].textContent,projects.mascot.title);
 });
