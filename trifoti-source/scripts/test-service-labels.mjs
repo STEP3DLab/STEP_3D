@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
 import {readFileSync} from 'node:fs';
 import {projects} from '../dist/project-data.js';
 const html=readFileSync(new URL('../dist/index.html',import.meta.url),'utf8');
@@ -106,4 +107,35 @@ test('Project heading and unified journal retain factual content and real action
  for(const [,key] of journal.matchAll(/href="#project\/([^"]+)"/g))assert(Object.hasOwn(projects,key));
  assert.equal((journal.match(/data-case-link/g)||[]).length,3);assert.equal((journal.match(/loading="lazy" decoding="async"/g)||[]).length,3);
  assert(!journal.includes('Читать далее'));assert(html.includes('href="#journal">Новости и блог'));
+});
+
+
+test('Team background composition preserves all original portrait bytes',()=>{
+ const expected={
+  'fedor-parshin-480.webp':'04730ee124f5db77ffa026a8bcfe2ff9cdb6005fc362189a156791b84ada35e9',
+  'fedor-parshin-920.webp':'e580da2100b16a2ffc3dcd4f2a5beed6f9788f2435ffeb6a0df91cc1b5a41093',
+  'khristina-ponkratova-480.webp':'8512691a7d4cf1052b487b3aaad00f223e52b90dba6f77a7673493185726c243',
+  'khristina-ponkratova-920.webp':'958a6d2e1cc6e57fa2a83b319137c9cfd845266fa39aa7d8165d2a282c8b1451'
+ };
+ for(const [name,hash] of Object.entries(expected))assert.equal(createHash('sha256').update(readFileSync(new URL('../dist/assets/team/'+name,import.meta.url))).digest('hex'),hash);
+ assert.match(html,/src="assets\/team\/fedor-parshin-920.webp" srcset="assets\/team\/fedor-parshin-480.webp 480w, assets\/team\/fedor-parshin-920.webp 920w"/);
+});
+
+test('Fedor mask preserves existing crop and keeps unsupported browsers on original photo',()=>{
+ const css=readFileSync(new URL('../dist/style.css',import.meta.url),'utf8');
+ assert(css.includes('.team-portrait{aspect-ratio:4/3;overflow:hidden;background:#e8e5df}'));
+ assert(css.includes('.team-portrait img{display:block;width:100%;height:100%;object-fit:cover;object-position:center 32%}'));
+ assert(css.includes('.team-card:first-child .team-portrait img{object-position:center 14%}'));
+ assert(css.includes('@supports (mask-mode:luminance){'));
+ assert(css.includes('.team-card[aria-labelledby="team-fedor"] .team-portrait img{mask-image:'));
+ assert(css.includes('mask-mode:luminance;mask-size:cover;mask-position:center 14%;mask-repeat:no-repeat'));
+ assert(!css.includes('[aria-labelledby="team-khristina"]'));
+});
+
+test('Mask normalizes near-white to opaque without altering portrait pixels',()=>{
+ const svg=readFileSync(new URL('../dist/assets/team/fedor-background-mask-20261026.svg',import.meta.url),'utf8');
+ assert.match(svg,/width="1254" height="1254" viewBox="0 0 1254 1254"/);
+ assert.equal((svg.match(/type="linear" slope="1.1" intercept="-0.05"/g)||[]).length,3);
+ assert(svg.includes('color-interpolation-filters="sRGB"'));
+ assert(svg.includes('href="data:image/png;base64,'));
 });
