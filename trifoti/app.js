@@ -126,7 +126,7 @@ function openProject(key,routeMedia){
 }
 const caseNavigation=createProjectNavigation({keys:Object.keys(projects),location,history,onOpen:openProject,onClose:()=>{if(projectDialog.open)projectDialog.close()}});
 const explorationHost=$('#portfolio-exploration');
-optionalModule({load:()=>Promise.all([import('./exploration-panel.js?v=20261026-directions'),import('./selection-controls.js?v=20261026-directions')]),mount:([{mountExploration},selectionTools])=>{
+optionalModule({load:()=>Promise.all([import('./exploration-panel.js?v=20261026-directions&audit=20261026-design-r1'),import('./selection-controls.js?v=20261026-directions&audit=20261026-design-r1')]),mount:([{mountExploration},selectionTools])=>{
  bindSelectionButton=selectionTools.bindSelectionButton;const mountSelectionSummary=selectionTools.mountSelectionSummary;
  exploration=mountExploration({host:explorationHost,document,location,history,clipboard:navigator.clipboard,onBrief:keys=>{
  const reference=form.elements.namedItem('reference'),result=appendSelectionReference(reference.value,keys);
@@ -137,7 +137,7 @@ optionalModule({load:()=>Promise.all([import('./exploration-panel.js?v=20261026-
  return null;
 },onOpen:(key,id,opener)=>{projectOpener=opener;caseNavigation.open(key,id)}});
 addEventListener('popstate',exploration.sync);addEventListener('hashchange',exploration.sync);
-const summaryHost=document.createElement('div');$('.portfolio-toolbar').after(summaryHost);selectionSummary=mountSelectionSummary({host:summaryHost,document,controller:exploration});
+const summaryHost=document.createElement('div');$('#all-projects').before(summaryHost);selectionSummary=mountSelectionSummary({host:summaryHost,document,controller:exploration});
 for(const button of $$('[data-selection]')){const feedback=document.createElement('p');feedback.className='form-note selection-feedback';feedback.setAttribute('role','status');feedback.setAttribute('aria-atomic','true');button.after(feedback);bindSelectionButton({button,key:button.dataset.selection,controller:exploration,status:feedback})}
 if(projectDialog.open)unbindCaseSelection=bindSelectionButton({button:$('#case-selection'),key:galleryProject,controller:exploration,status:$('#case-selection-status')});
 },onError:()=>optionalFallback({host:explorationHost,document,message:'Инструменты исследования не загрузились. Все кейсы по-прежнему доступны в галерее и на отдельных страницах.'})})();

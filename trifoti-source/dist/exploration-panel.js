@@ -41,6 +41,6 @@ export function mountExploration({host,document,location,history,onOpen,clipboar
   if(document.readyState==='complete')restore();else document.defaultView?.addEventListener('load',restore,{once:true});
   history.replaceState(history.state,'',(location.pathname||'index.html')+location.hash);
  }
- return {sync,toggle,getSelected:()=>[...selected],subscribe(fn){subscribers.add(fn);fn([...selected]);return ()=>subscribers.delete(fn)},showSelection(){panel.open=true;showTask('selection',true);panel.scrollIntoView?.({block:'start'})}};
+ return {sync,toggle,getSelected:()=>[...selected],subscribe(fn){subscribers.add(fn);fn([...selected]);return ()=>subscribers.delete(fn)},showSelection(){const catalog=document.getElementById('all-projects');if(catalog)catalog.open=true;panel.open=true;showTask('selection',true);panel.scrollIntoView?.({block:'start'})}};
 }
 export {mountRelated} from './related-works.js?v=20261026-directions';

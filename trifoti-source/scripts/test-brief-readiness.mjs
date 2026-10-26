@@ -21,7 +21,7 @@ test('Initial feedback explains unavailability instead of promising an unsaved d
 test('Noscript help explains real static content without offering transmission',()=>{
  const help=form.match(/<noscript>(.*?)<\/noscript>/s)[1];
  assert.match(help,/Для скачивания брифа нужен JavaScript/);
- assert.match(help,/описания направлений, публикации и ссылки на оригиналы обложек проектов/);
+ assert.match(help,/описания направлений, публикации и полные страницы проектов/);
  assert.doesNotMatch(help,/action=|https?:|отправлен|сохранён/);
 });
 test('Readiness is activated only after prevention, local export and input handlers are wired',()=>{

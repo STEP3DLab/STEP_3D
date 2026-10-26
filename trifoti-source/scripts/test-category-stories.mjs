@@ -169,7 +169,7 @@ test('Old-link load, reload, choices and Back/Forward preserve all six legacy br
 
 
 test('Dark viewer prioritizes the intact original with compact chrome and scroll-safe controls',()=>{
- const css=read('category-stories.css'),html=read('index.html');assert.match(css,/width:min\(900px,calc\(100% - 32px\)\)/);assert.match(css,/max-height:calc\(100dvh - 32px\)/);assert.match(css,/background:#1b1d1c;color:#f7f5f0;overflow:auto/);assert.match(css,/\.category-story-dialog::backdrop\{background:#080a09c9/);assert.match(css,/height:min\(60dvh,620px\);min-height:260px/);assert.match(css,/\.story-media\{height:58dvh;min-height:280px/);assert.match(css,/@media\(max-height:500px\)\{\.story-media\{height:320px;min-height:280px/);assert.match(css,/env\(safe-area-inset-bottom\)/);assert.match(css,/env\(safe-area-inset-top\)/);assert.match(css,/\.story-media img,\.story-media video\{[^}]*object-fit:contain/);assert.doesNotMatch(css,/34dvh|object-fit:cover|line-clamp/);
+ const css=read('category-stories.css'),html=read('index.html');assert.match(css,/width:min\(900px,calc\(100% - 32px\)\)/);assert.match(css,/max-height:calc\(100dvh - 32px\)/);assert.match(css,/background:#1b1d1c;color:#f7f5f0;overflow:auto/);assert.match(css,/\.category-story-dialog::backdrop\{background:#080a09c9/);assert.match(css,/height:min\(60dvh,620px\);min-height:260px/);assert.match(css,/\.story-media\{height:58dvh;min-height:280px/);assert.match(css,/@media\(max-height:500px\)\{\.story-media,\.story-media\.story-intro-art\{height:34dvh;min-height:110px/);assert.match(css,/env\(safe-area-inset-bottom\)/);assert.match(css,/env\(safe-area-inset-top\)/);assert.match(css,/\.story-media img,\.story-media video\{[^}]*object-fit:contain/);assert.doesNotMatch(css,/object-fit:cover|line-clamp/);
  const top=html.match(/<header class="story-top">(.*?)<\/header>/s)[1];for(const id of ['progress','category','counter','close'])assert(top.includes('id="story-'+id+'"'));assert(html.indexOf('id="story-media"')<html.indexOf('class="story-rail"'));assert.match(css,/\.story-actions a\{min-height:44px/);assert.match(css,/\.story-controls button,#story-retry\{min-height:44px/);assert.match(css,/#story-status:empty\{display:none\}/);
 });
 
@@ -183,4 +183,9 @@ test('Story polish changes both entry and optional module URLs without invalidat
 
 test('Reopening a previously scrolled hidden dialog resets after it has a visible scroll box',()=>{
  const f=mounted();f.open('awards');f.dialog.scrollTop=420;f.click('close');assert(!f.dialog.open);assert.equal(f.dialog.scrollTop,420);f.open('sculpture');assert(f.dialog.open);assert.equal(f.dialog.scrollTop,0);assert.equal(f.nodes['story-title'].textContent,projects.mascot.title);
+});
+
+test('Short-height stories keep 44px navigation before captions without changing normal-height media',()=>{
+ const html=read('index.html'),css=read('category-stories.css');assert(html.indexOf('id="story-media"')<html.indexOf('class="story-controls"'));assert(html.indexOf('class="story-controls"')<html.indexOf('id="story-caption"'));
+ assert.match(css,/@media\(max-height:500px\)\{\.story-media,\.story-media\.story-intro-art\{height:34dvh;min-height:110px\}/);assert.match(css,/\.story-controls button,#story-retry\{min-height:44px/);assert.match(css,/height:min\(60dvh,620px\);min-height:260px/);assert.match(css,/\.story-media\{height:58dvh;min-height:280px/);
 });

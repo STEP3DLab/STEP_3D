@@ -1,11 +1,15 @@
 import {projects} from './project-data.js?v=20261026-directions';
+import {visiblePortfolioTarget} from './portfolio-disclosure.js?v=20261026-directions';
 export function bindSelectionButton({button,key,controller,status}){
  if(!projects[key])return ()=>{};
  button.hidden=false;button.type='button';button.setAttribute('aria-label','Добавить в подборку: '+projects[key].title);
  const unsubscribe=controller.subscribe(ids=>{if(status)status.textContent='';const selected=ids.includes(key);button.textContent=selected?'✓ В подборке · убрать':'+ В подборку';button.setAttribute('aria-pressed',String(selected));button.setAttribute('aria-label',(selected?'Убрать из подборки: ':'Добавить в подборку: ')+projects[key].title)});
  button.addEventListener('click',()=>{const result=controller.toggle(key);if(status){status.textContent=result.message;status.dataset.state=result.ok?'ready':'error'}});return unsubscribe;
 }
-export function selectionReturnTarget(document,key){const card=document.querySelector(`[data-selection="${key}"]`);return card&&!card.hidden&&!card.closest('[hidden]')?card:document.querySelector('[data-filter][aria-pressed="true"]')}
+export function selectionReturnTarget(document,key){
+ const card=document.querySelector(`[data-selection="${key}"]`),filter=document.querySelector('[data-filter][aria-pressed="true"]');
+ return visiblePortfolioTarget(card)?card:visiblePortfolioTarget(filter)?filter:document.getElementById('all-projects-summary');
+}
 export function mountSelectionSummary({host,document,controller}){
  const el=(tag,text)=>{const n=document.createElement(tag);if(text)n.textContent=text;return n};
  const region=el('section');region.className='selection-summary';region.setAttribute('aria-label','Ваша подборка');const title=el('h3'),list=el('ul'),actions=el('div'),compare=el('button','Сравнить выбранное'),meeting=el('a','Показать на встрече'),status=el('p');status.className='form-note';status.setAttribute('role','status');compare.type='button';compare.addEventListener('click',()=>controller.showSelection());actions.className='exploration-actions';actions.append(compare,meeting);region.append(title,list,actions,status);host.append(region);

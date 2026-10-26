@@ -16,6 +16,8 @@ import {initializeLightView} from '../dist/light-view.js';
 const read=name=>readFileSync(new URL('../dist/'+name,import.meta.url),'utf8');
 class Node{
  constructor(tag,doc){this.tagName=tag.toUpperCase();this.doc=doc;this.children=[];this.attrs={};this.dataset={};this.listeners={};this.style={};this.hidden=false;this.disabled=false;this.checked=false;this.open=false;this.value='';this.textContent='';this.className='';this.scrollLeft=this.scrollTop=0;this.clientWidth=600;this.clientHeight=400;this.scrollWidth=900;this.scrollHeight=600;this.classList={toggle:(name,force)=>{const set=new Set(this.className.split(' '));if(force)set.add(name);else set.delete(name);this.className=[...set].join(' ')}};}
+ get parentElement(){return this.parent}
+ get isConnected(){return this.tagName==='MAIN'||Boolean(this.parent?.isConnected)}
  append(...nodes){for(const node of nodes){node.parent=this;this.children.push(node)}}
  replaceChildren(...nodes){for(const n of this.children)n.parent=null;this.children=[];this.append(...nodes)}
  remove(){if(this.parent)this.parent.children=this.parent.children.filter(n=>n!==this);this.parent=null}
@@ -125,7 +127,7 @@ test('Independent brief guard prevents native submission even with the main modu
 });
 test('New modules add no persistent storage, network API, personal field or automatic media play',()=>{for(const file of ['reference-manager.js','gallery-photo-detail.js','selection-controls.js','view-context.js','static-case-context.js','optional-module.js','brief-guard.js'])assert.doesNotMatch(read(file),/localStorage|sessionStorage|fetch\(|XMLHttpRequest|sendBeacon|\.submit\(|\.play\(|\.name\s*=/);assert.equal((read('index.html').match(/\bname="(?:reference|name|direction|idea|budget|deadline)"/g)||[]).length,6)});
 
-test('Removing the last filtered-out selection targets the visible active filter, not a hidden card',()=>{const activeFilter={},hiddenCard={hidden:false,closest:()=>({hidden:true})},visibleCard={hidden:false,closest:()=>null};let card=hiddenCard;const document={querySelector:selector=>selector.startsWith('[data-selection')?card:activeFilter};assert.equal(selectionReturnTarget(document,'mascot'),activeFilter);card=visibleCard;assert.equal(selectionReturnTarget(document,'mascot'),visibleCard);card=null;assert.equal(selectionReturnTarget(document,'mascot'),activeFilter)});
+test('Removing the last filtered-out selection targets the visible active filter, not a hidden card',()=>{const activeFilter={isConnected:true},hiddenCard={isConnected:true,hidden:false,closest:()=>({hidden:true})},visibleCard={isConnected:true,hidden:false,closest:()=>null};let card=hiddenCard;const document={querySelector:selector=>selector.startsWith('[data-selection')?card:activeFilter};assert.equal(selectionReturnTarget(document,'mascot'),activeFilter);card=visibleCard;assert.equal(selectionReturnTarget(document,'mascot'),visibleCard);card=null;assert.equal(selectionReturnTarget(document,'mascot'),activeFilter)});
 test('Zoomed image itself permits both native pan axes and pinch, not just its parent',()=>{assert.match(read('style.css'),/\.gallery-viewer\.photo-detail-active img\{touch-action:pan-x pan-y pinch-zoom;/)});
 
 test('Replacement records old focused descendant before zoom cleanup can remove it',()=>{const app=read('app.js'),open=app.slice(app.indexOf('function openProject'),app.indexOf('const caseNavigation='));assert(open.indexOf('const restoreFocus=')<open.indexOf('photoDetail?.destroy()'))});
@@ -138,3 +140,20 @@ test('A fourth inline selection explains the limit at that same card without scr
 test('Static frame links use a selector more specific than generic caption spans so flex gaps apply',()=>{const css=read('portfolio-resources.css');assert.match(css,/\.static-gallery \.frame-mode-links\{display:flex;flex-wrap:wrap;gap:10px 20px/);assert.match(css,/@media print\{\.static-gallery \.frame-mode-links\{display:none\}/)});
 
 test('Every static original reserves measured dimensions, including lazy photos and video, preventing anchor shift',async()=>{const {createHash}=await import('node:crypto');const dimensions=JSON.parse(readFileSync(new URL('./media-dimensions.json',import.meta.url),'utf8'));assert.equal(Object.keys(dimensions).length,Object.values(projects).flatMap(p=>p.media).length+2);for(const [src,d] of Object.entries(dimensions)){assert(d.width>0&&d.height>0);assert.equal(createHash('sha256').update(readFileSync(new URL('../dist/'+src,import.meta.url))).digest('hex'),d.sha256)}for(const [key,p] of Object.entries(projects)){const html=read('cases/'+key+'.html');for(const item of p.media){const figure=html.split('id="media-'+mediaId(item)+'"')[1].split('</figure>')[0],d=dimensions[item.src];assert(figure.includes('width="'+d.width+'" height="'+d.height+'"'),key+'/'+mediaId(item))}}});
+
+test('Story-first selection stays visible outside closed catalog and explicitly reveals both disclosures',()=>{
+ const f=fixture('#stories/awards/stdAwards/award-series'),catalog=f.el('details'),summary=f.el('summary'),exploreHost=f.el('div'),summaryHost=f.el('div');catalog.id='all-projects';summary.id='all-projects-summary';catalog.append(summary,exploreHost);f.host.append(summaryHost,catalog);
+ const controller=mountExploration({host:exploreHost,document:f.document,location:f.location,history:f.history,onOpen(){}}),{region}=mountSelectionSummary({host:summaryHost,document:f.document,controller});
+ assert(region.hidden);assert(!catalog.open);assert(!f.document.getElementById('explore').open);
+ f.location.hash='#project/stdAwards/media/award-series';const button=f.el('button');f.host.append(button);bindSelectionButton({button,key:'stdAwards',controller,status:f.el('p')});button.focus();button.emit('click');assert.equal(f.document.activeElement,button);assert.match(f.location.hash,/^#project\//);assert.equal(f.history.entries.length,0);
+ f.location.hash='#projects';controller.sync();assert(!catalog.open);assert(!region.hidden);assert(!catalog.contains(region));assert.equal(region.querySelectorAll('li').length,1);assert.deepEqual(controller.getSelected(),['stdAwards']);
+ const compare=region.querySelectorAll('button').at(-1);assert.equal(compare.textContent,'Открыть подборку');compare.emit('click');assert(catalog.open);assert(f.document.getElementById('explore').open);assert.equal(f.document.activeElement.attrs['aria-controls'],'explore-selection');assert.equal(f.history.entries.length,0);
+ catalog.open=false;region.querySelector('button').emit('click');assert(region.hidden);assert.equal(f.document.activeElement,summary);
+ assert.match(read('app.js'),/\$\('#all-projects'\)\.before\(summaryHost\)/);assert.doesNotMatch(read('app.js'),/portfolio-toolbar'\)\.after\(summaryHost\)/);
+});
+test('Selection removal never focuses a hidden, detached or closed-disclosure control',()=>{
+ const f=fixture(),catalog=f.el('details'),summary=f.el('summary'),card=f.el('button'),filter=f.el('button');catalog.id='all-projects';summary.id='all-projects-summary';card.dataset.selection='mascot';filter.dataset.filter='all';filter.setAttribute('aria-pressed','true');catalog.append(summary,card,filter);f.host.append(catalog);
+ // Test lookup separately: the tiny selector fixture does not implement compound attributes.
+ f.document.querySelector=selector=>selector.startsWith('[data-selection')?card:filter;
+ assert.equal(selectionReturnTarget(f.document,'mascot'),summary);catalog.open=true;assert.equal(selectionReturnTarget(f.document,'mascot'),card);card.hidden=true;assert.equal(selectionReturnTarget(f.document,'mascot'),filter);filter.hidden=true;assert.equal(selectionReturnTarget(f.document,'mascot'),summary);card.hidden=false;card.remove();assert.equal(selectionReturnTarget(f.document,'mascot'),summary);
+});

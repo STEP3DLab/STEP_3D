@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {projects} from '../dist/project-data.js';
+import {enhanceProjectCards} from '../dist/project-card-links.js';
 import {createProjectNavigation,projectKey,projectLink,copyProjectLink} from '../dist/project-navigation.js';
 const keys=Object.keys(projects);
 function browser(start='https://example.test/STEP_3D/trifoti/#projects') {
@@ -90,3 +91,14 @@ test('Adjacent cases keep one gallery entry and original return route',()=>{cons
 test('Adjacent shared case closes safely',()=>{const b=browser('https://example.test/#project/mascot');b.nav.switchCase('pink');assert.equal(b.history.length,1);assert.equal(b.close(),'fallback');assert.equal(b.location.hash,'#projects');assert.equal(b.calls.backs,0)});
 test('Adjacent case to brief Back restores selection',()=>{const b=browser();b.nav.open('mascot');b.nav.switchCase('pink');b.nav.visit('#contact');b.flush();b.history.back();b.flush();assert.equal(b.rendered,'pink');b.close();b.flush();assert.equal(b.location.hash,'#projects')});
 test('Invalid or unopened adjacent case does not navigate',()=>{const b=browser();assert.equal(b.nav.switchCase('pink'),false);b.nav.open('mascot');assert.equal(b.nav.switchCase('missing'),false);assert.equal(b.location.hash,'#project/mascot')});
+
+
+test('All nine journal/footer fallback links are full cases while ordinary click alone opens the modal',()=>{
+ const html=readFileSync(new URL('../dist/index.html',import.meta.url),'utf8'),links=[...html.matchAll(/data-case-link="([^"]+)" href="([^"]+)"/g)];assert.equal(links.length,9);
+ for(const [,key,href] of links){assert.equal(href,'cases/'+key+'.html');const page=readFileSync(new URL('../dist/'+href,import.meta.url),'utf8');assert(page.includes(projects[key].title));assert(page.includes(projects[key].media[0].src));let open=0,handler;const link={setAttribute(){},addEventListener(type,fn){assert.equal(type,'click');handler=fn}};
+ enhanceProjectCards([link],{dialog:{id:'project-dialog',showModal(){}},onOpen:()=>open++});
+ for(const extra of [{ctrlKey:true},{metaKey:true},{button:1},{shiftKey:true},{altKey:true}]){const event={button:0,preventDefault(){this.prevented=true},...extra};handler(event);assert(!event.prevented);assert.equal(open,0)}
+ const ordinary={button:0,preventDefault(){this.prevented=true}};handler(ordinary);assert(ordinary.prevented);assert.equal(open,1);
+ let enhanced=false;enhanceProjectCards([{setAttribute(){enhanced=true},addEventListener(){enhanced=true}}],{dialog:{},onOpen(){}});assert(!enhanced);
+ }
+});

@@ -13,11 +13,11 @@ const rule=selector=>{
 
 test('Reflow is limited to the verified very narrow header, not ordinary mobile or desktop',()=>{
  assert.equal(css.split(marker).length,2);
- assert.match(reflow,/^@media\(max-width:340px\)\{/);
+ assert.match(reflow,/^@media\(max-width:240px\)\{/);
  assert.equal((reflow.match(/@media/g)||[]).length,1);
  assert.equal(rule('.header').display,'grid');
  assert.equal(rule('.header')['grid-template-columns'],'minmax(0,1fr) 44px');
- for(const clientWidth of [285,316.25,320,337]){
+ for(const clientWidth of [210,225,240]){
   const firstColumn=clientWidth*.9-44-8;
   assert(firstColumn>=60,'The complete final 60px logo fits beside the menu');
  }
@@ -58,4 +58,8 @@ test('The disclosure DOM order remains unchanged and mobile CTA names the brief'
  assert(header.indexOf('</nav>')<header.indexOf('header-cta'));
  assert.equal((header.match(/<nav[\s\S]*?<\/nav>/)[0].match(/<a href=/g)||[]).length,5);
  assert.match(header,/<span class="mobile-label">Бриф<\/span>/);
+});
+
+test('The 320px mobile header no longer applies the obsolete full-width CTA second row',()=>{
+ assert.match(reflow,/^@media\(max-width:240px\)/);assert.doesNotMatch(css,/@media\(max-width:340px\)\{\s*html\{scroll-padding-top:132px/);assert.match(css,/\.header\{height:74px;padding:0 5%/);assert.match(css,/\.menu-button\{min-width:44px;min-height:44px/);
 });

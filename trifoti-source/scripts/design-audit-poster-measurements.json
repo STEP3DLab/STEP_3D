@@ -1,0 +1,41 @@
+{
+  "scope": "2026-10-26 design audit: local file sizes and source integrity, not a browser network trace",
+  "rows": [
+    {
+      "key": "gesture",
+      "source": "assets/projects/gesture/gesture-poster.webp",
+      "preview": "assets/previews/gesture/gesture-poster-thumb.webp",
+      "source_bytes": 13236,
+      "preview_bytes": 2760,
+      "source_sha256": "7f7dacfb80498a3eb069719945af4d7bf0661286fca4ef09f2cb2715b746046a",
+      "preview_sha256": "f2c16c503c6f21e6f2d48fdbb6c776382c50fe5b7127eb8dc2f10c3f75af975e",
+      "preview_width": 180,
+      "preview_height": 200,
+      "fit": "contain; black letterbox; no source crop"
+    },
+    {
+      "key": "vmeste-prize",
+      "source": "assets/projects/vmeste-prize/vmeste-prize.jpg",
+      "preview": "assets/previews/vmeste-prize/vmeste-prize-thumb.webp",
+      "source_bytes": 241457,
+      "preview_bytes": 4948,
+      "source_sha256": "b07bbe459027934410e5e9f60833704feda0a98a41027d90df4b287d3b45cea4",
+      "preview_sha256": "3d6bfb6ced20915452b8b61d142be0452177af103e9cff441f63f921cfb367e4",
+      "preview_width": 180,
+      "preview_height": 200,
+      "fit": "contain; black letterbox; no source crop"
+    },
+    {
+      "key": "two-figure-composition",
+      "source": "assets/projects/two-figure-composition/two-figure-composition.jpg",
+      "preview": "assets/previews/two-figure-composition/two-figure-composition-thumb.webp",
+      "source_bytes": 196686,
+      "preview_bytes": 3202,
+      "source_sha256": "d11683b2bf120911a3c9e40d6fb3edc585df43f05c4427e2c68bfb086cca6bb1",
+      "preview_sha256": "6c1ddd697c4db5c2c554b0393b2ceaad9f19daeb33dd5cb9a51e4c93b70504d5",
+      "preview_width": 180,
+      "preview_height": 200,
+      "fit": "contain; black letterbox; no source crop"
+    }
+  ]
+}

@@ -40,7 +40,7 @@ export function initializeMeeting({document,window}){
   if(player.hidden)return;const direction=galleryArrow(event);
   if(direction){event.preventDefault();go(index+direction)}else if(event.key==='Home'||event.key==='End'){event.preventDefault();go(event.key==='Home'?0:frames.length-1)}
  });
- get('meeting-skip').addEventListener('click',event=>{if(event.defaultPrevented||event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey||player.hidden)return;event.preventDefault();get('meeting-stage').focus({preventScroll:true});get('meeting-stage').scrollIntoView({block:'start'})});
+ get('meeting-skip').addEventListener('click',event=>{if(event.defaultPrevented||event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey||player.hidden)return;event.preventDefault();const stage=get('meeting-stage'),header=document.querySelector('.meeting-top');stage.style.scrollMarginTop=(Math.ceil(header.getBoundingClientRect().height)+8)+'px';stage.focus({preventScroll:true});stage.scrollIntoView({block:'start'})});
  document.addEventListener('visibilitychange',()=>{if(document.hidden)slot.pause()});window.addEventListener('pagehide',slot.pause);
  window.addEventListener('hashchange',sync);window.addEventListener('popstate',sync);sync();return {sync,go};
 }

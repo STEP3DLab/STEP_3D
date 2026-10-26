@@ -52,7 +52,7 @@ test('Meeting route validates and limits IDs, clamps frames and never embeds arb
  assert.equal(meetingHash(['pink'],NaN),'#show/pink/0');assert.equal(meetingHash(['pink'],-1),'#show/pink/0');
 });
 class Node{
- constructor(tag='div',doc){this.tagName=tag.toUpperCase();this.doc=doc;this.children=[];this.attrs={};this.listeners={};this.hidden=false;this.disabled=false;this.textContent='';this.value='';this.checked=false;this.dataset={};}
+ constructor(tag='div',doc){this.tagName=tag.toUpperCase();this.doc=doc;this.children=[];this.attrs={};this.listeners={};this.hidden=false;this.disabled=false;this.textContent='';this.value='';this.checked=false;this.dataset={};this.style={};}
  addEventListener(type,fn){(this.listeners[type]??=[]).push(fn)}
  emit(type,extra={}){const event={button:0,key:'',target:this,preventDefault(){this.defaultPrevented=true},...extra};for(const fn of this.listeners[type]||[])fn(event);return event}
  append(...nodes){for(const node of nodes){node.parent=this;this.children.push(node)}}
@@ -65,7 +65,7 @@ class Node{
  querySelector(selector){return selector==='[data-light-gallery]'?this.gallery:null}
 }
 function fixture(hash='#show/mascot,gesture/0'){
- const nodes={},listeners={},changes=[];const document={hidden:false,activeElement:null,createElement:tag=>new Node(tag,document),getElementById:id=>nodes[id],addEventListener(type,fn){(listeners[type]??=[]).push(fn)},querySelectorAll(){return []}};
+ const nodes={},listeners={},changes=[];const document={hidden:false,activeElement:null,createElement:tag=>new Node(tag,document),getElementById:id=>nodes[id],addEventListener(type,fn){(listeners[type]??=[]).push(fn)},querySelectorAll(){return []},querySelector(selector){return selector==='.meeting-top'?{getBoundingClientRect:()=>({height:78})}:null}};
  for(const id of ['meeting-player','meeting-media','meeting-media-status','meeting-load','meeting-case','meeting-exit','meeting-title','meeting-direction','meeting-caption','meeting-credit','meeting-counter','meeting-case-link','meeting-sources','meeting-prev','meeting-next','meeting-empty','meeting-skip','meeting-stage','light-posters','light-mode'])nodes[id]=new Node(id==='meeting-case'?'select':id==='light-posters'?'input':id.endsWith('-next')||id.endsWith('-prev')||id.endsWith('-load')?'button':'div',document);
  const window={location:{hash},history:{state:{existing:true},replaceState(state,_,hash){changes.push([state,hash]);window.location.hash=hash}},addEventListener(type,fn){(listeners[type]??=[]).push(fn)}};
  return {document,window,nodes,changes,emit(type,event={}){for(const fn of listeners[type]||[])fn({target:nodes['meeting-next'],preventDefault(){this.defaultPrevented=true},...event})}};
@@ -132,4 +132,17 @@ test('Historical group 10 trace stays explicitly scoped to its release, not curr
  const measurements=JSON.parse(readFileSync(new URL('./lightweight-measurements.json',import.meta.url),'utf8'));
  assert.equal(measurements.release_commit,'683f42bb5551ba257b97756d7ceb6c56b3ec3a62');
  for(const key of ['light_text','light_posters'])assert.equal(measurements[key].responses.reduce((sum,row)=>sum+row.bytes,0),measurements[key].body_bytes);
+});
+
+test('Light poster mode only assigns preview sources, including all one-frame cases; originals stay explicit',()=>{
+ const f=fixture(),requests=[];f.document.createElement=tag=>{const n=new Node(tag,f.document);let src;Object.defineProperty(n,'src',{configurable:true,get:()=>src,set:value=>{src=value;requests.push(value)}});return n};
+ const cards=Object.keys(projects).map(key=>{const n=new Node('article',f.document);n.dataset.lightCase=key;n.gallery=new Node('div',f.document);return n});f.document.querySelectorAll=()=>cards;
+ initializeLightView(f);assert.deepEqual(requests,[]);f.nodes['light-posters'].checked=true;f.nodes['light-posters'].emit('change');assert.equal(requests.length,9);assert(requests.every(src=>src.startsWith('assets/previews/')));
+ for(const key of ['vmeste-prize','two-figure-composition','gesture']){const item=projects[key].media[0];assert(!requests.includes(item.src));assert(!requests.includes(item.poster));assert(requests.includes(lightPreview(projects[key],item)));}
+ const before=requests.length;f.nodes['light-posters'].checked=false;f.nodes['light-posters'].emit('change');assert.equal(requests.length,before);
+ for(const key of ['vmeste-prize','two-figure-composition','gesture']){const frame=cards.find(card=>card.dataset.lightCase===key).gallery.children[0];frame.children[4].emit('click');assert.equal(requests.at(-1),projects[key].media[0].src);if(key==='gesture'){assert.equal(frame.children[1].children[0].preload,'none');assert.equal(frame.children[1].children[0].autoplay,undefined)}}
+});
+test('Meeting skip recalculates the sticky header clearance after responsive reflow without changing route',()=>{
+ const f=fixture();let height=78;f.document.querySelector=selector=>{assert.equal(selector,'.meeting-top');return {getBoundingClientRect:()=>({height})}};initializeMeeting(f);const stage=f.nodes['meeting-stage'],route=f.window.location.hash;
+ for(height of [78,124.5,62]){f.nodes['meeting-skip'].emit('click');assert.equal(stage.style.scrollMarginTop,(Math.ceil(height)+8)+'px');assert.equal(f.document.activeElement,stage);assert(stage.scrolled);assert.equal(f.window.location.hash,route)}
 });

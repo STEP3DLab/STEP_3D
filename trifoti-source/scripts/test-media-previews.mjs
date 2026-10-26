@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync,statSync} from 'node:fs';
+import {createHash} from 'node:crypto';
 import {projects} from '../dist/project-data.js';
 import {thumbnailSource} from '../dist/media-utils.js';
 const dist = new URL('../dist/', import.meta.url);
@@ -51,4 +52,13 @@ test('Portfolio and journal images stay lazy while original project sources rema
   const cards=html.match(/<img src="assets\/projects\/[^>]+>/g);
   assert.equal(cards.length,Object.keys(projects).length+5);
   for(const image of cards) assert(image.includes('loading="lazy"'));
+});
+
+
+test('All single-frame lightweight posters are real full-frame derivatives with preserved source hashes',()=>{
+ const data=JSON.parse(readFileSync(new URL('./design-audit-poster-measurements.json',import.meta.url),'utf8'));
+ assert.equal(data.rows.length,3);assert.deepEqual(new Set(data.rows.map(row=>row.key)),new Set(Object.entries(projects).filter(([,p])=>p.media.length===1).map(([key])=>key)));
+ for(const row of data.rows){const item=projects[row.key].media[0];assert.equal(row.source,item.poster||item.src);assert.equal(row.preview,thumbnailSource(item));assert.equal(size(row.source),row.source_bytes);assert.equal(size(row.preview),row.preview_bytes);assert.deepEqual(webpSize(file(row.preview)),[180,200]);for(const kind of ['source','preview'])assert.equal(createHash('sha256').update(file(row[kind])).digest('hex'),row[kind+'_sha256']);assert(row.preview_bytes<row.source_bytes*.25)}
+ const sum=key=>data.rows.reduce((n,row)=>n+row[key],0);assert.equal(sum('source_bytes'),451379);assert.equal(sum('preview_bytes'),10910);assert(sum('preview_bytes')<sum('source_bytes')*.025);
+ const builder=readFileSync(new URL('./make-media-previews.py',import.meta.url),'utf8');assert.match(builder,/ImageOps.pad/);assert.match(builder,/if len\(project\['media'\]\) < 2 or source.endswith\('\.jpg'\)/);
 });

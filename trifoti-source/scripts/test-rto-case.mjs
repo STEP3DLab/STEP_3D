@@ -33,7 +33,7 @@ test('All three real photographs retain their supplied bytes and original galler
 });
 test('The cup has one lazy dimensioned portfolio card, a footer link and an uncropped cover',()=>{
  assert.equal((html.match(/data-project="rto-traveling-cup"/g)||[]).length,1);
- assert.equal((html.match(/data-case-link="rto-traveling-cup" href="assets\/projects\/rto-traveling-cup\/trophy.webp"/g)||[]).length,1);
+ assert.equal((html.match(/data-case-link="rto-traveling-cup" href="cases\/rto-traveling-cup.html"/g)||[]).length,1);
  const card=html.match(/<a href="[^"]+" class="project-card[^>]*data-project="rto-traveling-cup">(.*?)<\/a>/s)[1];
  assert.match(card,/width="1152" height="1536" loading="lazy" decoding="async"/);
  assert.match(card,/3 фото/);assert.match(css,/\.rto-card img\{object-fit:contain\}/);

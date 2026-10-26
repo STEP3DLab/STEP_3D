@@ -19,7 +19,7 @@ test('Existing real cases use fitting directions without inventing architecture 
  for(const key of ['gesture','mascot','pink','restoration'])assert.equal(projects[key].direction,'Скульптура');
 });
 test('Hero, identity and contact copy follow the latest wording with stable anchors',()=>{
- assert(html.includes('Воплощаем смелые идеи в дизайне и архитектуре интерьеров и экстерьеров, скульптуре и бытовом дизайне.'));
+ assert(html.includes('Воплощаем смелые идеи: дизайн интерьеров, скульптура, сувениры и призы, макетирование.'));
  assert(html.includes('<title>ТРИФОТИ — творческое объединение</title>'));
  assert(html.includes('Творческое объединение «ТРИФОТИ»'));
  assert(html.replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').includes('Осуществим Вашу идею!'));
@@ -31,10 +31,10 @@ test('Footer has four useful groups and only real section or case destinations',
  assert.deepEqual([...footer.matchAll(/<h3>([^<]+)<\/h3>/g)].map(m=>m[1]),['Направления','Проекты','Об объединении','Начало работы']);
  const hrefs=[...footer.matchAll(/href="([^"]+)"/g)].map(m=>m[1]);
  for(const href of hrefs){
-  if(href.startsWith('assets/projects/'))assert(readFileSync(new URL('../dist/'+href,import.meta.url)).length>0);
+  if(href.startsWith('cases/'))assert(readFileSync(new URL('../dist/'+href,import.meta.url)).length>0);
   else assert(html.includes(`id="${href.slice(1)}"`));
  }
- assert.equal(hrefs.filter(x=>x.startsWith('assets/projects/')).length,6);
+ assert.equal(hrefs.filter(x=>x.startsWith('cases/')).length,6);
  for(const [,key] of footer.matchAll(/data-case-link="([^"]+)"/g))assert(Object.hasOwn(projects,key));
  assert.equal(hrefs.filter(x=>x.startsWith('#service-')).length,4);
  assert(footer.includes('aria-label="Разделы сайта"'));assert(!hrefs.includes('#'));

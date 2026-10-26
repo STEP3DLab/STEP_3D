@@ -4,7 +4,7 @@ import {projects} from './project-data.js?v=20261026-directions';
 import {thumbnailSource} from './media-utils.js?v=20261026-directions';
 import {createMediaSlot} from './portfolio-media.js?v=20261026-portfolio-tools';
 import {galleryArrow} from './dialog-controls.js?v=20261022-gallery';
-export function lightPreview(project,item){return project.media.length<2?(item.poster||item.src):thumbnailSource(item)}
+export function lightPreview(project,item){return thumbnailSource(item)}
 export function initializeLightView({document,window}){
  const mode=document.getElementById('light-posters');if(!mode)return null;
  const slots=[],renderers=[],cases=new Map();const el=(tag,text,cls)=>{const n=document.createElement(tag);if(text)n.textContent=text;if(cls)n.className=cls;return n};

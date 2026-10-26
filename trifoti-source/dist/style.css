@@ -363,7 +363,7 @@ form .brief-counter[data-near-limit="true"]{color:#a91c24;font-weight:700}
 .brief-reset-actions{display:flex;align-items:center;flex-wrap:wrap;gap:12px}.brief-reset-actions button{min-height:44px;white-space:normal}
 
 /* Reflow the complete header at extreme zoom instead of clipping its controls. */
-@media(max-width:340px){
+@media(max-width:240px){
  html{scroll-padding-top:132px}
  .header{display:grid;grid-template-columns:minmax(0,1fr) 44px;height:auto;min-height:74px;padding-block:7px;column-gap:8px;row-gap:4px}
  .brand-full{grid-column:1;grid-row:1}
