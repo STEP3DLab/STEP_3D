@@ -101,3 +101,49 @@ test('Both profile roles, biography text and evidence links are readable on pape
  ordinary(declarations('.team-evidence a').color,background,'profile evidence links');
  assert.equal((html.match(/class="team-role"/g)||[]).length,2);
 });
+
+// Focused cascade model for ordinary-color task buttons, not a browser CSS engine.
+// Both ancestors are present in the real panel. Keep source order and specificity:
+// the original :not(:disabled):hover rule beat the selected rule despite appearing first.
+const taskButtonRules=[...css.matchAll(/(\.exploration-(?:body|tasks) button[^{}]*)\{([^{}]*)\}/g)].map(([,selector,body])=>({
+ selector,
+ specificity:[...selector.matchAll(/\.[\w-]+|\[[^\]]+\]|:(?!not\()[\w-]+/g)].length,
+ values:Object.fromEntries(body.split(';').filter(Boolean).map(value=>{const i=value.indexOf(':');return [value.slice(0,i),value.slice(i+1)];}))
+}));
+function taskButtonColors({selected=false,hover=false,focus=false}={}) {
+ const matches=token=>{
+  if(token===':disabled')return false;
+  if(token===':hover')return hover;
+  if(token===':focus-visible')return focus;
+  if(token==='[aria-pressed="true"]')return selected;
+  assert.fail('Unmodelled task-button selector: '+token);
+ };
+ const values={color:'var(--ink)',background:'transparent'},weights={color:-1,background:-1};
+ for(const rule of taskButtonRules){
+  let applies=true;
+  const suffix=rule.selector.split(' button')[1].replace(/:not\(([^)]+)\)/g,(_,token)=>{if(matches(token))applies=false;return '';});
+  const conditions=suffix.match(/\[[^\]]+\]|:[\w-]+/g)||[];
+  assert.equal(conditions.join(''),suffix,'Unmodelled task-button selector: '+rule.selector);
+  if(!applies||!conditions.every(matches))continue;
+  for(const property of ['color','background'])if(property in rule.values&&rule.specificity>=weights[property]){
+   values[property]=rule.values[property];weights[property]=rule.specificity;
+  }
+ }
+ if(values.color==='inherit')values.color='var(--ink)';
+ if(values.background==='transparent')values.background=paper;
+ return values;
+}
+for(const selected of [false,true])for(const [state,extra] of [['default',{}],['hover',{hover:true}],['focus-visible',{focus:true}],['hover + focus-visible',{hover:true,focus:true}]]) {
+ test(`Exploration task is readable and preserves ${selected?'selected':'unselected'} state on ${state}`,()=>{
+  const colors=taskButtonColors({selected,...extra});
+  ordinary(colors.color,colors.background,`exploration ${selected?'selected':'unselected'} ${state}`);
+  assert.equal(colors.color,selected?paper:'var(--ink)');
+  assert.equal(colors.background,selected?'var(--ink)':extra.hover?'#f2e8e4':paper);
+ });
+}
+test('Exploration keyboard focus remains offset and visible without replacing selection colors',()=>{
+ const focus=declarations('button:focus-visible,a:focus-visible');
+ assert.equal(focus.outline,'2px solid var(--red)');
+ assert.equal(declarations('button,input,textarea,select,a')['outline-offset'],'5px');
+ assert(ratio('var(--red)',paper)>=3,'focus ring against surrounding paper');
+});

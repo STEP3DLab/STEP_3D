@@ -33,7 +33,7 @@ test('Typography, color, arrow size and visual state rules are unchanged',()=>{
  assert.match(css,/button:focus-visible,a:focus-visible\{outline:2px solid var\(--red\)\}/);
 });
 test('Returning visitors load the badge stylesheet without replacing app or data modules',()=>{
- assert.match(html,/style\.css\?v=20261026-seven/);
+ assert.match(html,/style\.css\?v=20261026-selected-contrast/);
  assert.match(html,/app\.js\?v=20261026-seven/);
  assert.match(css,/@media\(max-width:380px\)\{[\s\S]*?\.project-grid\{grid-template-columns:1fr\}/);
 });
