@@ -1,3 +1,4 @@
+import {mountVisualStories} from './visual-stories.js?v=20261026-stories';
 import {projects} from './project-data.js?v=20261024-case-story';
 import {caseKeys,selectionIds,selectionRoute,selectionFromHash,PUBLIC_SITE,mediaId,exactLink,relatedWorks,thematicRoutes,technicalNotes,countedNoun} from './exploration-data.js';
 import {copyProjectLink} from './project-navigation.js?v=20261024-explore';
@@ -21,6 +22,7 @@ export function mountExploration({host,document,location,history,onOpen,clipboar
  reset.addEventListener('click',()=>{selected=[];writeRoute();renderSelection();checks.values().next().value.focus()});
  const routes=el('section',null,'exploration-routes');routes.append(el('h3','Тематические маршруты'),el('p','Редакционные подборки по общей теме, не новые направления и не хронология.','form-note'));body.append(routes);
  for(const route of thematicRoutes){const details=el('details'),heading=el('summary',`${route.title} · ${route.frames.length} ${countedNoun(route.frames.length,'кадр','кадра','кадров')} / ${new Set(route.frames.map(frame=>frame[0])).size} ${countedNoun(new Set(route.frames.map(frame=>frame[0])).size,'работа','работы','работ')}`);details.append(heading,el('p',route.description));const list=el('ol');for(const [key,id] of route.frames){const item=projects[key].media.find(media=>mediaId(media)===id),row=el('li'),link=el('a',projects[key].title+' · '+item.caption+(item.type==='video'?' Видео.':''));link.href=exactLink(key,id);link.addEventListener('click',event=>{if(event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;event.preventDefault();onOpen(key,id,link)});row.append(link);list.append(row)}details.append(list);routes.append(details)}
+ mountVisualStories({host:body,document,onOpen});
  const close=el('button','Свернуть исследование');close.type='button';close.addEventListener('click',()=>{revision++;panel.open=false;summary.focus()});body.append(close);
  function sync(){const ids=selectionFromHash(location.hash);if(ids===null){revision++;return}panel.open=true;if(ids.join(',')!==selected.join(',')){selected=ids;renderSelection()}}
  renderSelection();sync();if(location.hash.startsWith('#explore/'))panel.scrollIntoView?.({block:'start'});return {sync};
