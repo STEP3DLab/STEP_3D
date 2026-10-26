@@ -54,11 +54,11 @@ test('The hyphenated case route and copy link work with the existing allowlist a
  assert.equal(projectKey('#project/'+key+'/extra',Object.keys(projects)),null);
 });
 test('The new case uses the unchanged brief handoff without overwriting a chosen direction',()=>{
- assert.match(app,/if\(p.direction&&direction.selectedIndex===0\)direction.value=p.direction;selectReference\(p.title\)/);
+ assert.match(app,/if\(p.direction&&direction.selectedIndex===0\)direction.value=p.direction;selectReference\(result.value\)/);
  const form=html.match(/<form id="brief-form"[^>]*>(.*?)<\/form>/s)[1];
  assert.deepEqual([...form.matchAll(/\bname="([^"]+)"/g)].map(x=>x[1]),['reference','name','direction','idea','budget','deadline']);
 });
 test('Returning visitors load the matching stylesheet, app and six-case data module',()=>{
- assert.match(html,/style\.css\?v=20261026-portfolio-tools/);assert.match(html,/app\.js\?v=20261026-portfolio-tools/);
+ assert.match(html,/style\.css\?v=20261026-seven/);assert.match(html,/app\.js\?v=20261026-seven/);
  assert.match(app,/project-data\.js\?v=20261024-case-story/);
 });

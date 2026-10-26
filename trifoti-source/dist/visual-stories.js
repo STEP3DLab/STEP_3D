@@ -21,9 +21,9 @@ export function atlasFrames(key='all',kind='all'){
  return Object.entries(projects).flatMap(([projectKey,project])=>project.media.map(item=>({key:projectKey,item})))
   .filter(frame=>(key==='all'||frame.key===key)&&(kind==='all'||(kind==='video')===(frame.item.type==='video')));
 }
-export function mountVisualStories({host,document,onOpen}){
+export function mountVisualStories({host,document,onOpen,part='all'}){
  const el=(tag,text,cls)=>{const n=document.createElement(tag);if(text)n.textContent=text;if(cls)n.className=cls;return n};
- const region=el('section',null,'visual-stories');region.setAttribute('aria-label','Визуальные истории и атлас');region.append(el('h3','Рассмотреть подробнее'));
+ const region=el('section',null,'visual-stories');region.setAttribute('aria-label',part==='atlas'?'Атлас кадров':'Визуальные истории');region.append(el('h3',part==='atlas'?'Все кадры портфолио':'Рассмотреть подробнее'));
  host.append(region);
  function disclosure(title,build){const details=el('details'),summary=el('summary',title),body=el('div',null,'visual-story-body');details.append(summary,body);let built=false;details.addEventListener('toggle',()=>{if(details.open&&!built){built=true;build(body)}});region.append(details);return details}
  function attribution(host,key){const project=projects[key];host.append(el('p',project.attribution||project.type,'form-note'));const sources=el('div',null,'visual-story-sources');for(const source of project.sources||[]){const link=el('a',source.label);link.href=source.url;link.target='_blank';link.rel='noopener noreferrer';sources.append(link)}host.append(sources)}
@@ -32,8 +32,8 @@ export function mountVisualStories({host,document,onOpen}){
   const update=()=>{const item=storyMedia(key,group.ids[index]);image.src=item.poster||item.src;image.alt=item.caption;caption.textContent=(group.labels?.[index]?group.labels[index]+'. ':'')+item.caption;counter.textContent=`${index+1} / ${group.ids.length}`;opener.replaceChildren(frameLink(key,item,'Открыть этот кадр в галерее'));};
   previous.addEventListener('click',()=>{index=(index+group.ids.length-1)%group.ids.length;update()});next.addEventListener('click',()=>{index=(index+1)%group.ids.length;update()});update();return card;
  }
- for(const story of visualStories)disclosure(story.title,body=>{body.append(el('p',story.note,'form-note'));const grid=el('div',null,story.groups.length===2?'visual-story-grid':'visual-story-single');for(const group of story.groups)grid.append(viewer(story.key,group));body.append(grid);attribution(body,story.key)});
- disclosure('Атлас: 23 фотографии и 2 видео',body=>{
+ if(part!=='atlas')for(const story of visualStories)disclosure(story.title,body=>{body.append(el('p',story.note,'form-note'));const grid=el('div',null,story.groups.length===2?'visual-story-grid':'visual-story-single');for(const group of story.groups)grid.append(viewer(story.key,group));body.append(grid);attribution(body,story.key)});
+ if(part!=='stories'){const atlas=disclosure('Атлас: 23 фотографии и 2 видео',body=>{
   body.append(el('p','Миниатюры всех кадров: нажмите, чтобы открыть полный кадр с подписью. Видео показаны постерами и запускаются только в галерее по вашему нажатию.','form-note'));
   const filters=el('div',null,'visual-atlas-filters');const projectLabel=el('label','Работа'),projectSelect=el('select'),kindLabel=el('label','Тип материала'),kindSelect=el('select');
   for(const [value,text] of [['all','Все работы'],...Object.entries(projects).map(([key,p])=>[key,p.title])]){const option=el('option',text);option.value=value;projectSelect.append(option)}
@@ -42,5 +42,6 @@ export function mountVisualStories({host,document,onOpen}){
   function render(){const frames=atlasFrames(projectSelect.value,kindSelect.value);status.textContent=`Показано кадров: ${frames.length}.`;grid.replaceChildren();if(!frames.length){grid.append(el('p','Для этой работы нет материалов выбранного типа. Измените фильтр.'));return}for(const {key,item} of frames){const figure=el('figure'),link=frameLink(key,item,null),image=el('img'),caption=el('figcaption');image.src=atlasPreview(key,item);image.alt=item.caption;image.loading='lazy';image.decoding='async';image.width=320;image.height=240;link.append(image,el('span',(item.type==='video'?'Видео · ':'Фото · ')+projects[key].title));caption.textContent=item.caption;figure.append(link,caption,el('p',projects[key].attribution||projects[key].type,'form-note'));grid.append(figure)}}
   projectSelect.addEventListener('change',render);kindSelect.addEventListener('change',render);render();
  });
+ if(part==='atlas')atlas.open=true;}
  return region;
 }

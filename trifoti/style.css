@@ -552,3 +552,39 @@ form .brief-counter[data-near-limit="true"]{color:#a91c24;font-weight:700}
 
 /* Optional portfolio tools, kept out of the primary navigation. */
 .portfolio-resources{display:flex;flex-wrap:wrap;gap:12px 28px;margin:12px 0 20px}.portfolio-resources a,.case-page-link{color:var(--red-link,#c9102c);font-size:14px;text-underline-offset:4px;min-height:44px;display:inline-flex;align-items:center}.case-page-link{margin-top:18px}
+
+/* Seven additional improvements: task-focused exploration and in-place tools. */
+.project-grid>.project-item{grid-column:span 6;min-width:0}
+.project-grid>[data-card="mascot"],.project-grid>[data-card="restoration"],.project-grid>[data-card="stdAwards"]{grid-column:span 7}
+.project-grid>[data-card="pink"],.project-grid>[data-card="gesture"],.project-grid>[data-card="rto-traveling-cup"]{grid-column:span 5}
+.project-item>.project-card{display:block}
+.selection-button{min-height:44px;padding:10px 14px;border:1px solid var(--line);border-radius:4px;background:transparent;text-align:left;font-size:12px;line-height:1.5;margin-top:14px}
+.selection-button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.selection-summary{margin:10px 0 28px;padding:20px;border:1px solid var(--line);border-left:3px solid var(--red);background:#efede7}
+.selection-summary h3{font-size:16px;margin:0 0 12px}.selection-summary ul{display:flex;flex-wrap:wrap;gap:8px;margin:0;padding:0;list-style:none}
+.selection-summary li{display:flex;align-items:center;gap:10px;max-width:100%;padding:2px 8px 2px 12px;background:var(--paper);border:1px solid var(--line);border-radius:4px;font-size:12px}
+.selection-summary li span{overflow-wrap:anywhere}.selection-summary button,.reference-item button,.reference-legacy~button,.brief-reference details button{min-height:44px;padding:8px 10px;background:transparent;border:1px solid var(--line);border-radius:3px;font-size:12px}
+.selection-summary .exploration-actions{margin-top:12px}.selection-summary a{min-height:44px;display:inline-flex;align-items:center;text-decoration:underline}
+.exploration-tasks{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 24px}
+.exploration-tasks button{min-height:48px;flex:1 1 180px;background:transparent;padding:12px 16px;border:1px solid var(--line);border-radius:4px;font-size:13px;text-align:left}
+.exploration-tasks button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.exploration-body>section{min-width:0}.exploration-body .visual-stories{margin-top:0;padding-top:0;border-top:0}
+.brief-reference{display:block;padding:18px}.brief-reference h4{font-size:14px;margin:0 0 10px}
+.reference-item{display:flex;align-items:center;justify-content:space-between;gap:12px;border-top:1px solid var(--line);font-size:12px;padding:7px 0}.reference-item span{overflow-wrap:anywhere}
+.reference-item button{flex-shrink:0}.brief-reference details{margin-top:12px}.brief-reference summary{font-size:12px;min-height:44px;padding:10px 0;cursor:pointer}.reference-legacy{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;line-height:1.7;margin-bottom:10px}
+.photo-detail{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding-top:10px}.photo-detail button{min-height:44px;min-width:44px;padding:8px 12px;background:var(--paper);border:1px solid var(--line);border-radius:4px;font-size:12px}
+.photo-detail>span{font-size:11px;color:var(--muted);line-height:1.6}.photo-pan{display:flex;gap:5px;width:100%}
+.gallery-viewer.photo-detail-active{display:block;overflow:auto;overscroll-behavior:contain;touch-action:auto}
+.gallery-viewer.photo-detail-active img{touch-action:pan-x pan-y pinch-zoom;max-width:none;max-height:none;object-fit:contain;margin:0 auto}
+.gallery-viewer:focus-visible{outline:2px solid var(--red);outline-offset:3px}
+.case-page-link{display:flex;min-height:44px;align-items:center;line-height:1.6}
+@media(max-width:900px){.project-grid>.project-item{grid-column:auto}}
+@media(max-width:800px){
+ .hero-followthrough{padding-bottom:0}.hero-followthrough .hero-signature{padding-top:20px;padding-right:0;flex-wrap:wrap}
+ .hero-art{padding-bottom:28px;margin-top:24px}.bear-stage{max-height:70svh;min-height:200px;aspect-ratio:auto;height:min(91vw,70svh)}
+ .bear-stage video,.bear-stage img{object-fit:contain}
+ .selection-summary{padding:14px}.selection-summary li{width:100%;justify-content:space-between}
+}
+@media(max-width:800px) and (max-height:500px){.bear-stage{height:60svh;min-height:180px}.scene-annotation{top:45%;font-size:9px}}
+
+.selection-feedback:empty{display:none}.selection-feedback[data-state="error"]{color:var(--red-text)}

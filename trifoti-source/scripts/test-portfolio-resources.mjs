@@ -24,7 +24,7 @@ for(const [key,p] of Object.entries(projects))test('Static '+key+' preserves eve
  assert.equal((html.match(/<figure /g)||[]).length,p.media.length);
  for(const item of p.media){assert(html.includes('../'+item.src));assert(html.includes(item.caption));if(item.type==='video'){assert(html.includes('../'+item.poster));assert.match(html,/<video controls playsinline preload="none"/);}}
  const image=html.match(/property="og:image" content="([^"]+)"/)[1];assert.equal(image,'https://step3dlab.github.io/STEP_3D/trifoti/'+(p.media[0].poster||p.media[0].src));
- assert.match(html,/meta name="twitter:image:alt"/);assert.doesNotMatch(html,/<script/);
+ assert.match(html,/meta name="twitter:image:alt"/);assert.match(html,/<script type="module" src="\.\.\/static-case-context.js/);
 });
 test('Catalog includes all six cases with exact descriptions, covers, citations and no video payload',()=>{
  const html=outputs.get('catalog.html');assert.equal((html.match(/class="catalog-case"/g)||[]).length,6);assert.doesNotMatch(html,/<video/);
@@ -128,7 +128,8 @@ test('Lightweight native request measurements reconcile and prove a bounded redu
 test('Return marker is transient and focuses the visible meeting entry only after load',()=>{
  const source=read('exploration-panel.js');assert.match(source,/get\('from'\)==='meeting'/);assert.match(source,/meeting\.focus\(\{preventScroll:true\}\)/);assert.match(source,/document\.defaultView\?\.addEventListener\('load',restore,\{once:true\}\)/);assert.match(source,/history\.replaceState\(history\.state,''/);
 });
-test('Final measured lightweight responses byte-match the candidate runtime files',()=>{
+test('Historical group 10 trace stays explicitly scoped to its release, not current runtime bytes',()=>{
  const measurements=JSON.parse(readFileSync(new URL('./lightweight-measurements.json',import.meta.url),'utf8'));
- for(const key of ['light_text','light_posters'])for(const row of measurements[key].responses){const path=row.path.slice(1).split('?')[0];assert.equal(readFileSync(new URL(path,root)).byteLength,row.bytes,path);}
+ assert.equal(measurements.release_commit,'683f42bb5551ba257b97756d7ceb6c56b3ec3a62');
+ for(const key of ['light_text','light_posters'])assert.equal(measurements[key].responses.reduce((sum,row)=>sum+row.bytes,0),measurements[key].body_bytes);
 });

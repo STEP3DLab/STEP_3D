@@ -11,15 +11,7 @@ export const preparationDirections=Object.freeze([
 const commonMaterials=['Короткое описание задумки','Примеры того, что нравится','Известные размеры или ограничения'];
 export function preparationMaterials(direction){return preparationDirections.find(item=>item.name===direction)?.materials||commonMaterials}
 export const ideaQuestions=Object.freeze(['Понятно ли, для кого и зачем нужен объект?','Указано ли, где и как им будут пользоваться?','Есть ли ориентир по размеру или важные ограничения?','Понятно ли, что нравится в выбранных примерах?']);
-export function appendSelectionReference(current,ids){
- const valid=[...new Set(Array.isArray(ids)?ids:[])].filter(key=>caseKeys.includes(key)).slice(0,3);
- const blocks=valid.filter(key=>!current.includes(exactLink(key))).map(key=>{
-  const project=projects[key];return `${project.title}\n${project.attribution||project.type}\n${exactLink(key)}`;
- });
- if(!blocks.length)return {value:current,added:0};
- const value=current+(current?'\n\n':'')+blocks.join('\n\n');
- return value.length>6000?{value:current,added:0,tooLong:true}:{value,added:blocks.length};
-}
+export {appendSelectionReference} from './reference-manager.js?v=20261026-seven';
 export function mountBriefPreparation({form,document,window}){
  const el=(tag,text)=>{const node=document.createElement(tag);if(text)node.textContent=text;return node};
  const details=el('details');details.className='brief-preparation';details.id='brief-preparation';

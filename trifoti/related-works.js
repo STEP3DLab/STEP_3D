@@ -1,0 +1,4 @@
+import {projects} from './project-data.js?v=20261024-case-story';
+import {relatedWorks} from './exploration-data.js';
+function element(document,tag,text,className){const node=document.createElement(tag);if(text)node.textContent=text;if(className)node.className=className;return node}
+export function mountRelated({host,key,document,onOpen}){const items=relatedWorks[key]||[];if(!items.length)return;const region=element(document,'nav',null,'case-related');region.setAttribute('aria-label','Связанные работы');region.append(element(document,'h3','Рядом по теме'));for(const item of items){const button=element(document,'button',projects[item.key].title,'text-link');button.type='button';button.addEventListener('click',()=>onOpen(item.key));region.append(button,element(document,'p',item.reason,'form-note'))}host.append(region)}

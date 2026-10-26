@@ -48,7 +48,7 @@ function fixture(){
  const history={get state(){return entries[index].state},get length(){return entries.length},
   pushState(state,_,hash){entries.splice(++index);entries.push({state,hash});location.hash=hash},
   replaceState(state,_,hash){entries[index]={state,hash};location.hash=hash},back(){move(-1)},forward(){move(1)}};
- const context={mountRelated,mediaIndex,window:{},$$:()=>[],clearMediaWait:()=>{},frameMemory:createFrameMemory(),thumbnailKey,mountPhotoSwipe,mountCaseSections,mountGalleryChapters,updateGalleryChapters:()=>{},projects,projectDialog:dialog,document,galleryProject:null,galleryIndex:0,galleryArrow,projectLink,location,
+ const context={photoDetail:null,exploration:null,unbindCaseSelection(){},mountPhotoDetail(){return {destroy(){},key(){return false}}},mountRelated,mediaIndex,window:{},$$:()=>[],clearMediaWait:()=>{},frameMemory:createFrameMemory(),thumbnailKey,mountPhotoSwipe,mountCaseSections,mountGalleryChapters,updateGalleryChapters:()=>{},projects,projectDialog:dialog,document,galleryProject:null,galleryIndex:0,galleryArrow,projectLink,location,
   $:selector=>selector==='[data-close="project-dialog"]'?close:nodes.get(selector.slice(1)),
   thumbnailSource:item=>item.src,showSlide(value){slides++;context.galleryIndex=value},
  };

@@ -1,0 +1,137 @@
+{
+  "assets/projects/std-awards/award-series.webp": {
+    "width": 1536,
+    "height": 1152,
+    "sha256": "5047ba58731c90e80e9155a2ff61cd191500d6904ea3f4f80895a0cd0bb2bbc2"
+  },
+  "assets/projects/std-awards/award-ceremony.webp": {
+    "width": 1536,
+    "height": 1024,
+    "sha256": "23a0d5c114535bfb16acf1c29f6c33a2ca5fa2672d207f3596e531122eaa8d58"
+  },
+  "assets/projects/std-awards/design-process.webp": {
+    "width": 1536,
+    "height": 864,
+    "sha256": "6a44b95e5a0ed9cd8cbfb74de5f63faec17adeaff65a787d97c110c1912b3419"
+  },
+  "assets/projects/bear/white-front.webp": {
+    "width": 1280,
+    "height": 1280,
+    "sha256": "42556c795dcbc433ebc882fe01ca2fdd1d94158066162cd85a7edb5d82d797df"
+  },
+  "assets/projects/bear/white-side.webp": {
+    "width": 1280,
+    "height": 1280,
+    "sha256": "934d1ac85e61bea1ab7083d67a41db23f26275f7257fd52ebae92fc5a942aeb7"
+  },
+  "assets/projects/bear/red-profile.webp": {
+    "width": 1280,
+    "height": 1280,
+    "sha256": "e6c77456979e3aca6b8ed2728435c823b6723864b32bae9fbad72a203094168b"
+  },
+  "assets/projects/bear/red-three-quarter.webp": {
+    "width": 1280,
+    "height": 1280,
+    "sha256": "6c6c9c5f92ad81c058e3e46968695d09148ce2ff11cdc47651910c50e3f4b73c"
+  },
+  "assets/projects/bear/red-back.webp": {
+    "width": 1280,
+    "height": 1280,
+    "sha256": "994f51d9ea3cc0788f2cd3ada19ef07e7147520261c06ec19fd9869216d9116e"
+  },
+  "assets/projects/bear/red-head.webp": {
+    "width": 1280,
+    "height": 1280,
+    "sha256": "bdad19d837ef8d582a1c826bfe9ba2f0fd045912dfc95fd0699c0808db254ebc"
+  },
+  "assets/projects/bear/red-edition.webp": {
+    "width": 960,
+    "height": 1280,
+    "sha256": "7ac03fe4332416fb40c667eb95222ceddfb2c0c08ccafa1625777f81f6b1c651"
+  },
+  "assets/projects/bear/white-edition.webp": {
+    "width": 960,
+    "height": 1280,
+    "sha256": "4a0b18a9bc04758b3b93df581573a16966b0064911fb1f3fd253381dc7e75d7a"
+  },
+  "assets/projects/bear/sketch.webp": {
+    "width": 960,
+    "height": 1280,
+    "sha256": "70cdf7324817703629263dc0c5b2ee5088561b05a2862e928cade482f95a995d"
+  },
+  "assets/projects/bear/clay-turntable.mp4": {
+    "width": 464,
+    "height": 848,
+    "sha256": "7ec081cc3fa5e1065c98f210aaa63f2b05c05764f4d3dcd73df2f08763eefcaf"
+  },
+  "assets/projects/bear/clay-poster.webp": {
+    "width": 464,
+    "height": 848,
+    "sha256": "2a2d36b7160be24ff1534a35ac05992e57cb74c6488a729825ffdaefd070cdd3"
+  },
+  "assets/projects/character/pink-front.webp": {
+    "width": 960,
+    "height": 1280,
+    "sha256": "1b27e33eb70eb0f0c386be1016d80ec9375cb46ea787626de7085f109ea9f226"
+  },
+  "assets/projects/character/pink-side.webp": {
+    "width": 960,
+    "height": 1280,
+    "sha256": "457960a6858315a7480db1329f7259a16c3add060b10b4868b51b6f46e581ce0"
+  },
+  "assets/projects/restoration/initial.webp": {
+    "width": 960,
+    "height": 1280,
+    "sha256": "d59d3b51efb01a2e8d1aa8dea2afaabcb1056cb5cc015fe5a9f0fb8cbbc28e18"
+  },
+  "assets/projects/restoration/loss-detail.webp": {
+    "width": 960,
+    "height": 1280,
+    "sha256": "99a435a59391cf6cf1caa4aebdf28df315bde0c3f2779fe5bf79c13ce319ed1f"
+  },
+  "assets/projects/restoration/model-front.webp": {
+    "width": 1158,
+    "height": 961,
+    "sha256": "a9c284ae2d1dc69b1b1941bb8902ee514f3e7a48d065ddae0496778812904d54"
+  },
+  "assets/projects/restoration/model-angle.webp": {
+    "width": 1235,
+    "height": 1165,
+    "sha256": "512be5b99cc25103f01d1bc15cb55597488eff269067d68d16e8c9590b6af408"
+  },
+  "assets/projects/restoration/result.webp": {
+    "width": 960,
+    "height": 1280,
+    "sha256": "d30a54ad2cab1111d1ccc82654546d69add761550f9f17e29f763d67cc536321"
+  },
+  "assets/projects/restoration/result-detail.webp": {
+    "width": 960,
+    "height": 1280,
+    "sha256": "192c287326796164c70ddbc2a351ea9ee9da9b704eeaf7cd05d6c463d3334666"
+  },
+  "assets/projects/gesture/gesture-turntable.mp4": {
+    "width": 464,
+    "height": 848,
+    "sha256": "a4de777503009807bec4daacca390b0abe41e1d8aea7b44a32160066da904779"
+  },
+  "assets/projects/gesture/gesture-poster.webp": {
+    "width": 464,
+    "height": 848,
+    "sha256": "7f7dacfb80498a3eb069719945af4d7bf0661286fca4ef09f2cb2715b746046a"
+  },
+  "assets/projects/rto-traveling-cup/trophy.webp": {
+    "width": 1152,
+    "height": 1536,
+    "sha256": "b02995e79c0e8c7715949feb6355e607af2b69d5db6982ab8feb7db7fea70159"
+  },
+  "assets/projects/rto-traveling-cup/ceremony.webp": {
+    "width": 1536,
+    "height": 995,
+    "sha256": "9eeecfb7e25c0cad5bad98295acfc6301d078d621eb6da6d55bf5cf77a7789cc"
+  },
+  "assets/projects/rto-traveling-cup/winners.webp": {
+    "width": 1536,
+    "height": 954,
+    "sha256": "55e392067af80c6928dc312b9abce9db42e86cedb7bc0a97e60c8db6353532d3"
+  }
+}

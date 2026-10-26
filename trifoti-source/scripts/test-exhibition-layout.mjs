@@ -17,7 +17,7 @@ test('Real projects follow the hero in the document, before all four directions'
 });
 test('Hero retains its complete copy, real bear and actions in logical narrow-screen order',()=>{
  assert(hero.indexOf('hero-description')<hero.indexOf('hero-art'));
- assert(hero.indexOf('hero-art')<hero.indexOf('hero-followthrough'));
+ assert(hero.indexOf('hero-followthrough')<hero.indexOf('hero-art'));
  assert.equal((hero.match(/class="hero-actions"/g)||[]).length,1);
  for(const id of ['bear-stage','bear-video','bear-gif','rotate-toggle','bear-reset'])assert(hero.includes(`id="${id}"`));
  assert.match(hero,/Пределов.*?в творчестве.*?не существует!/s);
@@ -56,8 +56,8 @@ test('Motion is optional, keyboard focus has equal emphasis and native navigatio
  assert.match(exhibition,/\.project-card:focus-visible \.project-arrow/);
  assert.match(exhibition,/\.project-card:focus-visible \.project-title/);
  assert.doesNotMatch(exhibition,/scroll-snap|scroll-timeline|animation:|cursor:none|position:fixed/);
- assert.match(html,/style\.css\?v=20261026-portfolio-tools/);
- assert.match(html,/app\.js\?v=20261026-portfolio-tools/);
+ assert.match(html,/style\.css\?v=20261026-seven/);
+ assert.match(html,/app\.js\?v=20261026-seven/);
 });
 
  test('Narrow manifesto strip wraps without hiding horizontal overflow',()=>{

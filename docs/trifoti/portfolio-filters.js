@@ -33,7 +33,7 @@ export function initializePortfolioFilters({document,window}){
    const badge=button.querySelector('.filter-count');
    if(badge)badge.textContent=String(countFor(button.dataset.filter));
   }
-  for(const card of cards)card.hidden=!matches(card,key);
+  for(const card of cards){card.hidden=!matches(card,key);const wrapper=card.closest?.('.project-item');if(wrapper)wrapper.hidden=card.hidden}
   const count=countFor(key),label=selected.dataset.direction||labels[key]||key;
   status.textContent=projectCount(count)+(key==='all'?'':` · ${label}`);
   if(empty)empty.hidden=count>0;
