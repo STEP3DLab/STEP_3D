@@ -7,9 +7,9 @@ const read=n=>readFileSync(new URL('../dist/'+n,import.meta.url),'utf8');
 const html=read('index.html'),css=read('style.css');
 const manifest=JSON.parse(readFileSync(new URL('./responsive-images.json',import.meta.url),'utf8'));
 function setup(supported=true){let opens=0,prevented=0;const card={attrs:{},setAttribute(k,v){this.attrs[k]=v},addEventListener(k,f){this.click=f}};enhanceProjectCards([card],{dialog:{id:'project-dialog',...(supported?{showModal(){}}:{})},onOpen:c=>{assert.equal(c,card);opens++}});return{card,event:extra=>({button:0,preventDefault(){prevented++},...extra}),counts:()=>[opens,prevented]}}
-test('Six native cards link directly to unchanged originals without JS-only semantics',()=>{
+test('Six native cards link to complete generated pages without JS-only semantics',()=>{
  const cards=[...html.matchAll(/<a href="([^"]+)" class="project-card[^>]*>([\s\S]*?)<\/a>/g)];assert.equal(cards.length,6);
- for(const [,href,body] of cards){assert.equal(href,body.match(/<img src="([^"]+)"/)[1]);assert.match(href,/^assets\/projects\//);assert.match(body,/<h3>/);assert.match(body,/alt="[^" ]/)}
+ for(const [,href,body] of cards){assert.match(href,/^cases\/[a-zA-Z0-9-]+\.html$/);assert.match(body,/<img src="assets\/projects\//);assert.match(body,/<h3>/);assert.match(body,/alt="[^" ]/)}
  assert.doesNotMatch(html,/<button class="project-card/);
 });
 test('Primary activation opens dialog once and suppresses only its own default navigation',()=>{const s=setup();assert.deepEqual(s.card.attrs,{'aria-haspopup':'dialog','aria-controls':'project-dialog'});s.card.click(s.event());assert.deepEqual(s.counts(),[1,1])});

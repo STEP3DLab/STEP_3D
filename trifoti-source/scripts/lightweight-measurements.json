@@ -1,0 +1,321 @@
+{
+  "date": "2026-10-26",
+  "baseline_commit": "02c123815db840c6a34009fd39c2fd2c13db46ff",
+  "method": "Native Chromium at 100% / 1188x848 outer window; local HTTP Cache-Control:no-store, completed response body writes counted by preview-measure.py. No DevTools. Favicon consistently excluded because browser may reuse favicon separately. No timing, real-mobile or WAN-speed claim. Baseline captured before implementation. Light mode intentionally defers optional media, not a visually equivalent page. Final light captures were repeated by the independent native reviewer after the copy-only summary correction.",
+  "baseline": {
+    "requests": 38,
+    "body_bytes": 1316817,
+    "responses": [
+      {
+        "path": "/index.html?baseline=group9",
+        "status": 200,
+        "bytes": 114701
+      },
+      {
+        "path": "/style.css?v=20261026-trust",
+        "status": 200,
+        "bytes": 80529
+      },
+      {
+        "path": "/header-navigation.js?v=20261024-navigation-rounds",
+        "status": 200,
+        "bytes": 2476
+      },
+      {
+        "path": "/app.js?v=20261026-trust",
+        "status": 200,
+        "bytes": 22879
+      },
+      {
+        "path": "/assets/brand/trifoti-logo-transparent-256.webp",
+        "status": 200,
+        "bytes": 26556
+      },
+      {
+        "path": "/assets/animation/bear-loop-poster.webp",
+        "status": 200,
+        "bytes": 12736
+      },
+      {
+        "path": "/assets/animation/bear-loop.webm",
+        "status": 200,
+        "bytes": 265741
+      },
+      {
+        "path": "/assets/fonts/oswald.woff2",
+        "status": 200,
+        "bytes": 72104
+      },
+      {
+        "path": "/assets/fonts/manrope.woff2",
+        "status": 200,
+        "bytes": 53892
+      },
+      {
+        "path": "/assets/fonts/unbounded.woff2",
+        "status": 200,
+        "bytes": 260104
+      },
+      {
+        "path": "/assets/responsive/character/pink-front-480.webp",
+        "status": 200,
+        "bytes": 29560
+      },
+      {
+        "path": "/assets/responsive/bear/white-front-800.webp",
+        "status": 200,
+        "bytes": 62516
+      },
+      {
+        "path": "/assets/responsive/restoration/result-800.webp",
+        "status": 200,
+        "bytes": 200502
+      },
+      {
+        "path": "/assets/projects/gesture/gesture-poster.webp",
+        "status": 200,
+        "bytes": 13236
+      },
+      {
+        "path": "/exploration-data.js",
+        "status": 200,
+        "bytes": 3513
+      },
+      {
+        "path": "/exploration-panel.js?v=20261026-trust",
+        "status": 200,
+        "bytes": 9405
+      },
+      {
+        "path": "/portfolio-filters.js?v=20261024-ux25",
+        "status": 200,
+        "bytes": 3869
+      },
+      {
+        "path": "/brief-preparation.js?v=20261026-brief-preparation",
+        "status": 200,
+        "bytes": 7271
+      },
+      {
+        "path": "/experience-ux.js?v=20261024-ux25",
+        "status": 200,
+        "bytes": 4914
+      },
+      {
+        "path": "/project-card-links.js",
+        "status": 200,
+        "bytes": 519
+      },
+      {
+        "path": "/case-sections.js?v=20261024-case-story",
+        "status": 200,
+        "bytes": 607
+      },
+      {
+        "path": "/gallery-interactions.js?v=20261024-gallery-browse",
+        "status": 200,
+        "bytes": 1849
+      },
+      {
+        "path": "/section-navigation.js?v=20261024-clear-navigation",
+        "status": 200,
+        "bytes": 2384
+      },
+      {
+        "path": "/brief-guidance.js?v=20261024-brief-guidance",
+        "status": 200,
+        "bytes": 1421
+      },
+      {
+        "path": "/brief-tools.js?v=20261024-ux25",
+        "status": 200,
+        "bytes": 5497
+      },
+      {
+        "path": "/gallery-chapters.js?v=20261023-bear-chapters",
+        "status": 200,
+        "bytes": 1581
+      },
+      {
+        "path": "/gallery-photo-link.js?v=20261024-photo-details",
+        "status": 200,
+        "bytes": 760
+      },
+      {
+        "path": "/media-recovery.js?v=20261024-gallery-browse",
+        "status": 200,
+        "bytes": 1947
+      },
+      {
+        "path": "/project-navigation.js?v=20261024-explore",
+        "status": 200,
+        "bytes": 2749
+      },
+      {
+        "path": "/media-utils.js?v=20261022-previews",
+        "status": 200,
+        "bytes": 315
+      },
+      {
+        "path": "/brief-utils.js?v=20261024-brief-tools",
+        "status": 200,
+        "bytes": 4226
+      },
+      {
+        "path": "/dialog-controls.js?v=20261022-gallery",
+        "status": 200,
+        "bytes": 1542
+      },
+      {
+        "path": "/project-data.js?v=20261024-case-story",
+        "status": 200,
+        "bytes": 8996
+      },
+      {
+        "path": "/visual-stories.js?v=20261026-stories",
+        "status": 200,
+        "bytes": 8506
+      },
+      {
+        "path": "/media-utils.js",
+        "status": 200,
+        "bytes": 315
+      },
+      {
+        "path": "/bear-video.js?v=20261024-ux25",
+        "status": 200,
+        "bytes": 6281
+      },
+      {
+        "path": "/publication-filters.js?v=20261026-team-profiles",
+        "status": 200,
+        "bytes": 6493
+      },
+      {
+        "path": "/publications-data.js?v=20261026-team-profiles",
+        "status": 200,
+        "bytes": 14325
+      }
+    ]
+  },
+  "light_text": {
+    "requests": 7,
+    "body_bytes": 42906,
+    "responses": [
+      {
+        "path": "/light.html?qa=group10-final",
+        "status": 200,
+        "bytes": 19462
+      },
+      {
+        "path": "/portfolio-resources.css?v=20261026-portfolio-tools",
+        "status": 200,
+        "bytes": 7236
+      },
+      {
+        "path": "/light-view.js?v=20261026-portfolio-tools",
+        "status": 200,
+        "bytes": 3587
+      },
+      {
+        "path": "/project-data.js?v=20261024-case-story",
+        "status": 200,
+        "bytes": 8996
+      },
+      {
+        "path": "/portfolio-media.js?v=20261026-portfolio-tools",
+        "status": 200,
+        "bytes": 1768
+      },
+      {
+        "path": "/media-utils.js",
+        "status": 200,
+        "bytes": 315
+      },
+      {
+        "path": "/dialog-controls.js?v=20261022-gallery",
+        "status": 200,
+        "bytes": 1542
+      }
+    ]
+  },
+  "light_posters": {
+    "requests": 13,
+    "body_bytes": 93528,
+    "responses": [
+      {
+        "path": "/light.html?qa=group10-final-posters",
+        "status": 200,
+        "bytes": 19462
+      },
+      {
+        "path": "/portfolio-resources.css?v=20261026-portfolio-tools",
+        "status": 200,
+        "bytes": 7236
+      },
+      {
+        "path": "/light-view.js?v=20261026-portfolio-tools",
+        "status": 200,
+        "bytes": 3587
+      },
+      {
+        "path": "/project-data.js?v=20261024-case-story",
+        "status": 200,
+        "bytes": 8996
+      },
+      {
+        "path": "/media-utils.js",
+        "status": 200,
+        "bytes": 315
+      },
+      {
+        "path": "/dialog-controls.js?v=20261022-gallery",
+        "status": 200,
+        "bytes": 1542
+      },
+      {
+        "path": "/portfolio-media.js?v=20261026-portfolio-tools",
+        "status": 200,
+        "bytes": 1768
+      },
+      {
+        "path": "/assets/projects/gesture/gesture-poster.webp",
+        "status": 200,
+        "bytes": 13236
+      },
+      {
+        "path": "/assets/previews/bear/white-front-thumb.webp",
+        "status": 200,
+        "bytes": 5838
+      },
+      {
+        "path": "/assets/previews/rto-traveling-cup/trophy-thumb.webp",
+        "status": 200,
+        "bytes": 9046
+      },
+      {
+        "path": "/assets/previews/std-awards/award-series-thumb.webp",
+        "status": 200,
+        "bytes": 10938
+      },
+      {
+        "path": "/assets/previews/restoration/initial-thumb.webp",
+        "status": 200,
+        "bytes": 7696
+      },
+      {
+        "path": "/assets/previews/character/pink-front-thumb.webp",
+        "status": 200,
+        "bytes": 3868
+      }
+    ]
+  },
+  "manual_original": {
+    "path": "/assets/projects/std-awards/award-series.webp",
+    "bytes": 125058,
+    "requests": 1,
+    "next_caption_extra_requests": 0
+  },
+  "text_body_reduction_percent": 96.74,
+  "poster_body_reduction_percent": 92.9
+}

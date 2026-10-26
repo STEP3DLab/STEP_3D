@@ -1,4 +1,4 @@
-// Native image links remain useful when scripting or dialog support is absent.
+// Native case-page links remain useful when scripting or dialog support is absent.
 export function enhanceProjectCards(cards,{dialog,onOpen}){
  if(typeof dialog?.showModal!=='function')return;
  for(const card of cards){

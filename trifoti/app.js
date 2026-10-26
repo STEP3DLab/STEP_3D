@@ -2,7 +2,7 @@ import {mountBriefPreparation,appendSelectionReference} from './brief-preparatio
 import {initializeBriefExperience,initializeBackToTop} from './experience-ux.js?v=20261024-ux25';
 import {initializePortfolioFilters} from './portfolio-filters.js?v=20261024-ux25';
 import {mediaId,mediaIndex} from './exploration-data.js';
-import {mountExploration,mountRelated} from './exploration-panel.js?v=20261026-trust';
+import {mountExploration,mountRelated} from './exploration-panel.js?v=20261026-portfolio-tools';
 import {enhanceProjectCards} from './project-card-links.js';
 import {createFrameMemory,thumbnailKey,mountPhotoSwipe} from './gallery-interactions.js?v=20261024-gallery-browse';
 import {initializeSectionNavigation} from './section-navigation.js?v=20261024-clear-navigation';
@@ -96,6 +96,7 @@ function openProject(key,routeMedia){
  updateGalleryChapters=mountGalleryChapters({key,host:$('.case-gallery'),document,onSelect:showSlide});
  $('#case-type').textContent=p.type;$('#case-title').textContent=p.title;$('#case-description').textContent=p.description;
  mountCaseSections({project:p,host:$('.case-copy'),document});
+ const pageLink=document.createElement('a');pageLink.href='cases/'+key+'.html';pageLink.className='case-page-link';pageLink.textContent='Открыть страницу кейса для пересылки';$('.case-copy').append(pageLink);
  if(p.attribution){const provenance=$('#case-provenance');provenance.hidden=false;const credit=document.createElement('p');credit.textContent=p.attribution;provenance.append(credit);for(const source of p.sources||[]){const link=document.createElement('a');link.href=source.url;link.textContent=source.label;link.target='_blank';link.rel='noopener noreferrer';provenance.append(link)}}
  p.tags.forEach(tag=>{const span=document.createElement('span');span.textContent=tag;$('#case-tags').append(span)});
  if(p.media.length>1)p.media.forEach((item,i)=>{const b=document.createElement('button');b.className='gallery-thumb';b.setAttribute('aria-label',`Показать: ${item.caption}`);const img=document.createElement('img');img.src=thumbnailSource(item);img.width=180;img.height=200;img.alt='';img.loading='lazy';img.decoding='async';b.append(img);const number=document.createElement('span');number.className='thumb-number';number.textContent=String(i+1).padStart(2,'0');number.setAttribute('aria-hidden','true');b.append(number);if(item.type==='video'){const label=document.createElement('span');label.textContent='▷';b.append(label)}b.addEventListener('click',()=>showSlide(i));b.addEventListener('keydown',event=>{const next=thumbnailKey(event,i,p.media.length);if(next===null)return;event.preventDefault();showSlide(next);$('#gallery-thumbnails').children[next].focus({preventScroll:true})});$('#gallery-thumbnails').append(b)});
