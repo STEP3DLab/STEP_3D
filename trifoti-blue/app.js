@@ -1,4 +1,5 @@
 import {projects} from './project-data.js';
+import {stories} from './project-stories.js';
 
 const $ = (s, root=document) => root.querySelector(s);
 const $$ = (s, root=document) => [...root.querySelectorAll(s)];
@@ -40,11 +41,17 @@ function renderMedia(){
   $$('#case-thumbs button').forEach((b,i)=>{b.classList.toggle('active',i===mediaIndex);b.setAttribute('aria-pressed',String(i===mediaIndex));});
 }
 function changeMedia(index){const p=projects[currentProject];mediaIndex=Math.max(0,Math.min(p.media.length-1,index));renderMedia();}
+function storyTeaser(id){
+  const story=stories[id];
+  if(!story)return (projects[id].sections||[]).map(s=>`<div class="case-section"><h3>${esc(s.title)}</h3><p>${esc(s.text)}</p></div>`).join('');
+  return `<div class="case-story-teaser"><h3>${esc(story.hook)}</h3><ol>${story.steps.map(([title],i)=>`<li><span>0${i+1}</span>${esc(title)}</li>`).join('')}</ol><a class="text-button" href="cases/${id}.html">Полная история проекта <span aria-hidden="true">↗</span></a></div>`;
+}
+
 function openProject(id,{hash=true}={}){
   if(!projects[id]||!modal)return;
   if(presentation?.open)closeDialog(presentation);
   currentProject=id;mediaIndex=0;const p=projects[id],idx=order.indexOf(id);
-  $('#case-content').innerHTML=`<div class="case-layout"><div class="case-media"><div id="case-media-main"></div><div class="case-caption"><p id="case-caption-text"></p><span id="media-count" aria-live="polite"></span><div class="media-controls"><button id="media-prev" aria-label="Предыдущий ракурс">←</button><button id="media-next" aria-label="Следующий ракурс">→</button></div></div><div class="case-thumbs" id="case-thumbs" role="group" aria-label="Ракурсы проекта">${p.media.map((m,i)=>`<button data-media="${i}" aria-label="${esc(m.type==='video'?'Видео: ':'Ракурс: ')}${esc(m.caption)}" aria-pressed="${i===0}"><img src="${esc(m.poster||m.src)}" alt="" loading="lazy"></button>`).join('')}</div></div><div class="case-copy"><div class="section-label">${esc(p.type)}</div><h2 id="case-title">${esc(p.title)}</h2><p>${esc(p.description)}</p><div class="tags">${(p.tags||[]).map(t=>`<span>${esc(t)}</span>`).join('')}</div>${(p.sections||[]).map(s=>`<div class="case-section"><h3>${esc(s.title)}</h3><p>${esc(s.text)}</p></div>`).join('')}<p class="case-credit">${esc(credits(id))}</p><div class="case-sources">${(p.sources||[]).map(s=>`<a href="${esc(s.url)}" target="_blank" rel="noopener noreferrer">${esc(s.label)} ↗</a>`).join('')}</div><button class="button cyan" id="case-to-brief">Хочу обсудить похожую идею <span>↗</span></button></div></div><div class="case-nav"><button id="case-prev" ${idx===0?'disabled':''}>← Предыдущий проект</button><button id="case-next" ${idx===order.length-1?'disabled':''}>Следующий проект →</button></div>`;
+  $('#case-content').innerHTML=`<div class="case-layout"><div class="case-media"><div id="case-media-main"></div><div class="case-caption"><p id="case-caption-text"></p><span id="media-count" aria-live="polite"></span><div class="media-controls"><button id="media-prev" aria-label="Предыдущий ракурс">←</button><button id="media-next" aria-label="Следующий ракурс">→</button></div></div><div class="case-thumbs" id="case-thumbs" role="group" aria-label="Ракурсы проекта">${p.media.map((m,i)=>`<button data-media="${i}" aria-label="${esc(m.type==='video'?'Видео: ':'Ракурс: ')}${esc(m.caption)}" aria-pressed="${i===0}"><img src="${esc(m.poster||m.src)}" alt="" loading="lazy"></button>`).join('')}</div></div><div class="case-copy"><div class="section-label">${esc(p.type)}</div><h2 id="case-title">${esc(p.title)}</h2><p>${esc(p.description)}</p><div class="tags">${(p.tags||[]).map(t=>`<span>${esc(t)}</span>`).join('')}</div>${storyTeaser(id)}<p class="case-credit">${esc(credits(id))}</p><div class="case-sources">${(p.sources||[]).map(s=>`<a href="${esc(s.url)}" target="_blank" rel="noopener noreferrer">${esc(s.label)} ↗</a>`).join('')}</div><button class="button cyan" id="case-to-brief">Хочу обсудить похожую идею <span>↗</span></button></div></div><div class="case-nav"><button id="case-prev" ${idx===0?'disabled':''}>← Предыдущий проект</button><button id="case-next" ${idx===order.length-1?'disabled':''}>Следующий проект →</button></div>`;
   $('#media-prev').addEventListener('click',()=>changeMedia(mediaIndex-1));$('#media-next').addEventListener('click',()=>changeMedia(mediaIndex+1));
   $$('#case-thumbs button').forEach(b=>b.addEventListener('click',()=>changeMedia(Number(b.dataset.media))));
   $('#case-prev').addEventListener('click',()=>openProject(order[idx-1]));$('#case-next').addEventListener('click',()=>openProject(order[idx+1]));
@@ -82,6 +89,8 @@ $$('[data-service]').forEach(b=>b.addEventListener('click',()=>setDirection(b.da
 function updateReference(){const line=$('#reference-line');if(!line)return;line.hidden=!selectedReference;if(selectedReference)$('span',line).textContent=`Отправная точка: ${projects[selectedReference].title}`;}
 $('#clear-reference')?.addEventListener('click',()=>{selectedReference='';updateReference();});
 const form=$('#brief-form');
+const incomingReference=new URLSearchParams(location.search).get('reference');
+if(incomingReference&&projects[incomingReference]){selectedReference=incomingReference;updateReference();const direction=projects[incomingReference].direction;const field=$('#brief-direction');if(field)field.value=direction==='Сувениры и призы'?'Награды и призы':direction;}
 function makeBrief(){const data=new FormData(form);return `БРИФ ПРОЕКТА / ТРИФОТИ\nТворческий комбинат\n\nИмя: ${String(data.get('name')).trim()}\nНаправление: ${data.get('direction')}\n\nИдея:\n${String(data.get('idea')).trim()}\n\nБюджет: ${String(data.get('budget')).trim()||'Обсудим'}\nЖелаемый срок: ${String(data.get('deadline')).trim()||'Обсудим'}${selectedReference?`\nОтправная точка: ${projects[selectedReference].title}`:''}\n\nБриф подготовлен на сайте ТРИФОТИ. Передайте его команде по вашему каналу связи.\n`;}
 function validateBrief(){for(const name of ['name','idea']){const el=form.elements.namedItem(name);el.setCustomValidity(el.value.trim()?'':'Пожалуйста, заполните это поле.');}return form.reportValidity();}
 form?.addEventListener('input',e=>{if(e.target.setCustomValidity)e.target.setCustomValidity('');$('#brief-status').textContent='';});
