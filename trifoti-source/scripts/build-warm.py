@@ -16,14 +16,16 @@ for path in source.rglob('*'):
     text = text.replace('https://step3dlab.github.io/STEP_3D/trifoti/', 'https://step3dlab.github.io/STEP_3D/trifoti/warm/')
     text = re.sub(r'(?<![\w:/])(?:\./|\.\./)*assets/', '/STEP_3D/trifoti/assets/', text)
     if path.suffix == '.css':
-        for old, new in {'#e71931':'#6b172b','#bf1230':'#6b172b','#c41027':'#4e1020','#c9102c':'#6b172b','#a3162c':'#541323','#f5f3ee':'#f3eade','#ff5266':'#eab9bd'}.items():
+        for old, new in {'#e71931': '#075e9d', '#bf1230': '#075e9d', '#c41027': '#064b7a', '#c9102c': '#075e9d', '#a3162c': '#064b7a', '#f5f3ee': '#f2f9ff', '#ff5266': '#b8e6ff', '#a91c24': '#075e9d', '#c92323': '#075e9d', '#e9e6df': '#e4f1fa', '#eee9e1': '#e6f4ff', '#f7f5f0': '#f5fbff', '#e8e5df': '#e7f3fc', '#f4f0ec': '#eef8ff', '#c82922':'#075e9d', '#ff6476':'#80ddff'}.items():
             text=text.replace(old,new)
+        text=text.replace('245,243,238','242,249,255')
     # Restore absolute shared media references after changing canonical URLs.
     text = text.replace('/trifoti/warm/assets/', '/trifoti/assets/')
     if path.suffix == '.html':
         css = '../warm-theme.css' if relative.parts[0] == 'cases' else 'warm-theme.css'
         text = text.replace('</head>', f'<link rel="stylesheet" href="{css}?v=20261104-warm">\n</head>')
-        text = text.replace('content="#f5f3ee"', 'content="#f3eade"')
+        text = text.replace('content="#f5f3ee"', 'content="#d5eefa"')
+        text = re.sub(r'(href="[^"]+\.css)(?:\?[^"]*)?(")', r'\1?v=20261104-sky\2', text)
     output = target / relative
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(text)
@@ -38,7 +40,7 @@ hero = '''  <figure class="warm-hero-art">
   </figure>'''
 html = html[:start] + hero + html[end:]
 html = html.replace('<h1 aria-label="Пределов в творчестве не существует!"><span>Пределов</span><span class="red">в творчестве</span><span>не существует!</span></h1>', '<h1><span>Пределов</span><span class="red">в творчестве</span><span>не существует.</span></h1>')
-html = html.replace('01 / TRIFOTI', 'TRIFOTI / ТЁПЛАЯ КОЛЛЕКЦИЯ')
+html = html.replace('01 / TRIFOTI', 'TRIFOTI / ФОРМА И ТЕХНОЛОГИИ')
 marker = '<section class="section projects'
 extra = '''<section class="warm-mood section" aria-labelledby="warm-mood-title">
   <div class="warm-mood-heading"><span class="eyebrow">Цвет и фактура</span><h2 id="warm-mood-title">Тёплый свет.<br>Выразительная форма.</h2><p>Художественная подача из предоставленных изображений. Подлинные фотографии и видео проектов сохранены в портфолио ниже.</p></div>
