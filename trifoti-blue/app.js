@@ -1,4 +1,4 @@
-import {projects, projectOrder as order} from './project-data.js';
+import {projects, projectOrder as order} from './project-data.js?v=3e0728e1c9';
 import {stories} from './project-stories.js';
 
 const $ = (s, root=document) => root.querySelector(s);

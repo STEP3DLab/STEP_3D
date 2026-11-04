@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import { createHash } from 'node:crypto';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { projects, projectOrder } from '../project-data.js';
@@ -9,6 +10,12 @@ const base = 'https://step3dlab.github.io/STEP_3D/trifoti-blue/';
 const esc = value => String(value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
 const pad = n => String(n).padStart(2, '0');
 const poster = item => item.poster || item.src;
+function versioned(asset) {
+  const hash = createHash('sha256').update(fs.readFileSync(path.join(root, asset))).digest('hex');
+  return asset + '?v=' + hash.slice(0, 10);
+}
+const styles = versioned('stories.css');
+const viewerScript = versioned('case-viewer.js');
 
 function figure(item, cover = false) {
   const caption = esc(item.caption);
@@ -49,7 +56,7 @@ for (const [index,id] of projectOrder.entries()) {
   <link rel="canonical" href="${canonical}"><meta property="og:url" content="${canonical}"><meta property="og:type" content="article"><meta property="og:locale" content="ru_RU">
   <meta property="og:title" content="${esc(p.title)} — ТРИФОТИ"><meta property="og:description" content="${esc(description)}"><meta property="og:image" content="${base}${esc(poster(p.media[0]))}">
   <link rel="icon" href="assets/favicon.svg"><link rel="preload" as="font" href="assets/fonts/manrope.woff2" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="stories.css"><script defer src="case-viewer.js"></script>
+  <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="${styles}"><script defer src="${viewerScript}"></script>
 </head>
 <body class="story-page">
 <a class="skip" href="cases/${id}.html#main">К содержимому</a>
