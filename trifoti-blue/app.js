@@ -1,10 +1,10 @@
-import {projects} from './project-data.js';
+import {projects, projectOrder as order} from './project-data.js';
 import {stories} from './project-stories.js';
 
 const $ = (s, root=document) => root.querySelector(s);
 const $$ = (s, root=document) => [...root.querySelectorAll(s)];
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const order = ['stdAwards','mascot','rto-traveling-cup','pink','restoration','gesture','feather-award','vmeste-prize','two-figure-composition'];
+
 const credits = id => projects[id].attribution || 'Из портфолио творческого объединения ТРИФОТИ.';
 const cover = id => projects[id].media[0].poster || projects[id].media[0].src;
 const modal = $('#project-dialog');
@@ -51,7 +51,7 @@ function renderMedia(){
 function changeMedia(index){const p=projects[currentProject];mediaIndex=Math.max(0,Math.min(p.media.length-1,index));renderMedia();}
 function storyTeaser(id){
   const story=stories[id];
-  if(!story)return (projects[id].sections||[]).map(s=>`<div class="case-section"><h3>${esc(s.title)}</h3><p>${esc(s.text)}</p></div>`).join('');
+  if (!story) return `<div class="case-story-teaser"><a class="text-button" href="cases/${id}.html">Страница проекта <span aria-hidden="true">↗</span></a></div>`;
   return `<div class="case-story-teaser"><h3>${esc(story.hook)}</h3><ol>${story.steps.map(([title],i)=>`<li><span>0${i+1}</span>${esc(title)}</li>`).join('')}</ol><a class="text-button" href="cases/${id}.html">Полная история проекта <span aria-hidden="true">↗</span></a></div>`;
 }
 
@@ -104,3 +104,27 @@ function validateBrief(){for(const name of ['name','idea']){const el=form.elemen
 form?.addEventListener('input',e=>{if(e.target.setCustomValidity)e.target.setCustomValidity('');$('#brief-status').textContent='';});
 form?.addEventListener('submit',e=>{e.preventDefault();if(!validateBrief())return;const blob=new Blob(['\uFEFF'+makeBrief()],{type:'text/plain;charset=utf-8'});const url=URL.createObjectURL(blob);const link=document.createElement('a');link.href=url;link.download='TRIFOTI-Brief.txt';document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);$('#brief-status').textContent='Бриф подготовлен для скачивания. Передайте файл команде.';});
 $('#copy-brief')?.addEventListener('click',async()=>{if(!validateBrief())return;const value=makeBrief();try{await navigator.clipboard.writeText(value);$('#brief-status').textContent='Бриф скопирован. Его можно вставить в сообщение.';toast('Бриф скопирован');}catch{const fallback=$('#copy-fallback');fallback.hidden=false;fallback.value=value;fallback.focus();fallback.select();$('#brief-status').textContent='Выделенный текст можно скопировать вручную.';}});
+
+const samples = [
+  { id: 'stdAwards', title: 'Театральная премия СТД', type: 'Серия наград · 2025' },
+  { id: 'mascot', title: 'Медведь. С характером.', type: 'Авторский персонаж' },
+  { id: 'rto-traveling-cup', title: 'Кубок Спартакиады РТО', type: 'Переходящий кубок · 2026' }
+];
+const sampleTabs = $('.sample-tabs');
+sampleTabs.hidden = false;
+sampleTabs.addEventListener('click', event => {
+  const button = event.target.closest('button[data-sample]');
+  if (!button || button.getAttribute('aria-pressed') === 'true') return;
+  const index = samples.findIndex(sample => sample.id === button.dataset.sample);
+  const sample = samples[index], photo = projects[sample.id].media[0];
+  $('#sample-photo').src = photo.src;
+  $('#sample-photo').alt = photo.caption;
+  $('#sample-title').textContent = sample.title;
+  $('#sample-type').textContent = sample.type;
+  $('#sample-link').href = 'cases/' + sample.id + '.html';
+  $('#sample-count').textContent = '0' + (index + 1) + ' / 03';
+  $('#sample-status').textContent = sample.title;
+  for (const tab of sampleTabs.querySelectorAll('button')) {
+    tab.setAttribute('aria-pressed', String(tab === button));
+  }
+});

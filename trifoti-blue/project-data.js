@@ -58,3 +58,5 @@ for (const project of Object.values(projects)) {
     media[picture] = media.originalPhoto.replace('assets/projects/', 'assets/gallery/');
   }
 }
+
+export const projectOrder = ['stdAwards','mascot','rto-traveling-cup','pink','restoration','gesture','feather-award','vmeste-prize','two-figure-composition'];

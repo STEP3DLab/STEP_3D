@@ -75,3 +75,146 @@
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 
 @media(max-width:600px){.projects .project-grid.filtered .project-card{grid-column:auto}}
+
+/* The home page opens as a small, manually curated exhibition. */
+.exhibition {
+  padding: clamp(32px, 4.5vw, 80px) var(--gutter);
+  display: grid;
+  grid-template-columns: minmax(0, .93fr) minmax(0, 1.07fr);
+  gap: clamp(32px, 4.6vw, 88px);
+  align-items: center;
+  color: #f5f9fc;
+  background: linear-gradient(115deg, #082b4c 4%, #092a47 54%, #061e32);
+}
+.exhibition-kicker, .sampler-heading, .sample-caption small {
+  font-size: 11px; font-weight: 650; line-height: 1.5; letter-spacing: .12em; text-transform: uppercase;
+}
+.exhibition-kicker { display: flex; align-items: center; gap: 10px; color: #b1d3e7; }
+.exhibition-kicker span { width: 24px; height: 2px; background: var(--blue); }
+.exhibition-kicker b { color: var(--blue); }
+.exhibition h1 {
+  margin: clamp(22px, 2.6vw, 43px) 0 22px;
+  font-size: clamp(58px, 6.6vw, 120px); letter-spacing: -.055em; line-height: 1.02; font-weight: 640;
+}
+.exhibition h1 em { display: block; }
+.exhibition-lead { max-width: 41ch; color: #d2e3ee; font-size: clamp(15px, 1.18vw, 20px); line-height: 1.7; }
+.exhibition-actions { margin-top: 28px; display: flex; align-items: center; column-gap: 23px; row-gap: 10px; flex-wrap: wrap; }
+.exhibition-actions .text-button { color: #eef6fc; border-color: #7396ac; min-height: 44px; }
+.sampler-heading { color: #c7e1f2; display: flex; align-items: center; justify-content: space-between; margin-bottom: 11px; }
+.sampler-heading span:last-child { color: var(--blue); font-variant-numeric: tabular-nums; }
+.sample-frame { display: block; overflow: hidden; border: 1px solid #476174; background: #09253b; }
+.sample-frame img { display: block; width: 100%; aspect-ratio: 1.52; object-fit: cover; }
+.sample-caption { display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 16px 20px 18px; }
+.sample-caption small { display: block; font-size: 9px; color: #a1c4db; margin-bottom: 4px; }
+.sample-caption strong { display: block; font-weight: 620; font-size: clamp(18px, 2vw, 34px); letter-spacing: -.035em; line-height: 1.2; }
+.sample-open { color: var(--blue); font-size: 26px; }
+.sample-frame:hover .sample-open { transform: translate(2px,-2px); }
+.sample-tabs { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); margin-top: 10px; gap: 8px; }
+.sample-tabs button { padding: 9px 4px; border: 0; border-top: 2px solid #45647b; background: transparent; color: #c8dce8; min-height: 44px; font-size: 12px; text-align: left; }
+.sample-tabs button span { font-size: 10px; margin-right: 5px; color: #99bdd1; font-variant-numeric: tabular-nums; }
+.sample-tabs button[aria-pressed="true"] { border-top-color: var(--blue); color: white; font-weight: 750; }
+.sample-tabs button:hover { background: #ffffff0c; }
+.sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; border:0; }
+.catalog-period { color:#0a8cbd; }
+.directions .catalog-period { color:var(--blue); }
+.projects .section-head { margin-bottom: 32px; }
+.projects .head-aside { max-width: 320px; }
+.projects .head-aside a { margin-top: 8px; }
+.site-header nav .nav-brief { display:none; }
+.projects .project-grid { align-items: start; }
+.projects .project-image { aspect-ratio: 1.4; }
+.projects .project-image img { object-fit: contain; background: #dde6eb; }
+.projects .featured-project .project-image { aspect-ratio: 1.31!important; }
+.projects .project-index { top: 12px; left: 12px; padding: 5px 8px; }
+.projects .project-meta h3 { text-wrap: balance; }
+.projects .featured-copy { min-height: 0; }
+.projects .featured-project .project-meta p { min-height: 0; }
+.projects .project-card .story-link { min-height: 40px; }
+@media (max-width:900px) {
+  .exhibition { gap: 26px; }
+  .exhibition-actions { gap: 8px 16px; }
+  .exhibition-actions .button { min-height: 45px; padding: 12px 18px; gap: 14px; }
+}
+@media (max-width:760px) {
+  .exhibition { grid-template-columns: 1fr; gap: 25px; padding-top: 30px; padding-bottom: 30px; }
+  .exhibition h1 { font-size: clamp(46px, 9.4vw, 69px); margin: 18px 0 13px; }
+  .exhibition h1 em { display: inline; }
+  .exhibition-lead { max-width:50ch; font-size:15px; line-height:1.55; }
+  .exhibition-actions { margin-top:17px; }
+  .sample-frame img { aspect-ratio:1.65; }
+  .sample-caption { padding:12px 15px; }
+  .sample-tabs { margin-top:6px; }
+  .sample-tabs button { font-size:11px; }
+  .projects .head-aside { margin-top:0; }
+}
+
+@media print { .exhibition { display:block; background:white; color:var(--ink); } .exhibition h1 { font-size:50px; } .exhibit-sampler,.exhibition-actions { display:none; } .exhibition-lead {color:var(--ink);} }
+
+.dossier {
+  padding: clamp(34px,4vw,74px) var(--gutter);
+  display:grid; grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);
+  gap:clamp(26px,5vw,90px); align-items:center;
+  background:var(--deep); color:white;
+}
+.dossier-number {display:flex;align-items:center;gap:12px;font-size:11px;font-weight:700;letter-spacing:.14em;color:#b7d8eb}
+.dossier-number span {width:32px;height:1px;background:var(--blue)}
+.dossier-type {color:var(--blue);font-weight:650;font-size:13px;margin-top:clamp(26px,4vw,64px)}
+.dossier h1 {font-size:clamp(34px,4.2vw,80px);line-height:1.06;letter-spacing:-.045em;margin-top:14px;text-wrap:balance;overflow-wrap:anywhere}
+.dossier-deck {color:#d5e4ed;font-size:clamp(15px,1.18vw,20px);line-height:1.65;max-width:50ch;margin-top:23px}
+.dossier .story-facts {margin:28px 0 0;gap:16px;padding-top:20px}
+.dossier-tags {display:flex;flex-wrap:wrap;gap:7px;margin-top:26px}
+.dossier-tags span {border:1px solid #7396ad;padding:5px 10px;font-size:11px;color:#d7e7f2}
+.enlarge {display:block;position:relative;cursor:zoom-in}
+.enlarge span {position:absolute;bottom:12px;right:12px;display:grid;place-items:center;width:36px;height:36px;border-radius:50%;background:#08263eea;color:white;font:23px/1 sans-serif;border:1px solid #ffffff73}
+.enlarge:hover span {background:var(--blue);color:var(--deep)}
+.dossier-cover img,.dossier-cover video {display:block;width:100%;height:clamp(285px,37vw,580px);object-fit:contain;background:#102c41}
+.story-page .dossier-cover figcaption {color:#c9dce7;font-size:12px;line-height:1.55}
+.dossier-gallery {padding:clamp(42px,6vw,100px) var(--gutter) 20px}
+.dossier-gallery .section-label {margin-bottom:13px}
+.dossier-gallery .story-media {padding:26px 0 0}
+.story-page .story-media .enlarge img {object-fit:contain}
+.story-page .story-provenance {border-top:1px solid var(--line);margin-top:28px;padding-top:30px;padding-bottom:40px}
+.story-page .story-process {background:#dfeef5}
+.story-page .story-cta {background:var(--navy)}
+.story-page .case-sources a,.story-page .original-photo {text-underline-offset:.2em}
+.story-page .story-next img {object-fit:contain;background:#dce7ed}
+dialog.photo-viewer {width:min(1060px,96vw);max-width:96vw;max-height:94dvh;padding:0;background:#071d2e;color:white;border:1px solid #668196}
+.photo-viewer::backdrop {background:#011322eb}
+.viewer-bar,.viewer-foot {display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 20px}
+.viewer-bar>span {font-size:10px;letter-spacing:.13em;color:#afccdd}
+.photo-viewer>img {height:min(65dvh,750px);width:100%;object-fit:contain;background:#031320}
+.viewer-foot p {font-size:13px;color:#d4e4ee;line-height:1.55}
+.viewer-controls {display:flex;align-items:center;gap:10px;white-space:nowrap;flex-shrink:0;font-size:12px}
+.photo-viewer button {min-width:44px;min-height:44px;background:transparent;color:white;border:1px solid #718da0;padding:7px 12px}
+.photo-viewer button:hover:not(:disabled) {background:#194462}
+@media(max-width:760px){
+  .dossier {grid-template-columns:1fr;gap:22px}
+  .dossier-type {margin-top:19px}
+  .dossier h1 {font-size:clamp(32px,8vw,48px)}
+  .dossier-deck {margin-top:15px}
+  .dossier .story-facts {margin-top:18px;padding-top:15px;gap:7px}
+  .dossier-cover img,.dossier-cover video {height:auto;max-height:52dvh}
+  .viewer-foot {flex-wrap:wrap;gap:10px}
+  .viewer-foot p {max-height:5em;overflow:auto}
+  .viewer-foot,.viewer-bar {padding:10px 14px}
+  .photo-viewer>img {height:55dvh}
+}
+/* Avoid cutting the tips of the wings and the tops of narrow sculptures. */
+.sample-frame img {aspect-ratio:1.42;object-fit:contain;background:#c8d6dd}
+.sample-frame[href$="rto-traveling-cup.html"] img {background:#193447}
+@media(max-width:850px) {
+  .site-header nav.open .nav-brief {display:block;color:var(--blue)}
+}
+@media(max-width:600px) {
+  body:not(.story-page) .site-header>.header-cta {display:none}
+  .menu-toggle {margin-left:auto;flex-shrink:0;width:44px;height:44px;align-items:center}
+  .site-header nav a {min-height:44px}
+  .story-page .site-header {gap:8px;padding-inline:16px}
+  .story-page .site-header .brand-type {font-size:16px}
+  .story-page .brand-mark {width:32px;height:32px}
+  .story-page .site-header .header-cta {flex-shrink:0;gap:6px;min-height:44px}
+  .exhibition-actions {column-gap:14px}
+  .exhibition-actions .button {gap:10px;padding:10px 13px;font-size:12px}
+  .exhibition-actions .text-button {font-size:12px;gap:8px}
+  .sample-tabs button span {display:block;margin:0 0 2px}
+}
