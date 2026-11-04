@@ -64,6 +64,8 @@ html = html.replace('</head>', '<script type="module" src="warm-ui.js?v=20261104
 (target/'index.html').write_text(html)
 shutil.copyfile(root/'trifoti-source/warm/warm-theme.css',target/'warm-theme.css')
 shutil.copyfile(root/'trifoti-source/warm/warm-ui.js',target/'warm-ui.js')
+import runpy
+runpy.run_path(str(root/'trifoti-source/warm/directions/apply.py'))['apply'](target)
 # Publish identical files for either GitHub Pages source layout.
 mirror=root/'docs/trifoti/warm'
 shutil.copytree(target,mirror,dirs_exist_ok=True)

@@ -1,6 +1,6 @@
-import {projects} from './project-data.js?v=20261026-directions';
-import {storyCategory,storyFrames,parseStoryRoute} from './category-stories-data.js?v=20261026-legacy-links';
-import {createStoryNavigation} from './category-stories-navigation.js?v=20261026-legacy-links';
+import {storyProjects as projects} from './category-stories-data.js?v=20261104-five';
+import {storyCategory,storyFrames,parseStoryRoute} from './category-stories-data.js?v=20261104-five';
+import {createStoryNavigation} from './category-stories-navigation.js?v=20261104-five';
 import {createMediaSlot} from './portfolio-media.js';
 import {keepDialogFocus,galleryArrow} from './dialog-controls.js';
 import {mountPhotoSwipe} from './gallery-interactions.js';
@@ -16,15 +16,15 @@ export function mountCategoryStories({document,window,onFullCase=()=>{},beforeOp
  function render(route){
   current=route;beforeOpen();const category=storyCategory(route.category),frames=storyFrames(category.id),frame=frames[route.index],project=frame&&projects[frame.key];
   get('category').textContent=category.title;get('title').textContent=project?.title||category.title;
-  get('counter').textContent=frame?`Проект ${category.keys.indexOf(frame.key)+1} из ${category.keys.length} · Кадр ${frame.index+1} из ${project.media.length}`:'О направлении · 1 из 1';
+  get('counter').textContent=frame?`${project?.concept?'Концепт':'Проект'} ${category.keys.indexOf(frame.key)+1} из ${category.keys.length} · Кадр ${frame.index+1} из ${project.media.length}`:'О направлении · 1 из 1';
   get('caption').textContent=frame?frame.item.caption:category.intro;
   get('credit').textContent=project?(project.attribution||project.type)+(project.attribution?'':' · Персональные роли участников не уточнены.'):'Пока нет опубликованных проектов';
-  get('full-case').hidden=!frame;get('full-case').href=frame?`#project/${frame.key}/media/${frame.id}`:'#projects';
-  get('direction').hidden=!!frame;get('direction').href='#'+category.service;
+  get('full-case').hidden=!frame||!!project?.concept;get('full-case').href=frame?`#project/${frame.key}/media/${frame.id}`:'#projects';
+  get('direction').hidden=!!frame&&!project?.concept;get('direction').href='#'+category.service;
   get('progress').replaceChildren();for(let i=0;i<(project?.media.length||1);i++){const segment=document.createElement('span');segment.className=i<=(frame?.index||0)?'is-seen':'';segment.setAttribute('aria-hidden','true');get('progress').append(segment)}
-  const last=!frame||route.index===frames.length-1;get('prev').disabled=route.index===0;get('next').hidden=last;get('restart').hidden=!frame||!last;get('end').hidden=!last;get('end').textContent=frame?'Последний кадр этого направления. Можно начать сначала или открыть полный кейс.':'Это знакомство с направлением, а не пример выполненного проекта.';
+  const last=!frame||route.index===frames.length-1;get('prev').disabled=route.index===0;get('next').hidden=last;get('restart').hidden=!frame||!last;get('end').hidden=!last;get('end').textContent=project?.concept?'Это концепт, не подтверждённый изготовленный объект.':frame?'Последний кадр этого направления. Можно начать сначала или открыть полный кейс.':'Это знакомство с направлением, а не пример выполненного проекта.';
   get('retry').hidden=true;get('original').hidden=!frame;
-  if(frame){get('original').href=frame.item.src;get('original').textContent=frame.item.type==='video'?'Открыть исходное видео ↗':'Открыть исходное фото ↗';slot.show(frame.item,{video:frame.item.type==='video'});get('media').classList.remove('story-intro-art')}
+  if(frame){get('original').href=frame.item.src;get('original').textContent=frame.item.type==='video'?'Открыть исходное видео ↗':project?.concept?'Открыть изображение концепта ↗':'Открыть исходное фото ↗';slot.show(frame.item,{video:frame.item.type==='video'});get('media').classList.remove('story-intro-art')}
   else{slot.clear();get('media').classList.add('story-intro-art');get('media').dataset.direction=category.id}
   // A new frame starts at its image, even after using the lower controls on a short screen.
   if(dialog.open&&dialog.scrollTop>0&&[get('prev'),get('next'),get('restart')].includes(document.activeElement))get('media').focus({preventScroll:true});
