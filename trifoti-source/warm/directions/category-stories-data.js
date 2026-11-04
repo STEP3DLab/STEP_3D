@@ -11,7 +11,8 @@ export const storyCategories=[
  {id:'sculpture',title:'Парковая и монументальная скульптура',service:'service-sculpture',keys:Object.keys(publishedProjects).filter(k=>publishedProjects[k].direction==='Скульптура')},
  {id:'interiors',title:'Дизайн интерьеров',service:'service-design',keys:[],intro:'Частные и офисные помещения. Опубликованных проектов этого направления пока нет.'},
  {id:'awards',title:'Награды',service:'service-awards',keys:Object.keys(publishedProjects).filter(k=>publishedProjects[k].direction==='Сувениры и призы')},
- {id:'industrial',title:'Промышленный дизайн',service:'service-industrial',keys:[],intro:'Форма и конструкция изделия с учётом назначения, материала и изготовления. Опубликованных проектов этого направления пока нет.'}
+ {id:'industrial',title:'Промышленный дизайн',service:'service-industrial',keys:[],intro:'Форма и конструкция изделия с учётом назначения, материала и изготовления. Опубликованных проектов этого направления пока нет.'},
+ {id:'artobjects',title:'Арт-объекты',service:'service-artobjects',keys:[],intro:'Арт-объекты для пространства и событий. Подтверждённые примеры пока не добавлены; этот раздел описывает направление, а не выполненный проект.'}
 ];
 export const categoryAliases=Object.freeze({design:'interiors',modelmaking:'industrial'});
 export const storyCategory=id=>storyCategories.find(category=>category.id===(categoryAliases[id]||id));

@@ -1,6 +1,6 @@
-import {storyProjects as projects} from './category-stories-data.js?v=20261104-five';
-import {storyCategory,storyFrames,parseStoryRoute} from './category-stories-data.js?v=20261104-five';
-import {createStoryNavigation} from './category-stories-navigation.js?v=20261104-five';
+import {storyProjects as projects} from './category-stories-data.js?v=20261104-six';
+import {storyCategory,storyFrames,parseStoryRoute} from './category-stories-data.js?v=20261104-six';
+import {createStoryNavigation} from './category-stories-navigation.js?v=20261104-six';
 import {createMediaSlot} from './portfolio-media.js';
 import {keepDialogFocus,galleryArrow} from './dialog-controls.js';
 import {mountPhotoSwipe} from './gallery-interactions.js';

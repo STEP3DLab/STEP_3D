@@ -3,7 +3,7 @@ import {appendSelectionReference,mountReferenceManager} from './reference-manage
 import {mountPhotoDetail} from './gallery-photo-detail.js?v=20261026-seven';
 import {modeLinks} from './view-context.js?v=20261026-directions';
 import {optionalModule,optionalFallback} from './optional-module.js?v=20261026-seven';
-import {initializeBriefExperience,initializeBackToTop} from './experience-ux.js?v=20261104-five';
+import {initializeBriefExperience,initializeBackToTop} from './experience-ux.js?v=20261104-six';
 import {initializePortfolioFilters} from './portfolio-filters.js?v=20261026-directions';
 import {mediaId,mediaIndex} from './exploration-data.js?v=20261026-directions';
 import {mountRelated} from './related-works.js?v=20261026-directions';
@@ -12,7 +12,7 @@ import {createFrameMemory,thumbnailKey,mountPhotoSwipe} from './gallery-interact
 import {initializeSectionNavigation} from './section-navigation.js?v=20261026-legacy-links';
 import {initializeBriefTools} from './brief-tools.js?v=20261026-directions';
 import {updateGalleryPhotoLink} from './gallery-photo-link.js?v=20261024-photo-details';
-import {updateBriefGuidance} from './brief-guidance.js?v=20261104-five';
+import {updateBriefGuidance} from './brief-guidance.js?v=20261104-six';
 import {mountCaseSections} from './case-sections.js?v=20261024-case-story';
 import {mountGalleryChapters} from './gallery-chapters.js?v=20261023-bear-chapters';
 import {watchGalleryMedia} from './media-recovery.js?v=20261024-gallery-browse';
@@ -65,7 +65,7 @@ briefExperience=initializeBriefExperience({form,document,window,validate:()=>bri
 // Keep the native submit button disabled until local-only handling is ready.
 draftStatus(recovered.state);
 $('#brief-save').disabled=false;
-optionalModule({load:()=>import('./brief-preparation.js?v=20261104-five'),mount:({mountBriefPreparation})=>{briefPreparation=mountBriefPreparation({form,document,window})},onError:()=>{const note=document.createElement('p');note.className='form-note';note.textContent='Подсказки не загрузились. Бриф можно заполнить, скачать и скопировать без них.';form.querySelector('.brief-intro').after(note)}})();
+optionalModule({load:()=>import('./brief-preparation.js?v=20261104-six'),mount:({mountBriefPreparation})=>{briefPreparation=mountBriefPreparation({form,document,window})},onError:()=>{const note=document.createElement('p');note.className='form-note';note.textContent='Подсказки не загрузились. Бриф можно заполнить, скачать и скопировать без них.';form.querySelector('.brief-intro').after(note)}})();
 
 $$('[data-close]').forEach(b=>b.addEventListener('click',()=>document.getElementById(b.dataset.close).close()));
 $$('dialog').forEach(dialog=>{if(dialog.id!=='category-story-dialog')keepDialogFocus(dialog);let backdropPressed=false;dialog.addEventListener('pointerdown',e=>{const r=dialog.getBoundingClientRect();backdropPressed=e.target===dialog&&(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)});dialog.addEventListener('click',e=>{if(backdropPressed&&e.target===dialog)dialog.close();backdropPressed=false})});
@@ -148,7 +148,7 @@ projectDialog.addEventListener('cancel',event=>{if(photoDetail?.reset())event.pr
 projectDialog.addEventListener('keydown',e=>{if(photoDetail?.key(e))return;if(!projectDialog.open||projects[galleryProject]?.media.length<2)return;const step=galleryArrow(e);if(step){e.preventDefault();showSlide(galleryIndex+step)}});
 projectDialog.addEventListener('close',()=>{if(projectDialog.open)return;photoDetail?.reset();slideRevision++;clearMediaWait();$$('video',projectDialog).forEach(v=>v.pause());const mode=caseNavigation.closed();if(mode!=='route'){const card=$(`[data-project="${galleryProject}"]`),openerMatches=projectOpener?.closest('.exploration-panel')||projectOpener?.dataset.project===galleryProject||projectOpener?.dataset.caseLink===galleryProject||projectOpener?.getAttribute('href')==='#project/'+galleryProject||projectOpener?.dataset.storyCategory,target=visiblePortfolioTarget(projectOpener)&&openerMatches?projectOpener:visiblePortfolioTarget(card)?card:$('#all-projects-summary');target?.focus({preventScroll:mode!=='fallback'})}});
 caseNavigation.sync();
-optionalModule({load:()=>import('./category-stories.js?v=20261104-five'),mount:({mountCategoryStories})=>{categoryStories=mountCategoryStories({document,window,beforeOpen:()=>caseNavigation.sync(),onFullCase:(key,id,tile)=>{projectOpener=tile;caseNavigation.sync()}})},onError:()=>{const help=$('.category-story-help');help.textContent='Истории не загрузились. Квадраты открывают каталог с работами или описание направления.'}})();
+optionalModule({load:()=>import('./category-stories.js?v=20261104-six'),mount:({mountCategoryStories})=>{categoryStories=mountCategoryStories({document,window,beforeOpen:()=>caseNavigation.sync(),onFullCase:(key,id,tile)=>{projectOpener=tile;caseNavigation.sync()}})},onError:()=>{const help=$('.category-story-help');help.textContent='Истории не загрузились. Квадраты открывают каталог с работами или описание направления.'}})();
 import('./bear-video.js?v=20261024-ux25').catch(()=>{const status=$('#bear-keyboard-help');if(status)status.textContent='Анимация не загрузилась. Доступен статичный постер настоящей скульптуры.';$$('#rotate-toggle, #bear-reset').forEach(button=>button.disabled=true)});
 
 // Editorial tools are an explicit local mode, separate from the visitor experience.
