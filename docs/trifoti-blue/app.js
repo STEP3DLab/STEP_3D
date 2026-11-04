@@ -35,7 +35,15 @@ $$('[data-filter]').forEach(button=>button.addEventListener('click',()=>{
 function renderMedia(){
   const p=projects[currentProject],m=p.media[mediaIndex];
   $('#case-media-main').innerHTML=m.type==='video'?`<video controls playsinline preload="metadata" poster="${esc(m.poster)}" aria-label="${esc(m.caption)}"><source src="${esc(m.src)}" type="video/mp4">Ваш браузер не поддерживает видео.</video>`:`<img class="case-photo" src="${esc(m.src)}" alt="${esc(m.caption)}">`;
-  $('#case-caption-text').textContent=m.caption;
+  const caption = $('#case-caption-text');
+  caption.textContent = m.caption + ' ';
+  const original = document.createElement('a');
+  original.className = 'original-photo';
+  original.href = m.originalPhoto;
+  original.target = '_blank';
+  original.rel = 'noopener';
+  original.textContent = 'Исходный кадр ↗';
+  caption.append(original);
   $('#media-count').textContent=`${mediaIndex+1} / ${p.media.length}`;
   $('#media-prev').disabled=mediaIndex===0;$('#media-next').disabled=mediaIndex===p.media.length-1;
   $$('#case-thumbs button').forEach((b,i)=>{b.classList.toggle('active',i===mediaIndex);b.setAttribute('aria-pressed',String(i===mediaIndex));});

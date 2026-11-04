@@ -2,7 +2,7 @@
 .projects .project-grid {grid-template-columns:repeat(6,minmax(0,1fr));gap:52px 28px}
 .projects .project-card {grid-column:span 3;padding-top:0}
 .projects .project-card.featured-project {grid-column:span 2}
-.featured-project .project-image {aspect-ratio:1!important}
+.featured-project .project-image {aspect-ratio:1.2!important}
 .featured-project .project-meta {display:block}
 .featured-project .project-meta>span {display:none}
 .featured-project .project-meta h3 {font-size:clamp(21px,2vw,30px)}

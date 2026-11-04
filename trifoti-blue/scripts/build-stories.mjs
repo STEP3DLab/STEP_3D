@@ -7,9 +7,10 @@ import {stories} from '../project-stories.js';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const esc = value => String(value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
 const ids = Object.keys(stories);
+const sourceLink = media => ` <a class="original-photo" href="${esc(media.originalPhoto)}" target="_blank" rel="noopener">Исходный кадр ↗</a>`;
 const media = (p, indices, className='') => indices.length ? `<div class="story-media ${indices.length===1?'single':''} ${className}">${indices.map(i=>{
   const m=p.media[i];
-  return `<figure>${m.type==='video'?`<video controls playsinline preload="none" poster="${esc(m.poster)}" aria-label="${esc(m.caption)}"><source src="${esc(m.src)}" type="video/mp4">Ваш браузер не поддерживает видео.</video>`:`<img src="${esc(m.src)}" alt="${esc(m.caption)}" loading="lazy">`}<figcaption>${esc(m.caption)}</figcaption></figure>`;
+  return `<figure>${m.type==='video'?`<video controls playsinline preload="none" poster="${esc(m.poster)}" aria-label="${esc(m.caption)}"><source src="${esc(m.src)}" type="video/mp4">Ваш браузер не поддерживает видео.</video>`:`<img src="${esc(m.src)}" alt="${esc(m.caption)}" loading="lazy">`}<figcaption>${esc(m.caption)}${sourceLink(m)}</figcaption></figure>`;
 }).join('')}</div>` : '';
 
 for (const [index,id] of ids.entries()) {
@@ -34,7 +35,7 @@ for (const [index,id] of ids.entries()) {
     <h1>${esc(p.title)}</h1><p class="story-subtitle">${esc(s.subtitle)}</p>
     <dl class="story-facts">${s.facts.map(([label,value])=>`<div><dt>${esc(label)}</dt><dd>${esc(value)}</dd></div>`).join('')}</dl>
   </section>
-  <figure class="story-cover"><img src="${esc(p.media[0].src)}" alt="${esc(p.media[0].caption)}" fetchpriority="high"><figcaption>${esc(p.media[0].caption)}</figcaption></figure>
+  <figure class="story-cover"><img src="${esc(p.media[0].src)}" alt="${esc(p.media[0].caption)}" fetchpriority="high"><figcaption>${esc(p.media[0].caption)}${sourceLink(p.media[0])}</figcaption></figure>
   <section class="story-chapter"><div class="section-label">01 / ЗАМЫСЕЛ</div><div><h2>${esc(s.taskTitle)}</h2><p>${esc(s.task)}</p></div></section>
   <section class="story-process"><div class="section-label">02 / ВОПЛОЩЕНИЕ</div><h2>${esc(s.processTitle)}</h2><ol class="story-steps">${s.steps.map(([title,text],i)=>`<li><span class="step-num">0${i+1}</span><h3>${esc(title)}</h3><p>${esc(text)}</p></li>`).join('')}</ol></section>
   ${media(p,s.processMedia)}

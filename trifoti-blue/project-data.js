@@ -1,7 +1,7 @@
 const bear='assets/projects/bear/';
 export const projects={
  stdAwards:{title:'Награды для премии СТД России',type:'Из портфолио STEP_3D / Награды',description:'Скульптурные награды для Премии Председателя и Сопредседателя СТД РФ.',sections:[{title:'Изготовление',text:'Цифровой дизайн и 3D-печать готовой серии скульптурных наград. Проект реализован командой Технопарка РГСУ.'},{title:'Вручение',text:'18 декабря 2025 года, Театральный центр «На Страстном». Владимир Машков вручил премии в области драматического театра.'}],attribution:'Проект реализован командой Технопарка РГСУ.',sources:[{label:'О создании наград',url:'https://technopark-rgsu.ru/skb/news/nagrady-dlya-zvezd-teatra/'},{label:'О церемонии · СТД РФ',url:'https://stdrf.ru/novosti/sostoyalos-vruchenie-premiy-predsedatelya-i-sopredsedatelya-std-rf/'}],direction:'Сувениры и призы',tags:['Награды','Цифровой дизайн','3D-печать'],media:[
-  {src:'assets/projects/std-awards/award-series.webp',caption:'Готовая серия скульптурных наград в мастерской.'},
+  {src:'assets/projects/std-awards/award-series.webp',caption:'Четыре скульптурные награды из готовой серии.'},
   {src:'assets/projects/std-awards/award-ceremony.webp',caption:'Вручение премии с Владимиром Машковым. Театральный центр «На Страстном», 18 декабря 2025 года.'},
   {src:'assets/projects/std-awards/design-process.webp',caption:'Проработка образа и этапов изготовления награды в Технопарке РГСУ.'}
  ]},
@@ -49,3 +49,12 @@ export const projects={
   {src:'assets/projects/two-figure-composition/two-figure-composition.jpg',caption:'Общий вид скульптурной композиции на постаменте: стоящая фигура с крестом и коленопреклонённая фигура.'}
  ]}
 };
+
+// Each edited still has a matching camera original. Video files stay in the source collection.
+for (const project of Object.values(projects)) {
+  for (const media of project.media) {
+    const picture = media.type === 'video' ? 'poster' : 'src';
+    media.originalPhoto = media[picture];
+    media[picture] = media.originalPhoto.replace('assets/projects/', 'assets/gallery/');
+  }
+}

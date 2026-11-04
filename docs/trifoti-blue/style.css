@@ -14,3 +14,7 @@ dialog{padding:0;border:0;color:var(--ink);background:var(--paper);max-width:120
 .brief-copy,.brief-panel{min-width:0}
 
 h2{word-spacing:.06em}
+
+.original-photo { display: inline-block; margin-inline-start: .55em; font: inherit; color: inherit; text-decoration: underline; text-underline-offset: .19em; white-space: nowrap; }
+.original-photo:hover { color: #11658c; }
+.download-gallery { margin: .45em 0 0; }

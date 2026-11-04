@@ -106,3 +106,9 @@ h1, h2, p, figure { margin: 0; }
   .work-nav a { gap: 4px; font-size: 11px; }
   .collection-head h1 { font-size: 18px; }
 }
+
+.exhibit .original-photo { color: var(--soft); text-decoration: underline; text-underline-offset: .2em; font-size: 11px; white-space: nowrap; margin-left: auto; }
+@media (max-width: 760px) {
+  .exhibit figcaption { flex-wrap: wrap; }
+  .exhibit .original-photo { margin-left: 0; }
+}
