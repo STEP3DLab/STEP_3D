@@ -1,4 +1,4 @@
-import {formatBrief} from './brief-utils.js?v=20261026-directions';
+import {formatBrief} from './brief-utils.js?v=20261104-red7';
 
 export function briefCompletion(values){
  const done=['name','idea'].filter(key=>String(values[key]||'').trim()).length;

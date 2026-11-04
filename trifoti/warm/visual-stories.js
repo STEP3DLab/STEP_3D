@@ -1,6 +1,6 @@
-import {projects} from './project-data.js?v=20261026-directions';
-import {mediaId,exactLink} from './exploration-data.js?v=20261026-directions';
-import {thumbnailSource} from './media-utils.js?v=20261026-directions';
+import {projects} from './project-data.js?v=20261104-red7';
+import {mediaId,exactLink} from './exploration-data.js?v=20261104-red7';
+import {thumbnailSource} from './media-utils.js?v=20261104-red7';
 
 // Editorial views of existing assets. These are not production timelines.
 export const visualStories=[

@@ -66,6 +66,7 @@ shutil.copyfile(root/'trifoti-source/warm/warm-theme.css',target/'warm-theme.css
 shutil.copyfile(root/'trifoti-source/warm/warm-ui.js',target/'warm-ui.js')
 import runpy
 runpy.run_path(str(root/'trifoti-source/warm/directions/apply.py'))['apply'](target)
+runpy.run_path(str(root/'trifoti-source/warm/red7/apply.py'))['apply'](target)
 # Publish identical files for either GitHub Pages source layout.
 mirror=root/'docs/trifoti/warm'
 shutil.copytree(target,mirror,dirs_exist_ok=True)

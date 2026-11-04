@@ -1,4 +1,4 @@
-import {projects} from './project-data.js?v=20261026-directions';
+import {projects} from './project-data.js?v=20261104-red7';
 export const PUBLIC_SITE='https://step3dlab.github.io/STEP_3D/trifoti/warm/';
 export const caseKeys=Object.keys(projects);
 // Asset basenames are permanent public media identifiers, not positional indexes.

@@ -1,5 +1,5 @@
-import {projects} from './project-data.js?v=20261026-directions';
-import {caseKeys,exactLink} from './exploration-data.js?v=20261026-directions';
+import {projects} from './project-data.js?v=20261104-red7';
+import {caseKeys,exactLink} from './exploration-data.js?v=20261104-red7';
 export const referenceBlock=key=>`${projects[key].title}\n${projects[key].attribution||projects[key].type}\n${exactLink(key)}`;
 // Recognize only complete blocks written by this site. Arbitrary older prose is opaque.
 export function referenceParts(value=''){

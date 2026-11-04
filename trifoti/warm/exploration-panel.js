@@ -1,9 +1,9 @@
-import {optionalModule,optionalFallback} from './optional-module.js?v=20261026-seven';
-import {projects} from './project-data.js?v=20261026-directions';
-import {caseKeys,selectionIds,selectionRoute,selectionFromHash,PUBLIC_SITE,mediaId,exactLink,relatedWorks,thematicRoutes,technicalNotes,countedNoun} from './exploration-data.js?v=20261026-directions';
-import {copyProjectLink} from './project-navigation.js?v=20261026-directions';
+import {optionalModule,optionalFallback} from './optional-module.js?v=20261104-red7';
+import {projects} from './project-data.js?v=20261104-red7';
+import {caseKeys,selectionIds,selectionRoute,selectionFromHash,PUBLIC_SITE,mediaId,exactLink,relatedWorks,thematicRoutes,technicalNotes,countedNoun} from './exploration-data.js?v=20261104-red7';
+import {copyProjectLink} from './project-navigation.js?v=20261104-red7';
 function element(document,tag,text,className){const node=document.createElement(tag);if(text)node.textContent=text;if(className)node.className=className;return node}
-export function mountExploration({host,document,location,history,onOpen,clipboard,onBrief,loadStories=()=>import('./visual-stories.js?v=20261026-directions')}){
+export function mountExploration({host,document,location,history,onOpen,clipboard,onBrief,loadStories=()=>import('./visual-stories.js?v=20261104-red7')}){
  let selected=[],revision=0,pendingSelection=false;const subscribers=new Set();const el=(tag,text,cls)=>element(document,tag,text,cls);
  const panel=el('details',null,'exploration-panel');panel.id='explore';const summary=el('summary','Исследовать работы · подборка, сравнение, маршруты');panel.append(summary);host.append(panel);
  panel.addEventListener('toggle',()=>{if(!panel.open)revision++});
@@ -43,4 +43,4 @@ export function mountExploration({host,document,location,history,onOpen,clipboar
  }
  return {sync,toggle,getSelected:()=>[...selected],subscribe(fn){subscribers.add(fn);fn([...selected]);return ()=>subscribers.delete(fn)},showSelection(){const catalog=document.getElementById('all-projects');if(catalog)catalog.open=true;panel.open=true;showTask('selection',true);panel.scrollIntoView?.({block:'start'})}};
 }
-export {mountRelated} from './related-works.js?v=20261026-directions';
+export {mountRelated} from './related-works.js?v=20261104-red7';

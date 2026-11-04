@@ -1,10 +1,10 @@
-import {storyProjects as projects} from './category-stories-data.js?v=20261104-six';
-import {storyCategory,storyFrames,parseStoryRoute} from './category-stories-data.js?v=20261104-six';
-import {createStoryNavigation} from './category-stories-navigation.js?v=20261104-six';
+import {storyProjects as projects} from './category-stories-data.js?v=20261104-red7';
+import {storyCategory,storyFrames,parseStoryRoute} from './category-stories-data.js?v=20261104-red7';
+import {createStoryNavigation} from './category-stories-navigation.js?v=20261104-red7';
 import {createMediaSlot} from './portfolio-media.js';
 import {keepDialogFocus,galleryArrow} from './dialog-controls.js';
 import {mountPhotoSwipe} from './gallery-interactions.js';
-import {visiblePortfolioTarget} from './portfolio-disclosure.js?v=20261026-directions';
+import {visiblePortfolioTarget} from './portfolio-disclosure.js?v=20261104-red7';
 
 export function mountCategoryStories({document,window,onFullCase=()=>{},beforeOpen=()=>{}}){
  const dialog=document.getElementById('category-story-dialog');

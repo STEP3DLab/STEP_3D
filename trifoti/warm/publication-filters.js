@@ -1,4 +1,4 @@
-import {publications, publicationCategories} from './publications-data.js?v=20261026-team-profiles';
+import {publications, publicationCategories} from './publications-data.js?v=20261104-red7';
 
 export function publicationMatches(category, filter) {
   return filter === 'all' || category === filter;

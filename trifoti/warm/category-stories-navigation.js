@@ -1,4 +1,4 @@
-import {parseStoryRoute,firstStoryRoute,storyRoute} from './category-stories-data.js?v=20261104-six';
+import {parseStoryRoute,firstStoryRoute,storyRoute} from './category-stories-data.js?v=20261104-red7';
 const marker='trifotiStories';
 export function createStoryNavigation({location,history,onOpen,onClose}){
  let active=null,activeHash='';

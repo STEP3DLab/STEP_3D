@@ -1,26 +1,26 @@
-import {initializePortfolioDisclosure,visiblePortfolioTarget} from './portfolio-disclosure.js?v=20261026-directions';
-import {appendSelectionReference,mountReferenceManager} from './reference-manager.js?v=20261026-directions';
-import {mountPhotoDetail} from './gallery-photo-detail.js?v=20261026-seven';
-import {modeLinks} from './view-context.js?v=20261026-directions';
-import {optionalModule,optionalFallback} from './optional-module.js?v=20261026-seven';
-import {initializeBriefExperience,initializeBackToTop} from './experience-ux.js?v=20261104-six';
-import {initializePortfolioFilters} from './portfolio-filters.js?v=20261026-directions';
-import {mediaId,mediaIndex} from './exploration-data.js?v=20261026-directions';
-import {mountRelated} from './related-works.js?v=20261026-directions';
+import {initializePortfolioDisclosure,visiblePortfolioTarget} from './portfolio-disclosure.js?v=20261104-red7';
+import {appendSelectionReference,mountReferenceManager} from './reference-manager.js?v=20261104-red7';
+import {mountPhotoDetail} from './gallery-photo-detail.js?v=20261104-red7';
+import {modeLinks} from './view-context.js?v=20261104-red7';
+import {optionalModule,optionalFallback} from './optional-module.js?v=20261104-red7';
+import {initializeBriefExperience,initializeBackToTop} from './experience-ux.js?v=20261104-red7';
+import {initializePortfolioFilters} from './portfolio-filters.js?v=20261104-red7';
+import {mediaId,mediaIndex} from './exploration-data.js?v=20261104-red7';
+import {mountRelated} from './related-works.js?v=20261104-red7';
 import {enhanceProjectCards} from './project-card-links.js';
-import {createFrameMemory,thumbnailKey,mountPhotoSwipe} from './gallery-interactions.js?v=20261024-gallery-browse';
-import {initializeSectionNavigation} from './section-navigation.js?v=20261026-legacy-links';
-import {initializeBriefTools} from './brief-tools.js?v=20261026-directions';
-import {updateGalleryPhotoLink} from './gallery-photo-link.js?v=20261024-photo-details';
-import {updateBriefGuidance} from './brief-guidance.js?v=20261104-six';
-import {mountCaseSections} from './case-sections.js?v=20261024-case-story';
-import {mountGalleryChapters} from './gallery-chapters.js?v=20261023-bear-chapters';
-import {watchGalleryMedia} from './media-recovery.js?v=20261024-gallery-browse';
-import {createProjectNavigation,projectLink,copyProjectLink} from './project-navigation.js?v=20261026-directions';
-import {thumbnailSource} from './media-utils.js?v=20261026-directions';
-import {BRIEF_KEY,legacyDirections,createBriefDraftSession,formatBrief,requestBriefDownload} from './brief-utils.js?v=20261026-directions';
-import {keepDialogFocus,galleryArrow} from './dialog-controls.js?v=20261022-gallery';
-import {projects} from './project-data.js?v=20261026-directions';
+import {createFrameMemory,thumbnailKey,mountPhotoSwipe} from './gallery-interactions.js?v=20261104-red7';
+import {initializeSectionNavigation} from './section-navigation.js?v=20261104-red7';
+import {initializeBriefTools} from './brief-tools.js?v=20261104-red7';
+import {updateGalleryPhotoLink} from './gallery-photo-link.js?v=20261104-red7';
+import {updateBriefGuidance} from './brief-guidance.js?v=20261104-red7';
+import {mountCaseSections} from './case-sections.js?v=20261104-red7';
+import {mountGalleryChapters} from './gallery-chapters.js?v=20261104-red7';
+import {watchGalleryMedia} from './media-recovery.js?v=20261104-red7';
+import {createProjectNavigation,projectLink,copyProjectLink} from './project-navigation.js?v=20261104-red7';
+import {thumbnailSource} from './media-utils.js?v=20261104-red7';
+import {BRIEF_KEY,legacyDirections,createBriefDraftSession,formatBrief,requestBriefDownload} from './brief-utils.js?v=20261104-red7';
+import {keepDialogFocus,galleryArrow} from './dialog-controls.js?v=20261104-red7';
+import {projects} from './project-data.js?v=20261104-red7';
 const $=(s,root=document)=>root.querySelector(s);
 const $$=(s,root=document)=>[...root.querySelectorAll(s)];
 let toastTimer,bindSelectionButton;
@@ -65,7 +65,7 @@ briefExperience=initializeBriefExperience({form,document,window,validate:()=>bri
 // Keep the native submit button disabled until local-only handling is ready.
 draftStatus(recovered.state);
 $('#brief-save').disabled=false;
-optionalModule({load:()=>import('./brief-preparation.js?v=20261104-six'),mount:({mountBriefPreparation})=>{briefPreparation=mountBriefPreparation({form,document,window})},onError:()=>{const note=document.createElement('p');note.className='form-note';note.textContent='Подсказки не загрузились. Бриф можно заполнить, скачать и скопировать без них.';form.querySelector('.brief-intro').after(note)}})();
+optionalModule({load:()=>import('./brief-preparation.js?v=20261104-red7'),mount:({mountBriefPreparation})=>{briefPreparation=mountBriefPreparation({form,document,window})},onError:()=>{const note=document.createElement('p');note.className='form-note';note.textContent='Подсказки не загрузились. Бриф можно заполнить, скачать и скопировать без них.';form.querySelector('.brief-intro').after(note)}})();
 
 $$('[data-close]').forEach(b=>b.addEventListener('click',()=>document.getElementById(b.dataset.close).close()));
 $$('dialog').forEach(dialog=>{if(dialog.id!=='category-story-dialog')keepDialogFocus(dialog);let backdropPressed=false;dialog.addEventListener('pointerdown',e=>{const r=dialog.getBoundingClientRect();backdropPressed=e.target===dialog&&(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)});dialog.addEventListener('click',e=>{if(backdropPressed&&e.target===dialog)dialog.close();backdropPressed=false})});
@@ -126,7 +126,7 @@ function openProject(key,routeMedia){
 }
 const caseNavigation=createProjectNavigation({keys:Object.keys(projects),location,history,onOpen:openProject,onClose:()=>{if(projectDialog.open)projectDialog.close()}});
 const explorationHost=$('#portfolio-exploration');
-optionalModule({load:()=>Promise.all([import('./exploration-panel.js?v=20261026-directions&audit=20261026-design-r1'),import('./selection-controls.js?v=20261026-directions&audit=20261026-design-r1')]),mount:([{mountExploration},selectionTools])=>{
+optionalModule({load:()=>Promise.all([import('./exploration-panel.js?v=20261104-red7'),import('./selection-controls.js?v=20261104-red7')]),mount:([{mountExploration},selectionTools])=>{
  bindSelectionButton=selectionTools.bindSelectionButton;const mountSelectionSummary=selectionTools.mountSelectionSummary;
  exploration=mountExploration({host:explorationHost,document,location,history,clipboard:navigator.clipboard,onBrief:keys=>{
  const reference=form.elements.namedItem('reference'),result=appendSelectionReference(reference.value,keys);
@@ -148,22 +148,22 @@ projectDialog.addEventListener('cancel',event=>{if(photoDetail?.reset())event.pr
 projectDialog.addEventListener('keydown',e=>{if(photoDetail?.key(e))return;if(!projectDialog.open||projects[galleryProject]?.media.length<2)return;const step=galleryArrow(e);if(step){e.preventDefault();showSlide(galleryIndex+step)}});
 projectDialog.addEventListener('close',()=>{if(projectDialog.open)return;photoDetail?.reset();slideRevision++;clearMediaWait();$$('video',projectDialog).forEach(v=>v.pause());const mode=caseNavigation.closed();if(mode!=='route'){const card=$(`[data-project="${galleryProject}"]`),openerMatches=projectOpener?.closest('.exploration-panel')||projectOpener?.dataset.project===galleryProject||projectOpener?.dataset.caseLink===galleryProject||projectOpener?.getAttribute('href')==='#project/'+galleryProject||projectOpener?.dataset.storyCategory,target=visiblePortfolioTarget(projectOpener)&&openerMatches?projectOpener:visiblePortfolioTarget(card)?card:$('#all-projects-summary');target?.focus({preventScroll:mode!=='fallback'})}});
 caseNavigation.sync();
-optionalModule({load:()=>import('./category-stories.js?v=20261104-six'),mount:({mountCategoryStories})=>{categoryStories=mountCategoryStories({document,window,beforeOpen:()=>caseNavigation.sync(),onFullCase:(key,id,tile)=>{projectOpener=tile;caseNavigation.sync()}})},onError:()=>{const help=$('.category-story-help');help.textContent='Истории не загрузились. Квадраты открывают каталог с работами или описание направления.'}})();
-import('./bear-video.js?v=20261024-ux25').catch(()=>{const status=$('#bear-keyboard-help');if(status)status.textContent='Анимация не загрузилась. Доступен статичный постер настоящей скульптуры.';$$('#rotate-toggle, #bear-reset').forEach(button=>button.disabled=true)});
+optionalModule({load:()=>import('./category-stories.js?v=20261104-red7'),mount:({mountCategoryStories})=>{categoryStories=mountCategoryStories({document,window,beforeOpen:()=>caseNavigation.sync(),onFullCase:(key,id,tile)=>{projectOpener=tile;caseNavigation.sync()}})},onError:()=>{const help=$('.category-story-help');help.textContent='Истории не загрузились. Квадраты открывают каталог с работами или описание направления.'}})();
+import('./bear-video.js?v=20261104-red7').catch(()=>{const status=$('#bear-keyboard-help');if(status)status.textContent='Анимация не загрузилась. Доступен статичный постер настоящей скульптуры.';$$('#rotate-toggle, #bear-reset').forEach(button=>button.disabled=true)});
 
 // Editorial tools are an explicit local mode, separate from the visitor experience.
 const reviewMode=new URLSearchParams(location.search).get('review')==='1';
 if(reviewMode&&typeof $('#review-dialog')?.showModal==='function'){
  $('#review-launch').hidden=false;
  $('#review-launch')?.addEventListener('click',()=>$('#review-dialog')?.showModal());
- import('./review-panel.js?v=20261022-identity').then(({initializeReviewPanel})=>initializeReviewPanel({document,download})).catch(()=>{
+ import('./review-panel.js?v=20261104-red7').then(({initializeReviewPanel})=>initializeReviewPanel({document,download})).catch(()=>{
   const status=$('#review-save-status');if(status){status.textContent='Панель заметок не загрузилась. Обновите страницу, чтобы попробовать снова.';status.dataset.state='error'}
   $$('#review-dialog textarea, #review-dialog select, #export-review').forEach(control=>control.disabled=true);
  });
 }
 
 // Optional catalogue enhancement: source links stay usable if this module fails.
-import('./publication-filters.js?v=20261026-team-profiles').then(({initializePublicationFilters})=>initializePublicationFilters({document})).catch(()=>{
+import('./publication-filters.js?v=20261104-red7').then(({initializePublicationFilters})=>initializePublicationFilters({document})).catch(()=>{
  $$('#publication-catalog [data-publication-category]').forEach(entry=>entry.hidden=false);
  const filters=$('#publication-filters');if(filters)filters.hidden=true;
  $$('#publication-tools, #publication-collapse, #publication-citation, #publication-sort-note, #publication-empty, [data-publication-copy]').forEach(control=>control.hidden=true);

@@ -1,7 +1,7 @@
-import {projects} from './project-data.js?v=20261026-directions';
-import {selectionIds} from './exploration-data.js?v=20261026-directions';
-import {createMediaSlot} from './portfolio-media.js?v=20261026-portfolio-tools';
-import {galleryArrow} from './dialog-controls.js?v=20261022-gallery';
+import {projects} from './project-data.js?v=20261104-red7';
+import {selectionIds} from './exploration-data.js?v=20261104-red7';
+import {createMediaSlot} from './portfolio-media.js?v=20261104-red7';
+import {galleryArrow} from './dialog-controls.js?v=20261104-red7';
 export function meetingFrames(ids){return selectionIds(ids.join(',')).flatMap(key=>projects[key].media.map((item,index)=>({key,item,index})))}
 export function meetingRoute(hash){
  if(typeof hash!=='string'||hash.length>140)return {ids:[],index:0};

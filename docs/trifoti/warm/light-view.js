@@ -1,9 +1,9 @@
-import {lightContext,modeLinks} from './view-context.js?v=20261026-directions';
-import {mediaId,mediaIndex} from './exploration-data.js?v=20261026-directions';
-import {projects} from './project-data.js?v=20261026-directions';
-import {thumbnailSource} from './media-utils.js?v=20261026-directions';
-import {createMediaSlot} from './portfolio-media.js?v=20261026-portfolio-tools';
-import {galleryArrow} from './dialog-controls.js?v=20261022-gallery';
+import {lightContext,modeLinks} from './view-context.js?v=20261104-red7';
+import {mediaId,mediaIndex} from './exploration-data.js?v=20261104-red7';
+import {projects} from './project-data.js?v=20261104-red7';
+import {thumbnailSource} from './media-utils.js?v=20261104-red7';
+import {createMediaSlot} from './portfolio-media.js?v=20261104-red7';
+import {galleryArrow} from './dialog-controls.js?v=20261104-red7';
 export function lightPreview(project,item){return thumbnailSource(item)}
 export function initializeLightView({document,window}){
  const mode=document.getElementById('light-posters');if(!mode)return null;

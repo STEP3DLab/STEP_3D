@@ -1,5 +1,5 @@
-import {projects as publishedProjects} from './project-data.js?v=20261026-directions';
-import {mediaId,countedNoun} from './exploration-data.js?v=20261026-directions';
+import {projects as publishedProjects} from './project-data.js?v=20261104-red7';
+import {mediaId,countedNoun} from './exploration-data.js?v=20261104-red7';
 
 export const storyProjects={...publishedProjects,
  'atlas-concept':{title:'Атлас с ажурным глобусом и колонкой',concept:true,attribution:'Концепт из предоставленного изображения. Изготовление не подтверждено.',media:[{type:'image',src:'concepts/atlas.webp',caption:'Концепт подставки под колонку: фигура Атласа и ажурный глобус. Статичное изображение, не интерактивная 3D-модель.'}]},
@@ -12,7 +12,7 @@ export const storyCategories=[
  {id:'interiors',title:'Дизайн интерьеров',service:'service-design',keys:[],intro:'Частные и офисные помещения. Опубликованных проектов этого направления пока нет.'},
  {id:'awards',title:'Награды',service:'service-awards',keys:Object.keys(publishedProjects).filter(k=>publishedProjects[k].direction==='Сувениры и призы')},
  {id:'industrial',title:'Промышленный дизайн',service:'service-industrial',keys:[],intro:'Форма и конструкция изделия с учётом назначения, материала и изготовления. Опубликованных проектов этого направления пока нет.'},
- {id:'artobjects',title:'Арт-объекты',service:'service-artobjects',keys:[],intro:'Арт-объекты для пространства и событий. Подтверждённые примеры пока не добавлены; этот раздел описывает направление, а не выполненный проект.'}
+ {id:'artobjects',title:'Арт-объекты',service:'service-artobjects',keys:['red7-panels']}
 ];
 export const categoryAliases=Object.freeze({design:'interiors',modelmaking:'industrial'});
 export const storyCategory=id=>storyCategories.find(category=>category.id===(categoryAliases[id]||id));

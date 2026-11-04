@@ -1,5 +1,5 @@
-import {projects} from './project-data.js?v=20261026-directions';
-import {visiblePortfolioTarget} from './portfolio-disclosure.js?v=20261026-directions';
+import {projects} from './project-data.js?v=20261104-red7';
+import {visiblePortfolioTarget} from './portfolio-disclosure.js?v=20261104-red7';
 export function bindSelectionButton({button,key,controller,status}){
  if(!projects[key])return ()=>{};
  button.hidden=false;button.type='button';button.setAttribute('aria-label','Добавить в подборку: '+projects[key].title);
