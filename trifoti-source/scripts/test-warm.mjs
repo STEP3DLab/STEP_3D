@@ -19,3 +19,4 @@ test('Cover link and deep link reveal the real sculpture block',async()=>{
  vm.runInNewContext(read('warm-ui.js'),{document:{querySelector:s=>s==='#original-bear details'?block:{addEventListener:(_,f)=>click=f}},location,window:{addEventListener:(_,f)=>hashchange=f}});
  click();assert.equal(block.open,true);block.open=false;location.hash='#original-bear';hashchange();assert.equal(block.open,true);
 });
+test('Warm branding uses blue edition emblem while preserving warm header and organization name',()=>{const h=read('index.html');assert.equal((h.match(/src="brand\/logo-original.jpg"/g)||[]).length,2);assert.match(h,/ТВОРЧЕСКОЕ ОБЪЕДИНЕНИЕ/);assert.match(read('warm-theme.css'),/\.header\{background:#a87c74/);assert.match(read('warm-theme.css'),/\.header nav a\{color:#241916/);assert.ok(statSync(path.join(warm,'brand/logo-original.jpg')).size>0);});

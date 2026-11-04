@@ -1,7 +1,7 @@
 /* Warm editorial edition. Original project media and all existing flows are retained. */
 :root{--paper:#f3eade;--ink:#30221e;--muted:#705e55;--line:#d4c1ad;--red:#6b172b;--red-text:#6b172b;--white:#fffaf3;--gold:#a58248}
 body{background:var(--paper);color:var(--ink)}
-.header{background:rgba(243,234,222,.96);border-color:var(--line)}
+.header{background:#a87c74;border-color:#8f695d;backdrop-filter:none}
 .button,.button:hover,.button-dark:hover{background:#6b172b;color:#fffaf3}
 .button:hover{background:#4e1020}.button-dark{background:#30221e}.button-light{background:#fffaf3;color:#4e1020}.button-light:hover{background:#ead8c2;color:#4e1020}
 .brand-final-image{mix-blend-mode:multiply}.red,.text-link:hover{color:#6b172b}
@@ -10,7 +10,7 @@ body{background:var(--paper);color:var(--ink)}
 .hero-copy{padding:25px 0 0}.hero h1{font-family:Oswald,Manrope,sans-serif;font-weight:500;font-size:clamp(55px,6.2vw,104px);line-height:1.05;letter-spacing:-.03em;width:100%}
 .hero h1 span{white-space:normal}.hero .eyebrow{margin-bottom:36px}.hero-description{max-width:420px;font-size:16px;line-height:1.8;margin-top:28px}.hero-location{margin-right:0}.hero-directions a{border-color:var(--line);background:transparent}.hero-directions a:hover{background:#e9d7c4;color:#4e1020}
 .hero-followthrough{padding:0 0 36px;align-self:end}.hero-signature{padding-right:0;border-top:1px solid var(--line);padding-top:18px;margin-top:32px;font-size:10px;gap:20px}
-.warm-hero-art{grid-column:2;grid-row:1 / span 2;margin:0;position:relative;background:#aa8274;min-width:0;overflow:hidden;border-radius:180px 180px 4px 4px;isolation:isolate}
+.warm-hero-art{grid-column:2;grid-row:1 / span 2;margin:0;position:relative;background:#a87c74;min-width:0;overflow:hidden;border-radius:180px 180px 4px 4px;isolation:isolate}
 .warm-hero-art>img{display:block;width:100%;height:620px;object-fit:cover;object-position:50% 50%;max-width:100%}
 .warm-hero-art figcaption{position:absolute;left:24px;right:24px;top:34px;display:flex;justify-content:space-between;gap:15px;color:#fffaf3;font-size:10px;line-height:1.5;text-shadow:0 1px 4px #39211e;letter-spacing:.04em}
 .warm-original-link{position:absolute;bottom:22px;left:22px;right:22px;display:flex;align-items:center;justify-content:space-between;gap:12px;background:#fffaf3ed;color:#4e1020;padding:15px 19px;font-size:12px;border:1px solid #e5ccae;min-height:48px}
@@ -35,3 +35,17 @@ body{background:var(--paper);color:var(--ink)}
 .contact .button{background:#6b172b;color:#fffaf3}
 .contact input,.contact textarea,.contact select{background:#fffaf3;color:#30221e}
 .footer{background:#f3eade;color:#30221e}
+
+/* Blue edition emblem and wordmark structure, with the warm edition typography colors. */
+.brand.brand-blue-origin{display:flex;align-items:center;gap:10px;width:auto;height:76px;flex-shrink:0;color:#241916}
+.warm-brand-mark{display:block;position:relative;overflow:hidden;border-radius:50%;width:49px;height:49px;flex-shrink:0;background:#092d50}
+.warm-brand-mark img{position:absolute;width:175%;height:auto;max-width:none;left:-37%;top:-7%;object-fit:initial;mix-blend-mode:normal}
+.warm-brand-type{font-family:Unbounded,Manrope,sans-serif;font-size:20px;letter-spacing:.07em;font-weight:600;line-height:1.2}
+.warm-brand-type small{display:block;font-family:Manrope,sans-serif;font-size:6px;font-weight:700;letter-spacing:.14em;margin-top:7px;color:inherit}
+.site-footer .footer-brand-blue-origin{display:flex;align-items:center;gap:12px;flex-shrink:0;color:#30221e;line-height:1.2}
+.header nav a{color:#241916}.header .menu-button{color:#241916;border-color:#241916}
+@media(max-width:1150px){.warm-brand-type{font-size:17px}.warm-brand-type small{font-size:5.5px}.warm-brand-mark{width:42px;height:42px}}
+@media(max-width:800px){.brand.brand-blue-origin{height:60px;gap:8px}.warm-brand-mark{width:38px;height:38px}.warm-brand-type{font-size:17px}.header nav{background:#a87c74}}
+@media(max-width:380px){.brand.brand-blue-origin{gap:6px}.warm-brand-type{font-size:15px}.warm-brand-type small{font-size:5px;letter-spacing:.08em}.warm-brand-mark{width:34px;height:34px}}
+.header nav a[aria-current="location"]{color:#241916}
+@media(min-width:801px) and (max-width:1000px){.header{gap:12px;padding-left:3%;padding-right:3%}.header nav{gap:12px}.header-cta{gap:10px}}
