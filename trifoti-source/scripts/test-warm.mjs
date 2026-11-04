@@ -1,0 +1,21 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync,readdirSync,statSync} from 'node:fs';
+import path from 'node:path';
+const root=path.resolve(import.meta.dirname,'../..');
+const warm=path.join(root,'trifoti/warm');
+const read=p=>readFileSync(path.join(warm,p),'utf8');
+const files=(dir)=>readdirSync(dir).flatMap(n=>{const f=path.join(dir,n);return statSync(f).isDirectory()?files(f):[f]});
+test('Warm mirror is byte identical',()=>{for(const f of files(warm))assert.deepEqual(readFileSync(f),readFileSync(path.join(root,'docs/trifoti/warm',path.relative(warm,f))));});
+test('Original project content is preserved',()=>assert.equal(read('project-data.js').replaceAll('/STEP_3D/trifoti/assets/','assets/'),readFileSync(path.join(root,'trifoti/project-data.js'),'utf8')));
+test('All nine static cases are retained',()=>assert.equal(readdirSync(path.join(warm,'cases')).filter(n=>n.endsWith('.html')).length,9));
+test('Visual concept is disclosed and original bear remains',()=>{const h=read('index.html');assert.match(h,/Художественная визуализация/);assert.match(h,/id="bear-video"/);assert.match(h,/id="bear-reset"/);assert.match(h,/id="rotate-toggle"/);assert.match(h,/Подлинное видео/);assert.equal((h.match(/<h1\b/g)||[]).length,2);});
+test('Category story order and honest empty categories stay unchanged',()=>{const h=read('index.html');assert.deepEqual([...h.matchAll(/data-story-category="([^"]+)"/g)].map(m=>m[1]),['interiors','sculpture','awards','modelmaking']);assert.equal((h.match(/Пока нет проектов/g)||[]).length,2);});
+test('Brief and keyboard modules remain unchanged',()=>{for(const f of ['brief-guard.js','brief-utils.js','header-navigation.js','dialog-controls.js'])assert.equal(read(f),readFileSync(path.join(root,'trifoti',f),'utf8'));});
+test('Warm root has own canonical and no analytics or submit backend',()=>{const h=read('index.html');assert.match(h,/rel="canonical" href="https:\/\/step3dlab.github.io\/STEP_3D\/trifoti\/warm\/"/);assert.doesNotMatch(h,/google-analytics|googletagmanager|formspree|<form[^>]*action=/);});
+test('Artwork delivery stays lightweight and deferred beyond hero',()=>{const visual=files(path.join(warm,'visuals'));assert.equal(visual.length,3);assert.ok(visual.reduce((s,p)=>s+statSync(p).size,0)<250000);assert.match(read('index.html'),/visuals\/bear.webp[^>]*fetchpriority="high"/);assert.match(read('index.html'),/visuals\/together.webp[^>]*loading="lazy"/);});
+test('Cover link and deep link reveal the real sculpture block',async()=>{
+ const vm=await import('node:vm');let click,hashchange;const block={open:false};const location={hash:''};
+ vm.runInNewContext(read('warm-ui.js'),{document:{querySelector:s=>s==='#original-bear details'?block:{addEventListener:(_,f)=>click=f}},location,window:{addEventListener:(_,f)=>hashchange=f}});
+ click();assert.equal(block.open,true);block.open=false;location.hash='#original-bear';hashchange();assert.equal(block.open,true);
+});
