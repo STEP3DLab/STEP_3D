@@ -228,3 +228,18 @@ test('480px story covers transfer about 63% fewer file bytes without new assets 
  assert.equal(originals,231310);assert.equal(small,85588);assert(small/originals<.371);
  assert.match(read('category-stories.js'),/slot\.show\(frame\.item,\{video:frame\.item\.type==='video'\}\)/);
 });
+
+
+test('Story contrast mode keeps opaque labels, structural progress and legible disabled controls',()=>{
+ const css=read('category-stories.css'),contrast=css.split('@media(forced-colors:active){')[1];
+ assert(contrast,'Stories must support the visitor’s forced-color palette');
+ assert.match(contrast,/\.category-tile-copy,\.is-intro \.category-tile-copy\{padding:6px;background:Canvas;color:CanvasText\}/);
+ assert.match(contrast,/\.category-story-tile\.has-photo::after\{background:none\}/);
+ assert.match(contrast,/\.story-progress span\{height:6px;border:1px solid CanvasText;background:Canvas\}/);
+ assert.match(contrast,/\.story-progress \.is-seen\{border-width:3px;border-color:Highlight;background:Canvas\}/);
+ assert.match(contrast,/\.story-controls button:disabled\{opacity:1;color:GrayText;border-color:GrayText\}/);
+ assert.match(contrast,/\.category-story-dialog :focus-visible\{outline-color:Highlight\}/);
+ assert.match(contrast,/\.story-actions a\{color:LinkText\}/);
+ assert.doesNotMatch(contrast,/forced-color-adjust\s*:\s*none|#[0-9a-f]{3,8}\b|display\s*:\s*none|opacity\s*:\s*0/);
+ assert.match(read('index.html'),/category-stories\.css\?[^"\n]+&amp;contrast=20261105/);
+});

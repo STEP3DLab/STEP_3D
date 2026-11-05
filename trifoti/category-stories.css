@@ -42,3 +42,20 @@
 /* Short screens keep the intact frame and its controls together; captions continue below. */
 @media(max-height:500px){.story-media,.story-media.story-intro-art{height:34dvh;min-height:110px}.category-story-dialog{max-height:calc(100dvh - 8px)}.story-shell h2{margin-bottom:8px}.story-controls{margin-top:8px}.story-rail{padding-top:10px}}
 @media(prefers-reduced-motion:reduce){.category-story-tile{transition:none}}
+
+/* Respect the visitor's contrast palette without relying on gradients or fill alone. */
+@media(forced-colors:active){
+ .category-story-tile{border-color:LinkText;background:Canvas;color:LinkText}
+ .category-story-tile.has-photo::after{background:none}
+ .category-tile-copy,.is-intro .category-tile-copy{padding:6px;background:Canvas;color:CanvasText}
+ .category-tile-count,.is-intro .category-tile-count{color:CanvasText}
+ .category-tile-cta,.is-intro .category-tile-cta,.category-story-tile:hover .category-tile-cta{background:Canvas;border-color:LinkText;color:LinkText}
+ .category-story-tile:focus-visible,.category-story-tile:hover,.category-story-dialog :focus-visible{outline-color:Highlight}
+ .category-story-dialog,.story-top,.story-media,.story-media.story-intro-art{background:Canvas;color:CanvasText;border-color:CanvasText}
+ .story-counter,.story-credit,.story-end,#story-help{color:CanvasText}
+ .story-progress span{height:6px;border:1px solid CanvasText;background:Canvas}
+ .story-progress .is-seen{border-width:3px;border-color:Highlight;background:Canvas}
+ .story-controls button,.story-top button,#story-retry,#story-next,#story-restart{background:ButtonFace;color:ButtonText;border-color:ButtonText}
+ .story-controls button:disabled{opacity:1;color:GrayText;border-color:GrayText}
+ .story-actions a{color:LinkText}
+}
