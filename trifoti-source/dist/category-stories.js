@@ -15,6 +15,10 @@ export function mountCategoryStories({document,window,onFullCase=()=>{},beforeOp
  const navigation=createStoryNavigation({location:window.location,history:window.history,onOpen:render,onClose:()=>{if(dialog.open)dialog.close();slot.clear()}});
  function render(route){
   current=route;beforeOpen();const category=storyCategory(route.category),frames=storyFrames(category.id),frame=frames[route.index],project=frame&&projects[frame.key];
+  // Removing focused media or hiding a control can move native focus to <body>.
+  // Remember it before the update; leave surviving controls and initial opening alone.
+  const previousFocus=dialog.open&&dialog.contains(document.activeElement)?document.activeElement:null;
+  const replacingFocusedMedia=previousFocus&&previousFocus!==get('media')&&get('media').contains(previousFocus);
   get('category').textContent=category.title;get('title').textContent=project?.title||category.title;
   get('counter').textContent=frame?`Проект ${category.keys.indexOf(frame.key)+1} из ${category.keys.length} · Кадр ${frame.index+1} из ${project.media.length}`:'О направлении · 1 из 1';
   get('caption').textContent=frame?frame.item.caption:category.intro;
@@ -27,11 +31,12 @@ export function mountCategoryStories({document,window,onFullCase=()=>{},beforeOp
   if(frame){get('original').href=frame.item.src;get('original').textContent=frame.item.type==='video'?'Открыть исходное видео ↗':'Открыть исходное фото ↗';slot.show(frame.item,{video:frame.item.type==='video'});get('media').classList.remove('story-intro-art')}
   else{slot.clear();get('media').classList.add('story-intro-art');get('media').dataset.direction=category.id}
   // A new frame starts at its image, even after using the lower controls on a short screen.
-  if(dialog.open&&dialog.scrollTop>0&&[get('prev'),get('next'),get('restart')].includes(document.activeElement))get('media').focus({preventScroll:true});
+  if(dialog.open&&dialog.scrollTop>0&&[get('prev'),get('next'),get('restart')].includes(previousFocus))get('media').focus({preventScroll:true});
   if(!dialog.open)dialog.showModal();
   dialog.scrollTop=0;
   // Do not leave keyboard focus on a control hidden by a boundary transition.
-  if(document.activeElement?.hidden||document.activeElement?.disabled)get('restart').hidden?get('close').focus():get('restart').focus();
+  if(replacingFocusedMedia)get('close').focus({preventScroll:true});
+  else if((previousFocus?.hidden||previousFocus?.disabled)&&[previousFocus,document.body].includes(document.activeElement))(get('restart').hidden?get('close'):get('restart')).focus({preventScroll:true});
  }
  function step(delta){if(!current)return;const frames=storyFrames(current.category),index=current.index+delta;if(index<0||index>=frames.length)return;const frame=frames[index];navigation.frame(current.category,frame.key,frame.id)}
  for(const tile of tiles){tile.setAttribute('aria-haspopup','dialog');tile.setAttribute('aria-controls',dialog.id);tile.addEventListener('click',event=>{if(event.defaultPrevented||event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;event.preventDefault();opener=tile;navigation.open(tile.dataset.storyCategory)})}

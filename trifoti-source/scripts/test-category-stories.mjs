@@ -59,16 +59,20 @@ class Node{
  get scrollTop(){return this._scrollTop||0}set scrollTop(value){if(this.tagName!=='DIALOG'||this.open)this._scrollTop=value}
  addEventListener(type,fn){(this.listeners[type]??=[]).push(fn)}
  emit(type,extra={}){const event={button:0,target:this,key:'',preventDefault(){this.defaultPrevented=true},...extra};for(const fn of this.listeners[type]||[])fn(event);return event}
- append(...nodes){for(const node of nodes){node.parentElement=this;this.children.push(node)}}replaceChildren(...nodes){this.children=[];this.append(...nodes)}
+ append(...nodes){for(const node of nodes){node.parentElement=this;this.children.push(node)}}
+ contains(other){return other===this||this.children.some(node=>node.contains(other))}
+ replaceChildren(...nodes){for(const node of this.children){if(node.contains(this.document.activeElement))this.document.activeElement=this.document.body;node.parentElement=null}this.children=[];this.append(...nodes)}
  setAttribute(k,v){this.attrs[k]=v}removeAttribute(k){delete this.attrs[k]}
- focus(){this.document.activeElement=this}pause(){this.paused=(this.paused||0)+1}load(){}
+ focus(options){this.document.activeElement=this;this.focusOptions=options}pause(){this.paused=(this.paused||0)+1}load(){}
  closest(selector){if(selector.includes('video')&&this.tagName==='VIDEO')return this;return null}
  showModal(){this.open=true}close(){this.open=false;this.emit('close')}scrollIntoView(){}querySelector(){return this.summary}
 }
 function mounted(hash='#projects'){
  const window=browser(hash),nodes={},document={hidden:false,activeElement:null,createElement:tag=>new Node(tag,document),getElementById:id=>nodes[id],listeners:{},addEventListener(type,fn){(this.listeners[type]??=[]).push(fn)}};
+ document.body=new Node('body',document);
  const dialog=nodes['category-story-dialog']=new Node('dialog',document);dialog.id='category-story-dialog';
  for(const id of ['category','title','counter','caption','credit','full-case','direction','progress','prev','next','restart','end','retry','original','media','status','close'])nodes['story-'+id]=new Node(['prev','next','restart','retry','close'].includes(id)?'button':'div',document);
+ dialog.append(...Object.entries(nodes).filter(([id])=>id.startsWith('story-')).map(([,node])=>node));
  const tiles=storyCategories.map(c=>{const tile=new Node('a',document);tile.dataset.storyCategory=c.id;return tile});document.querySelectorAll=()=>tiles;
  let caseOpen=false,fullCase;const cases=createProjectNavigation({...window,keys:Object.keys(projects),onOpen:(key,id)=>{assert(!dialog.open);caseOpen=true;fullCase={key,id}},onClose:()=>caseOpen=false});
  const controller=mountCategoryStories({document,window,beforeOpen:()=>cases.sync(),onFullCase:()=>cases.sync()});
@@ -242,4 +246,59 @@ test('Story contrast mode keeps opaque labels, structural progress and legible d
  assert.match(contrast,/\.story-actions a\{color:LinkText\}/);
  assert.doesNotMatch(contrast,/forced-color-adjust\s*:\s*none|#[0-9a-f]{3,8}\b|display\s*:\s*none|opacity\s*:\s*0/);
  assert.match(read('index.html'),/category-stories\.css\?[^"\n]+&amp;contrast=20261105/);
+});
+
+// The native browser blurs removed media and controls made hidden or disabled.
+function blurOnChange(node,property,document){
+ let value=node[property];Object.defineProperty(node,property,{get:()=>value,set:next=>{value=next;if(next&&document.activeElement===node)document.activeElement=document.body}});
+}
+test('Replacing a focused video through a story route restores the persistent close control',()=>{
+ for(const hash of ['#stories/sculpture/mascot/white-front','#stories/sculpture/gesture/gesture-turntable','#stories/modelmaking/intro']){
+  const f=mounted('#stories/sculpture/mascot/clay-turntable'),video=f.nodes['story-media'].children[0];video.focus();
+  f.window.location.hash=hash;f.window.emit('hashchange');
+  assert.equal(video.paused,1);assert.equal(f.document.activeElement,f.nodes['story-close']);assert.deepEqual(f.nodes['story-close'].focusOptions,{preventScroll:true});assert(f.dialog.contains(f.document.activeElement));
+ }
+});
+test('Back and Forward recover focus from replaced video without adding history entries',()=>{
+ const f=mounted('#stories/sculpture/mascot/clay-turntable');
+ f.window.history.pushState({},'','#stories/sculpture/gesture/gesture-turntable');f.window.emit('hashchange');
+ for(let i=0;i<3;i++)for(const direction of ['back','forward']){
+  f.nodes['story-media'].children[0].focus();f.window.history[direction]();f.window.emit('popstate');f.window.emit('hashchange');
+  assert.equal(f.document.activeElement,f.nodes['story-close']);assert.equal(f.window.history.length,2);
+ }
+});
+test('Story rerenders preserve a surviving media container, close button, link or next button',()=>{
+ for(const id of ['media','close','original','next']){
+  const f=mounted();f.open('sculpture');f.nodes['story-'+id].focus();
+  f.window.location.hash='#stories/sculpture/mascot/white-side';f.window.emit('hashchange');
+  assert.equal(f.document.activeElement,f.nodes['story-'+id]);
+ }
+});
+test('A hidden next button receives a visible restart replacement even after native blur',()=>{
+ const frames=storyFrames('awards'),previous=frames.at(-2),f=mounted(storyRoute('awards',previous.key,previous.id));
+ blurOnChange(f.nodes['story-next'],'hidden',f.document);f.nodes['story-next'].focus();f.click('next');
+ assert(f.nodes['story-next'].hidden);assert.equal(f.document.activeElement,f.nodes['story-restart']);assert.deepEqual(f.nodes['story-restart'].focusOptions,{preventScroll:true});
+ blurOnChange(f.nodes['story-restart'],'hidden',f.document);f.click('restart');assert.equal(f.document.activeElement,f.nodes['story-close']);
+});
+test('A disabled previous button receives visible focus recovery even after native blur',()=>{
+ const f=mounted('#stories/sculpture/mascot/white-side');blurOnChange(f.nodes['story-prev'],'disabled',f.document);f.nodes['story-prev'].focus();f.click('prev');
+ assert(f.nodes['story-prev'].disabled);assert.equal(f.document.activeElement,f.nodes['story-close']);
+});
+test('Retrying an unavailable frame does not leave focus on body when its retry control disappears',()=>{
+ const f=mounted();f.open('awards');f.nodes['story-media'].children[0].emit('error');assert(!f.nodes['story-retry'].hidden);
+ blurOnChange(f.nodes['story-retry'],'hidden',f.document);f.nodes['story-retry'].focus();f.click('retry');
+ assert(f.nodes['story-retry'].hidden);assert.equal(f.document.activeElement,f.nodes['story-close']);
+});
+test('Story focus repair never pulls a target from outside the dialog',()=>{
+ const f=mounted();f.open('awards');const outside=new Node('button',f.document);outside.disabled=true;outside.focus();f.click('next');assert.equal(f.document.activeElement,outside);
+});
+test('Focus recovery release updates both the entry module and the lazy story import',()=>{
+ assert.match(read('index.html'),/app\.js\?[^"\n]+&amp;focus=20261105/);
+ assert.match(read('app.js'),/category-stories\.js\?[^'\n]+&focus=20261105/);
+});
+test('Scrolled boundary transitions retain the newly focused frame instead of the hidden control',()=>{
+ for(const [hash,id,property] of [['#stories/sculpture/mascot/white-side','prev','disabled'],['#stories/awards/vmeste-prize/vmeste-prize','restart','hidden']]){
+  const f=mounted(hash);blurOnChange(f.nodes['story-'+id],property,f.document);f.dialog.scrollTop=420;f.nodes['story-'+id].focus();f.click(id);
+  assert.equal(f.document.activeElement,f.nodes['story-media']);assert.equal(f.dialog.scrollTop,0);
+ }
 });
