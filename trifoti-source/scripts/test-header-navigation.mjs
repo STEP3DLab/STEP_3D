@@ -10,7 +10,7 @@ function fixture(desktop=false){
  const listeners=new Map();
  const document={activeElement:null};
  const on=(target,type,fn)=>{const key=target+':'+type;listeners.set(key,[...(listeners.get(key)||[]),fn]);};
- const emit=(target,type,props={})=>{const event={type,target:elements[target],...props};for(const fn of listeners.get(target+':'+type)||[])fn(event);return event;};
+ const emit=(target,type,props={})=>{const event={type,button:0,target:elements[target],...props};for(const fn of listeners.get(target+':'+type)||[])fn(event);return event;};
  function element(id,parent=null){return {id,parent,attrs:{},classes:new Set(),focusOptions:null,
   setAttribute(key,value){this.attrs[key]=value},getAttribute(key){return this.attrs[key]},
   addEventListener(type,fn){on(id,type,fn)},contains(other){while(other){if(other===this)return true;other=other.parent;}return false},
@@ -81,4 +81,34 @@ test('Resize preserves focus on visible links, CTA, brand and unrelated page con
 test('Repeated breakpoint changes reset open state without duplicate listeners or asynchronous focus work',()=>{
  const f=fixture();assert.equal(f.listeners.get('media:change').length,1);for(let i=0;i<8;i++){f.open();f.resize(true);f.resize(false);assert(!f.expanded());assert.equal(f.document.activeElement,f.elements.menu);}
  assert(!/scrollIntoView|requestAnimationFrame|prefers-reduced-motion/.test(code));
+});
+
+// A new-tab/window action stays in the browser's control. Closing the disclosure
+// here would remove the still-current keyboard target from the original page.
+for(const fields of [{ctrlKey:true},{metaKey:true},{shiftKey:true},{altKey:true},{button:1},{button:2},{defaultPrevented:true}])test(`Header preserves the current menu and focus for native/handled link action ${JSON.stringify(fields)}`,()=>{
+ const f=fixture();
+ for(const target of [f.elements.brand,...f.links,f.elements.cta]){
+  f.open();target.focus();let prevented=false;
+  f.emit(target.id,'click',{...fields,preventDefault(){prevented=true}});
+  assert(f.expanded());assert(f.elements.nav.classes.has('open'));
+  assert.equal(f.document.activeElement,target);assert.equal(prevented,false);
+  // The bubbling document listener must not undo the link's decision.
+  f.emit('document','click',{target,...fields});assert(f.expanded());
+  f.emit('document','keydown',{key:'Escape'});
+ }
+});
+test('A modified menu link can be followed by ordinary keyboard activation, Escape or outside dismissal',()=>{
+ const f=fixture();
+ for(const finish of ['activate','escape','outside']){
+  f.open();f.links[2].focus();f.emit('link2','click',{ctrlKey:true});assert(f.expanded());
+  if(finish==='activate')f.emit('link2','click',{detail:0});
+  if(finish==='escape')f.emit('document','keydown',{key:'Escape'});
+  if(finish==='outside'){f.elements.hero.focus();f.emit('document','click',{target:f.elements.hero})}
+  assert(!f.expanded());assert(!f.elements.nav.classes.has('open'));
+  assert.equal(f.document.activeElement,finish==='escape'?f.elements.menu:finish==='outside'?f.elements.hero:f.links[2]);
+ }
+});
+test('Desktop modified link actions preserve visible focus and the closed disclosure state',()=>{
+ const f=fixture(true);f.links[1].focus();f.emit('link1','click',{metaKey:true});
+ assert(!f.expanded());assert.equal(f.document.activeElement,f.links[1]);
 });

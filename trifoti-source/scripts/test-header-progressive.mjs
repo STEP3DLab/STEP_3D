@@ -10,7 +10,7 @@ function fixture({desktop = false, active = null, initialize = true} = {}) {
     listeners.set(key, [...(listeners.get(key) || []), fn]);
   };
   const emit = (id, type, fields = {}) => {
-    const event = {type, target: elements[id], ...fields};
+    const event = {type, button: 0, target: elements[id], ...fields};
     for (const fn of listeners.get(`${id}:${type}`) || []) fn(event);
     return event;
   };

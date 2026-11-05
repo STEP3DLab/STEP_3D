@@ -16,7 +16,12 @@ export function initializeHeaderNavigation({document, window}) {
     nav.classList.toggle('open', open);
   }
   menu.addEventListener('click', () => setMenuOpen(menu.getAttribute('aria-expanded') !== 'true'));
-  header.querySelectorAll('a').forEach(link => link.addEventListener('click', () => setMenuOpen(false)));
+  header.querySelectorAll('a').forEach(link => link.addEventListener('click', event => {
+    // Keep the current page and its focused link intact when the browser opens
+    // another tab/window or an earlier handler has already handled the action.
+    if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    setMenuOpen(false);
+  }));
   document.addEventListener('keydown', event => {
     if (event.key === 'Escape' && menu.getAttribute('aria-expanded') === 'true') {
       setMenuOpen(false);
