@@ -189,3 +189,42 @@ test('Short-height stories keep 44px navigation before captions without changing
  const html=read('index.html'),css=read('category-stories.css');assert(html.indexOf('id="story-media"')<html.indexOf('class="story-controls"'));assert(html.indexOf('class="story-controls"')<html.indexOf('id="story-caption"'));
  assert.match(css,/@media\(max-height:500px\)\{\.story-media,\.story-media\.story-intro-art\{height:34dvh;min-height:110px\}/);assert.match(css,/\.story-controls button,#story-retry\{min-height:44px/);assert.match(css,/height:min\(60dvh,620px\);min-height:260px/);assert.match(css,/\.story-media\{height:58dvh;min-height:280px/);
 });
+
+
+test('Story covers use verified responsive files while retaining original fallback, dimensions and lazy loading',()=>{
+ const manifest=JSON.parse(readFileSync(new URL('./responsive-images.json',import.meta.url),'utf8'));
+ const markup=read('index.html').split('<!-- category-stories:start -->')[1].split('<!-- category-stories:end -->')[0];
+ const images=[...markup.matchAll(/<img\b[^>]+>/g)].map(match=>match[0]);
+ const covers=storyCategories.filter(category=>category.cover).map(category=>projects[category.cover].media[0]);
+ assert.equal(images.length,2);assert.equal(images.length,covers.length);
+ for(const [index,cover] of covers.entries()){
+  const src=cover.poster||cover.src,info=manifest.find(image=>image.src===src),image=images[index];
+  assert(info);assert(image.includes(`src="${src}"`));assert(image.includes(`width="${info.width}" height="${info.height}"`));
+  const expected=[...info.variants.map(variant=>`${variant.src} ${variant.width}w`),`${src} ${info.width}w`].join(', ');
+  assert(image.includes(`srcset="${expected}"`));assert(image.includes('alt=""'));assert(image.includes('loading="lazy" decoding="async"'));
+  for(const item of [{src:info.src,bytes:info.bytes},...info.variants])assert.equal(readFileSync(new URL('../dist/'+item.src,import.meta.url)).length,item.bytes);
+  assert.equal(createHash('sha256').update(readFileSync(new URL('../dist/'+src,import.meta.url))).digest('hex'),info.sha256);
+ }
+});
+test('Story cover sizes follow the two/four-column grid, section padding and borders at every breakpoint',()=>{
+ const html=read('index.html').split('<!-- category-stories:start -->')[1].split('<!-- category-stories:end -->')[0];
+ const sizes='(max-width:500px) calc(45vw - 8px), (max-width:800px) calc(45vw - 11px), (max-width:900px) calc(45.5vw - 11px), calc(22.75vw - 17px)';
+ assert.equal(html.split(`sizes="${sizes}"`).length-1,2);
+ for(const width of [320,390,500,501,800,801,820,900,901,1280,1920]){
+  const columns=width<=900?2:4,gap=width<=500?12:width<=900?18:20,padding=width<=800?.05:.045;
+  const actual=(width*(1-2*padding)-(columns-1)*gap)/columns-2;
+  const declared=width<=500?width*.45-8:width<=800?width*.45-11:width<=900?width*.455-11:width*.2275-17;
+  assert(Math.abs(actual-declared)<.001,`Viewport ${width}`);
+ }
+ const css=read('category-stories.css');assert.match(css,/grid-template-columns:repeat\(4,minmax\(0,1fr\)\);gap:20px/);
+ assert.match(css,/@media\(max-width:900px\)\{\.category-stories\{grid-template-columns:repeat\(2,minmax\(0,1fr\)\);gap:18px/);
+ assert.match(css,/@media\(max-width:500px\)\{\.category-stories\{gap:12px/);
+});
+test('480px story covers transfer about 63% fewer file bytes without new assets or changing gallery sources',()=>{
+ const manifest=JSON.parse(readFileSync(new URL('./responsive-images.json',import.meta.url),'utf8'));
+ const covers=storyCategories.filter(category=>category.cover).map(category=>projects[category.cover].media[0]);
+ const rows=covers.map(cover=>manifest.find(image=>image.src===(cover.poster||cover.src)));
+ const originals=rows.reduce((sum,row)=>sum+row.bytes,0),small=rows.reduce((sum,row)=>sum+row.variants.find(item=>item.width===480).bytes,0);
+ assert.equal(originals,231310);assert.equal(small,85588);assert(small/originals<.371);
+ assert.match(read('category-stories.js'),/slot\.show\(frame\.item,\{video:frame\.item\.type==='video'\}\)/);
+});
