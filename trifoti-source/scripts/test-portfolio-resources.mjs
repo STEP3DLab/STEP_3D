@@ -56,7 +56,7 @@ class Node{
  addEventListener(type,fn){(this.listeners[type]??=[]).push(fn)}
  emit(type,extra={}){const event={button:0,key:'',target:this,preventDefault(){this.defaultPrevented=true},...extra};for(const fn of this.listeners[type]||[])fn(event);return event}
  append(...nodes){for(const node of nodes){node.parent=this;this.children.push(node)}}
- replaceChildren(...nodes){for(const n of this.children)n.parent=null;this.children=[];this.append(...nodes)}
+ replaceChildren(...nodes){if(this.children.some(n=>n.contains(this.doc.activeElement)))this.doc.activeElement=this.doc.body;for(const n of this.children)n.parent=null;this.children=[];this.append(...nodes)}
  setAttribute(k,v){this.attrs[k]=v} removeAttribute(k){delete this.attrs[k];if(k==='src')delete this.src}
  focus(){this.doc.activeElement=this} scrollIntoView(){this.scrolled=true} pause(){this.paused=(this.paused||0)+1}load(){this.loaded=(this.loaded||0)+1}
  closest(selector){return selector.includes('video')&&['VIDEO','INPUT','TEXTAREA','SELECT'].includes(this.tagName)?this:null}
@@ -67,6 +67,9 @@ class Node{
 function fixture(hash='#show/mascot,gesture/0'){
  const nodes={},listeners={},changes=[];const document={hidden:false,activeElement:null,createElement:tag=>new Node(tag,document),getElementById:id=>nodes[id],addEventListener(type,fn){(listeners[type]??=[]).push(fn)},querySelectorAll(){return []},querySelector(selector){return selector==='.meeting-top'?{getBoundingClientRect:()=>({height:78})}:null}};
  for(const id of ['meeting-player','meeting-media','meeting-media-status','meeting-load','meeting-case','meeting-exit','meeting-title','meeting-direction','meeting-caption','meeting-credit','meeting-counter','meeting-case-link','meeting-sources','meeting-prev','meeting-next','meeting-empty','meeting-skip','meeting-stage','light-posters','light-mode'])nodes[id]=new Node(id==='meeting-case'?'select':id==='light-posters'?'input':id.endsWith('-next')||id.endsWith('-prev')||id.endsWith('-load')?'button':'div',document);
+ document.body=new Node('body',document);document.activeElement=document.body;
+ nodes['meeting-stage'].append(nodes['meeting-media'],nodes['meeting-sources'],nodes['meeting-load']);
+ nodes['meeting-player'].append(nodes['meeting-prev'],nodes['meeting-next'],nodes['meeting-case'],nodes['meeting-stage']);
  const window={location:{hash},history:{state:{existing:true},replaceState(state,_,hash){changes.push([state,hash]);window.location.hash=hash}},addEventListener(type,fn){(listeners[type]??=[]).push(fn)}};
  return {document,window,nodes,changes,emit(type,event={}){for(const fn of listeners[type]||[])fn({target:nodes['meeting-next'],preventDefault(){this.defaultPrevented=true},...event})}};
 }
@@ -117,6 +120,46 @@ test('Meeting moves focus from removed dynamic sources to the stable stage',()=>
  const source=f.nodes['meeting-sources'].children[0].children[0];source.focus();
  f.emit('keydown',{key:'End',target:source});
  assert.equal(f.document.activeElement,f.nodes['meeting-stage']);assert.equal(f.nodes['meeting-title'].textContent,projects.pink.title);
+});
+for(const event of ['hashchange','popstate']){
+ test(`Meeting ${event} preserves a visible focus target before removing video controls`,()=>{
+  const f=fixture('#show/gesture,pink/0');initializeMeeting(f);
+  f.nodes['meeting-load'].emit('click');const video=f.nodes['meeting-media'].children[0];video.focus();
+  f.window.location.hash='#show/gesture,pink/1';f.emit(event);
+  assert.equal(f.document.activeElement,f.nodes['meeting-stage']);
+  assert.equal(f.nodes['meeting-title'].textContent,projects.pink.title);
+  assert.equal(f.nodes['meeting-counter'].textContent,'2 / 3');
+  assert.equal(video.paused,1);assert.equal(video.src,undefined);
+  assert.equal(f.nodes['meeting-media'].children[0].src,projects.pink.media[0].src);
+  assert.equal(f.changes.length,0);
+ });
+ test(`Meeting ${event} leaves stable navigation focus alone`,()=>{
+  for(const id of ['meeting-exit','meeting-next','meeting-case']){
+   const f=fixture('#show/gesture,pink/0');initializeMeeting(f);f.nodes[id].focus();
+   f.window.location.hash='#show/gesture,pink/1';f.emit(event);
+   assert.equal(f.document.activeElement,f.nodes[id],id);
+  }
+ });
+ test(`Meeting ${event} returns focus outside a player hidden by an invalid route`,()=>{
+  const f=fixture('#show/gesture,pink/0');initializeMeeting(f);
+  f.nodes['meeting-load'].emit('click');const video=f.nodes['meeting-media'].children[0];video.focus();
+  f.window.location.hash='#bad';f.emit(event);
+  assert.equal(f.document.activeElement,f.nodes['meeting-exit']);
+  assert.equal(f.nodes['meeting-player'].hidden,true);assert.equal(f.nodes['meeting-empty'].hidden,false);
+  assert.equal(f.nodes['meeting-media'].children.length,0);assert.equal(video.paused,1);
+  assert.equal(f.nodes['meeting-exit'].href,'index.html#projects');
+ });
+}
+test('Meeting repeated route events keep the current video and its native focus',()=>{
+ const f=fixture('#show/gesture,pink/0');initializeMeeting(f);
+ f.nodes['meeting-load'].emit('click');const video=f.nodes['meeting-media'].children[0];video.focus();
+ f.emit('popstate');f.emit('hashchange');
+ assert.equal(f.document.activeElement,video);assert.equal(f.nodes['meeting-media'].children[0],video);
+ assert.equal(video.paused,undefined);assert.equal(f.changes.length,0);
+});
+test('Meeting an invalid route does not steal focus from outside the player',()=>{
+ const f=fixture('#show/gesture,pink/0');initializeMeeting(f);f.nodes['meeting-skip'].focus();
+ f.window.location.hash='#bad';f.emit('hashchange');assert.equal(f.document.activeElement,f.nodes['meeting-skip']);
 });
 test('Lightweight native request measurements reconcile and prove a bounded reduction',()=>{
  const measurements=JSON.parse(readFileSync(new URL('./lightweight-measurements.json',import.meta.url),'utf8'));

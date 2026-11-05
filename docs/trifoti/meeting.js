@@ -26,7 +26,18 @@ export function initializeMeeting({document,window}){
   exit.href='index.html?from=meeting#explore/'+ids.join(',');
   if(displaced)get('meeting-stage').focus({preventScroll:true});
  }
- function sync(){const route=meetingRoute(window.location.hash);if(ids.join(',')===route.ids.join(',')&&index===route.index&&frames.length)return;ids=route.ids;index=route.index;frames=meetingFrames(ids);slot.clear();player.hidden=!frames.length;get('meeting-empty').hidden=!!frames.length;exit.href=ids.length?'index.html?from=meeting#explore/'+ids.join(','):'index.html#projects';select.replaceChildren();for(const key of ids){const option=document.createElement('option');option.value=key;option.textContent=projects[key].title;select.append(option)}if(frames.length)render();}
+ function sync(){
+  const route=meetingRoute(window.location.hash);
+  if(ids.join(',')===route.ids.join(',')&&index===route.index&&frames.length)return;
+  ids=route.ids;index=route.index;frames=meetingFrames(ids);
+  const leavingPlayer=!frames.length&&player.contains(document.activeElement);
+  player.hidden=!frames.length;get('meeting-empty').hidden=!!frames.length;
+  exit.href=ids.length?'index.html?from=meeting#explore/'+ids.join(','):'index.html#projects';
+  select.replaceChildren();for(const key of ids){const option=document.createElement('option');option.value=key;option.textContent=projects[key].title;select.append(option)}
+  // render must see focused media before replacing it so it can restore focus.
+  if(frames.length)render();
+  else{slot.clear();if(leavingPlayer)exit.focus({preventScroll:true})}
+ }
  function go(next){if(!frames.length)return;index=(next+frames.length)%frames.length;window.history.replaceState(window.history.state,'',meetingHash(ids,index));render()}
  get('meeting-prev').addEventListener('click',()=>go(index-1));get('meeting-next').addEventListener('click',()=>go(index+1));
  select.addEventListener('change',()=>{const next=frames.findIndex(frame=>frame.key===select.value);if(next>=0)go(next)});
