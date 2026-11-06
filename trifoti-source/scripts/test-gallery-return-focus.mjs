@@ -7,7 +7,7 @@ import {visiblePortfolioTarget} from '../dist/portfolio-disclosure.js';
 const app=readFileSync(new URL('../dist/app.js',import.meta.url),'utf8');
 // Exercise the shipped close handler and its helper, not a parallel implementation.
 function fixture({mode='back',source='comparison',open=false}={}){
- const focus=[],scroll=[],listeners=[],frames=[],document={activeElement:null};let close;
+ const focus=[],scroll=[],listeners=[],tasks=[],document={activeElement:null};let close;
  const node=(id,extra={})=>({id,isConnected:true,hidden:false,dataset:{},parentElement:null,
   closest(){return null},getAttribute(){return null},focus(options){document.activeElement=this;focus.push({id,options})},
   scrollIntoView(options){scroll.push({id,options})},...extra});
@@ -19,24 +19,24 @@ function fixture({mode='back',source='comparison',open=false}={}){
   photoDetail:{reset(){}},slideRevision:0,clearMediaWait(){},releaseGalleryVideo(){},$$:()=>[],
   caseNavigation:{closed:()=>mode},
   $:selector=>selector==='[data-project="mascot"]'?card:selector==='#all-projects-summary'?catalog:null,
-  window:{addEventListener(type,fn,options){listeners.push({type,fn,options})}},requestAnimationFrame:fn=>frames.push(fn)};
+  window:{addEventListener(type,fn,options){listeners.push({type,fn,options})}},setTimeout(fn,delay){assert.equal(delay,0);tasks.push(fn)}};
  vm.createContext(context);
  const start=app.indexOf('function rememberProjectOpener(');
  if(start>=0)vm.runInContext(app.slice(start,app.indexOf('\nfunction showSlide(',start)),context);
  if(context.rememberProjectOpener)context.rememberProjectOpener(opener);else context.projectOpener=opener;
  vm.runInContext(app.split('\n').find(line=>line.startsWith("projectDialog.addEventListener('close'")),context);
- return {context,opener,card,catalog,summary,panel,outside,document,focus,scroll,listeners,frames,close,
+ return {context,opener,card,catalog,summary,panel,outside,document,focus,scroll,listeners,tasks,close,
   removeOpener(){opener.isConnected=false;opener.closest=()=>null},
-  settle(){for(const entry of listeners.splice(0)){assert.equal(entry.type,'popstate');assert.equal(entry.options.once,true);entry.fn()}for(const fn of frames.splice(0))fn()}};
+  settle(){for(const entry of listeners.splice(0)){assert.equal(entry.type,'popstate');assert.equal(entry.options.once,true);entry.fn()}for(const fn of tasks.splice(0))fn()}};
 }
 
 test('Removing a comparison opener returns to its stable selection summary, not a distant card',()=>{
  const f=fixture();f.removeOpener();f.close();assert.equal(f.document.activeElement,f.summary);assert.equal(f.focus.length,1);
  assert.equal(f.scroll[0].id,'explore-summary');f.settle();assert.equal(f.scroll.at(-1).id,'explore-summary');
 });
-test('Return is revealed after Back scroll restoration as well as immediately',()=>{
+test('Return waits until the popstate task ends, after native Back scroll restoration',()=>{
  const f=fixture();f.removeOpener();f.close();assert.equal(f.listeners.length,1);assert.equal(f.scroll.length,1);
- f.listeners.shift().fn();assert.equal(f.scroll.length,1);assert.equal(f.frames.length,1);f.frames.shift()();assert.equal(f.scroll.length,2);
+ f.listeners.shift().fn();assert.equal(f.scroll.length,1);assert.equal(f.tasks.length,1);f.tasks.shift()();assert.equal(f.scroll.length,2);
  assert.equal(f.scroll[1].options.block,'center');assert.equal(f.scroll[1].options.behavior,'instant');
 });
 test('Unchanged comparison opener keeps native context and avoids extra scrolling',()=>{

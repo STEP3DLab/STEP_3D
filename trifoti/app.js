@@ -86,10 +86,10 @@ function restoreProjectFocus(mode){
  const target=visiblePortfolioTarget(projectOpener)&&openerMatches?projectOpener:visiblePortfolioTarget(projectOpenerFallback)?projectOpenerFallback:visiblePortfolioTarget(card)?card:$('#all-projects-summary');
  target?.focus({preventScroll:mode!=='fallback'});
  if(!target||target===projectOpener)return;
- // Back restores the old page scroll after popstate. Reveal a replacement
- // target again on the next frame, unless focus or the dialog has moved on.
+ // Back restores the old page scroll after popstate. Wait for that event
+ // task to finish; an animation frame can run before native restoration.
  const reveal=()=>{if(!projectDialog.open&&document.activeElement===target&&visiblePortfolioTarget(target))target.scrollIntoView({block:'center',behavior:'instant'})};
- reveal();if(mode==='back')window.addEventListener('popstate',()=>requestAnimationFrame(reveal),{once:true});
+ reveal();if(mode==='back')window.addEventListener('popstate',()=>setTimeout(reveal,0),{once:true});
 }
 function showSlide(index,retrying=false,updateRoute=true){
  const project=projects[galleryProject];if(!project?.media.length)return;
