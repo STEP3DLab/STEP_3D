@@ -189,3 +189,60 @@ test('Meeting skip recalculates the sticky header clearance after responsive ref
  const f=fixture();let height=78;f.document.querySelector=selector=>{assert.equal(selector,'.meeting-top');return {getBoundingClientRect:()=>({height})}};initializeMeeting(f);const stage=f.nodes['meeting-stage'],route=f.window.location.hash;
  for(height of [78,124.5,62]){f.nodes['meeting-skip'].emit('click');assert.equal(stage.style.scrollMarginTop,(Math.ceil(height)+8)+'px');assert.equal(f.document.activeElement,stage);assert(stage.scrolled);assert.equal(f.window.location.hash,route)}
 });
+
+function lightFixture(hash='#project/mascot/media/white-front'){
+ const f=fixture(hash),cards=Object.keys(projects).map(key=>{const card=new Node('article',f.document);card.dataset.lightCase=key;card.gallery=new Node('div',f.document);card.append(card.gallery);return card});
+ f.document.querySelectorAll=()=>cards;
+ const controller=initializeLightView(f);
+ const frame=key=>cards.find(card=>card.dataset.lightCase===key).gallery.children[0];
+ return {...f,controller,frame};
+}
+for(const [id,type] of [['white-front','IMG'],['clay-turntable','VIDEO']]){
+ test(`Light unchanged route keeps manually loaded ${type}, focus and retry state`,()=>{
+  const f=lightFixture('#project/mascot/media/'+id),frame=f.frame('mascot'),host=frame.children[1],load=frame.children[4];
+  load.emit('click');const original=host.children[0];assert.equal(original.tagName,type);
+  if(type==='VIDEO')original.focus();else load.focus();const active=f.document.activeElement;
+  f.emit('popstate');f.emit('hashchange');f.emit('load');f.controller.sync(false);
+  assert.equal(host.children[0],original);assert.equal(f.document.activeElement,active);
+  assert.equal(original.paused,undefined);assert.equal(original.loaded,undefined);assert.equal(load.textContent,'Повторить загрузку');
+  assert.equal(f.changes.length,0);
+ });
+}
+test('Light browser return to an unchanged frame preserves its requested original',()=>{
+ const f=lightFixture(),bear=f.frame('mascot');bear.children[4].emit('click');const original=bear.children[1].children[0];
+ f.window.location.hash='#pink';f.emit('popstate');f.emit('hashchange');
+ assert.equal(bear.children[1].children[0],original);
+ f.window.location.hash='#project/mascot/media/white-front';f.emit('popstate');f.emit('hashchange');
+ assert.equal(bear.children[1].children[0],original);assert.equal(f.changes.length,0);
+});
+for(const event of ['hashchange','popstate']){
+ test(`Light ${event} restores focus after replacing focused video with an unloaded photo`,()=>{
+  const f=lightFixture('#project/mascot/media/clay-turntable'),frame=f.frame('mascot'),host=frame.children[1];
+  frame.children[4].emit('click');const video=host.children[0];video.focus();
+  f.window.location.hash='#project/mascot/media/white-front';f.emit(event);
+  assert.equal(f.document.activeElement,frame);assert.equal(frame.attrs.tabindex,'-1');
+  assert.equal(video.paused,1);assert.equal(video.src,undefined);assert.equal(host.children.length,0);
+  assert.equal(frame.children[0].children[1].textContent,'1 / 10');assert.match(frame.children[2].textContent,/Белый медведь/);
+  assert.equal(frame.children[4].textContent,'Загрузить оригинал фото');
+  f.emit(event);assert.equal(f.document.activeElement,frame);assert.equal(video.paused,1);
+ });
+ test(`Light ${event} does not move focus from stable controls or another case`,()=>{
+  for(const target of ['next','load','other']){
+   const f=lightFixture('#project/mascot/media/clay-turntable'),frame=f.frame('mascot');
+   const focus=target==='next'?frame.children[0].children[2]:target==='load'?frame.children[4]:f.frame('pink').children[4];focus.focus();
+   f.window.location.hash='#project/mascot/media/white-front';f.emit(event);
+   assert.equal(f.document.activeElement,focus,target);
+  }
+ });
+}
+test('Light duplicate route events do not replace or refetch the same preview',()=>{
+ const f=lightFixture(),frame=f.frame('mascot');f.nodes['light-posters'].checked=true;f.nodes['light-posters'].emit('change');
+ const first=frame.children[1].children[0];f.emit('popstate');f.emit('hashchange');assert.equal(frame.children[1].children[0],first);
+ f.window.location.hash='#project/mascot/media/white-side';f.emit('popstate');const second=frame.children[1].children[0];assert.notEqual(second,first);
+ assert.equal(second.src,lightPreview(projects.mascot,projects.mascot.media[1]));f.emit('hashchange');assert.equal(frame.children[1].children[0],second);
+ f.nodes['light-posters'].checked=false;f.nodes['light-posters'].emit('change');assert.equal(frame.children[1].children.length,0);
+});
+test('Light invalid routes leave loaded media and focus intact',()=>{
+ const f=lightFixture('#project/mascot/media/clay-turntable'),frame=f.frame('mascot');frame.children[4].emit('click');const video=frame.children[1].children[0];video.focus();
+ f.window.location.hash='#unknown';f.emit('popstate');f.emit('hashchange');assert.equal(frame.children[1].children[0],video);assert.equal(f.document.activeElement,video);assert.equal(video.paused,undefined);
+});
