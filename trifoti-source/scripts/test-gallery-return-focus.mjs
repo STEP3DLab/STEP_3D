@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import {readFileSync} from 'node:fs';
+import {keepFocusedReturnVisible} from '../dist/gallery-return-focus.js';
 import {visiblePortfolioTarget} from '../dist/portfolio-disclosure.js';
 const app=readFileSync(new URL('../dist/app.js',import.meta.url),'utf8');
 // The actual close handler and viewport guard, not a parallel implementation.
@@ -20,7 +21,7 @@ function fixture({mode='back',source='comparison',open=false}={}){
  const card=node('card',{dataset:{project:'mascot'}}),catalog=node('catalog-summary'),outside=node('outside');
  const opener=source==='card'?card:source==='story'?node('story-tile',{dataset:{storyCategory:'sculpture'}}):node('comparison-open',{closest:selector=>selector==='.exploration-panel'?panel:null});
  document.querySelector=()=>({getBoundingClientRect:()=>({bottom:92})});
- const context={document,window,visiblePortfolioTarget,cancelProjectReturn:()=>{},projectOpener:null,projectOpenerFallback:null,galleryProject:'mascot',
+ const context={document,window,visiblePortfolioTarget,keepFocusedReturnVisible,cancelProjectReturn:()=>{},projectOpener:null,projectOpenerFallback:null,galleryProject:'mascot',
   projectDialog:{open,addEventListener(type,handler){assert.equal(type,'close');close=handler}},
   photoDetail:{reset(){}},slideRevision:0,clearMediaWait(){},releaseGalleryVideo(){},$$:()=>[],caseNavigation:{closed:()=>mode},
   $:selector=>selector==='[data-project="mascot"]'?card:selector==='#all-projects-summary'?catalog:null};
@@ -94,5 +95,9 @@ test('New explicit opening removes listeners and resets the old fallback',()=>{
 test('All opening paths remember current return context and cache key is refreshed',()=>{
  for(const [entry,arg] of [['onOpen:(key,id,opener)','opener'],['onOpen:card','card'],['onOpen:link','link'],['onFullCase:(key,id,tile)','tile']])assert(app.includes(entry+'=>{rememberProjectOpener('+arg+');'));
  assert.match(readFileSync(new URL('../dist/index.html',import.meta.url),'utf8'),/return=20261106-resized-return/);
- assert.doesNotMatch(app.slice(app.indexOf('function restoreProjectFocus'),app.indexOf('function showSlide')),/setTimeout|requestAnimationFrame|scrollRestoration\s*=/);
+ assert.doesNotMatch(readFileSync(new URL('../dist/gallery-return-focus.js',import.meta.url),'utf8'),/setTimeout|requestAnimationFrame|scrollRestoration\s*=/);
+ assert.match(app,/gallery-return-focus\.js\?v=20261106-story-return/);
+ assert.match(app,/category-stories\.js\?[^']+return=20261106-story-return/);
+ assert.match(readFileSync(new URL('../dist/category-stories.js',import.meta.url),'utf8'),/gallery-return-focus\.js\?v=20261106-story-return/);
+ assert.match(readFileSync(new URL('../dist/index.html',import.meta.url),'utf8'),/storyreturn=20261106/);
 });

@@ -1,3 +1,4 @@
+import {keepFocusedReturnVisible} from './gallery-return-focus.js?v=20261106-story-return';
 import {initializePortfolioDisclosure,visiblePortfolioTarget} from './portfolio-disclosure.js?v=20261026-directions';
 import {appendSelectionReference,mountReferenceManager} from './reference-manager.js?v=20261026-directions';
 import {mountPhotoDetail} from './gallery-photo-detail.js?v=20261106-photo-resize';
@@ -94,32 +95,7 @@ function restoreProjectFocus(mode){
  const target=visiblePortfolioTarget(projectOpener)&&openerMatches?projectOpener:visiblePortfolioTarget(projectOpenerFallback)?projectOpenerFallback:visiblePortfolioTarget(card)?card:$('#all-projects-summary');
  target?.focus({preventScroll:mode!=='fallback'});
  if(!target)return;
- // History restoration can arrive after both a frame and a zero-delay task.
- // Even the original opener can move offscreen after zoom or viewport changes.
- // Guard this focused return target, yielding immediately to any user input.
- let active=true,awaitingBack=mode==='back',returnHash=window.location.hash;
- const inputs=['keydown','pointerdown','touchstart','wheel'];
- function cancel(){
-  if(!active)return;active=false;
-  window.removeEventListener('scroll',check);window.removeEventListener('popstate',route);window.removeEventListener('hashchange',hashChanged);window.removeEventListener('blur',cancel);window.removeEventListener('pagehide',cancel);
-  for(const type of inputs)document.removeEventListener(type,cancel,true);document.removeEventListener('focusin',focusChanged,true);
-  if(cancelProjectReturn===cancel)cancelProjectReturn=()=>{};
- }
- function focusChanged(){if(document.activeElement!==target)cancel()}
- function route(){if(awaitingBack){awaitingBack=false;returnHash=window.location.hash}else cancel()}
- function hashChanged(){if(!awaitingBack&&window.location.hash!==returnHash)cancel()}
- function check(){
-  if(projectDialog.open||document.activeElement!==target||!visiblePortfolioTarget(target)){cancel();return}
-  const rect=target.getBoundingClientRect(),header=document.querySelector('.header')?.getBoundingClientRect().bottom||0;
-  if(rect.bottom>header&&rect.top<window.innerHeight)return;
-  target.scrollIntoView({block:'center',behavior:'instant'});
- }
- if(target===projectOpener)check();else target.scrollIntoView({block:'center',behavior:'instant'});
- if(!active)return;
- cancelProjectReturn=cancel;
- window.addEventListener('scroll',check,{passive:true});window.addEventListener('popstate',route);window.addEventListener('hashchange',hashChanged);window.addEventListener('blur',cancel);window.addEventListener('pagehide',cancel);
- for(const type of inputs)document.addEventListener(type,cancel,{capture:true,passive:true});document.addEventListener('focusin',focusChanged,true);
-
+ cancelProjectReturn=keepFocusedReturnVisible({target,document,window,isOpen:()=>projectDialog.open,mode,reveal:target!==projectOpener});
 }
 function showSlide(index,retrying=false,updateRoute=true){
  const project=projects[galleryProject];if(!project?.media.length)return;
@@ -195,7 +171,7 @@ projectDialog.addEventListener('cancel',event=>{if(photoDetail?.reset())event.pr
 projectDialog.addEventListener('keydown',e=>{if(photoDetail?.key(e))return;if(!projectDialog.open||projects[galleryProject]?.media.length<2)return;const step=galleryArrow(e);if(step){e.preventDefault();showSlide(galleryIndex+step)}});
 projectDialog.addEventListener('close',()=>{if(projectDialog.open)return;photoDetail?.reset();slideRevision++;clearMediaWait();$$('video',projectDialog).forEach(releaseGalleryVideo);const mode=caseNavigation.closed();if(mode!=='route')restoreProjectFocus(mode)});
 caseNavigation.sync();
-optionalModule({load:()=>import('./category-stories.js?v=20261026-legacy-links&stories=20261026-story-polish&focus=20261105'),mount:({mountCategoryStories})=>{categoryStories=mountCategoryStories({document,window,beforeOpen:()=>caseNavigation.sync(),onFullCase:(key,id,tile)=>{rememberProjectOpener(tile);caseNavigation.sync()}})},onError:()=>{const help=$('.category-story-help');help.textContent='Истории не загрузились. Квадраты открывают каталог с работами или описание направления.'}})();
+optionalModule({load:()=>import('./category-stories.js?v=20261026-legacy-links&stories=20261026-story-polish&focus=20261105&return=20261106-story-return'),mount:({mountCategoryStories})=>{categoryStories=mountCategoryStories({document,window,beforeOpen:()=>caseNavigation.sync(),onFullCase:(key,id,tile)=>{rememberProjectOpener(tile);caseNavigation.sync()}})},onError:()=>{const help=$('.category-story-help');help.textContent='Истории не загрузились. Квадраты открывают каталог с работами или описание направления.'}})();
 import('./bear-video.js?v=20261024-ux25&fallback=20261106-native-bear&recovery=20261106-gif-error').catch(()=>{const status=$('#bear-keyboard-help');if(status)status.textContent='Дополнительное управление не загрузилось. Используйте встроенные кнопки видео.';$$('#rotate-toggle, #bear-reset').forEach(button=>button.disabled=true)});
 
 // Editorial tools are an explicit local mode, separate from the visitor experience.

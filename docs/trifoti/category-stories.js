@@ -5,16 +5,17 @@ import {createMediaSlot} from './portfolio-media.js';
 import {keepDialogFocus,galleryArrow} from './dialog-controls.js';
 import {mountPhotoSwipe} from './gallery-interactions.js';
 import {visiblePortfolioTarget} from './portfolio-disclosure.js?v=20261026-directions';
+import {keepFocusedReturnVisible} from './gallery-return-focus.js?v=20261106-story-return';
 
 export function mountCategoryStories({document,window,onFullCase=()=>{},beforeOpen=()=>{}}){
  const dialog=document.getElementById('category-story-dialog');
  if(!dialog||typeof dialog.showModal!=='function')return null;
  const get=id=>document.getElementById('story-'+id),tiles=[...document.querySelectorAll('[data-story-category]')];
- let current=null,opener=null;
+ let current=null,opener=null,cancelReturn=()=>{};
  const slot=createMediaSlot({document,host:get('media'),status:get('status'),onError:()=>get('retry').hidden=false,onReady:()=>{if(document.activeElement===get('retry'))get('media').focus({preventScroll:true});get('retry').hidden=true}});
  const navigation=createStoryNavigation({location:window.location,history:window.history,onOpen:render,onClose:()=>{if(dialog.open)dialog.close();slot.clear()}});
  function render(route){
-  current=route;beforeOpen();const category=storyCategory(route.category),frames=storyFrames(category.id),frame=frames[route.index],project=frame&&projects[frame.key];
+  cancelReturn();current=route;beforeOpen();const category=storyCategory(route.category),frames=storyFrames(category.id),frame=frames[route.index],project=frame&&projects[frame.key];
   // Removing focused media or hiding a control can move native focus to <body>.
   // Remember it before the update; leave surviving controls and initial opening alone.
   const previousFocus=dialog.open&&dialog.contains(document.activeElement)?document.activeElement:null;
@@ -47,7 +48,7 @@ export function mountCategoryStories({document,window,onFullCase=()=>{},beforeOp
  get('direction').addEventListener('click',event=>{if(event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;event.preventDefault();const service=document.getElementById(storyCategory(current.category).service);navigation.visit('#'+service.id);service.open=true;service.scrollIntoView({block:'start'});service.querySelector('summary').focus({preventScroll:true})});
  keepDialogFocus(dialog);
  dialog.addEventListener('keydown',event=>{const delta=galleryArrow(event);if(delta){event.preventDefault();step(delta)}});
- dialog.addEventListener('close',()=>{if(dialog.open)return;slot.clear();const mode=navigation.closed();if(mode==='route')return;const tile=tiles.find(tile=>tile.dataset.storyCategory===current?.category);(visiblePortfolioTarget(opener)?opener:tile)?.focus({preventScroll:mode!=='fallback'})});
+ dialog.addEventListener('close',()=>{if(dialog.open)return;slot.clear();const mode=navigation.closed();if(mode==='route')return;cancelReturn();const tile=tiles.find(tile=>tile.dataset.storyCategory===current?.category),target=visiblePortfolioTarget(opener)?opener:tile;target?.focus({preventScroll:mode!=='fallback'});cancelReturn=keepFocusedReturnVisible({target,document,window,isOpen:()=>dialog.open,mode})});
  document.addEventListener('visibilitychange',()=>{if(document.hidden)slot.pause()});
  mountPhotoSwipe({viewer:get('media'),onStep:step,isEnabled:()=>dialog.open&&!!current?.key&&(!window.visualViewport||window.visualViewport.scale===1)});
  window.addEventListener('popstate',navigation.sync);window.addEventListener('hashchange',navigation.sync);navigation.sync();

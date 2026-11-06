@@ -35,7 +35,7 @@ function browser(hash='#projects'){
  const location={hash,href:'https://example.test/'+hash},entries=[{hash,state:{keep:true}}];let index=0;const listeners={};
  const set=()=>{location.hash=entries[index].hash;location.href='https://example.test/'+location.hash};
  const history={get state(){return entries[index].state},get length(){return entries.length},pushState(state,_,hash){entries.splice(++index);entries.push({state,hash});set()},replaceState(state,_,hash){entries[index]={state,hash};set()},back(){if(index)index--;set()},forward(){if(index<entries.length-1)index++;set()}};
- return {location,history,listeners,addEventListener(type,fn){(listeners[type]??=[]).push(fn)},emit(type){for(const f of listeners[type]||[])f()},get index(){return index}};
+ return {location,history,listeners,innerHeight:756,addEventListener(type,fn){(listeners[type]??=[]).push(fn)},removeEventListener(type,fn){listeners[type]=(listeners[type]||[]).filter(f=>f!==fn)},emit(type){for(const f of [...listeners[type]||[]])f()},get index(){return index}};
 }
 test('One story session creates one entry; frames replace; Back/Forward reload the exact frame',()=>{
  const b=browser(),opened=[];let closes=0;const n=createStoryNavigation({...b,onOpen:r=>opened.push(r),onClose:()=>closes++});n.sync();n.open('sculpture');assert.equal(b.history.length,2);
@@ -63,12 +63,13 @@ class Node{
  contains(other){return other===this||this.children.some(node=>node.contains(other))}
  replaceChildren(...nodes){for(const node of this.children){if(node.contains(this.document.activeElement))this.document.activeElement=this.document.body;node.parentElement=null}this.children=[];this.append(...nodes)}
  setAttribute(k,v){this.attrs[k]=v}removeAttribute(k){delete this.attrs[k]}
- focus(options){this.document.activeElement=this;this.focusOptions=options}pause(){this.paused=(this.paused||0)+1}load(){}
+ focus(options){this.document.activeElement=this;this.focusOptions=options;this.document.emit('focusin')}pause(){this.paused=(this.paused||0)+1}load(){}
  closest(selector){if(selector.includes('video')&&this.tagName==='VIDEO')return this;return null}
- showModal(){this.open=true}close(){this.open=false;this.emit('close')}scrollIntoView(){}querySelector(){return this.summary}
+ getBoundingClientRect(){return this.bounds||{top:300,bottom:346}}
+ showModal(){this.open=true}close(){this.open=false;this.emit('close')}scrollIntoView(options){this.scrolls=(this.scrolls||0)+1;this.scrollOptions=options;this.bounds={top:300,bottom:346}}querySelector(){return this.summary}
 }
 function mounted(hash='#projects'){
- const window=browser(hash),nodes={},document={hidden:false,activeElement:null,createElement:tag=>new Node(tag,document),getElementById:id=>nodes[id],listeners:{},addEventListener(type,fn){(this.listeners[type]??=[]).push(fn)}};
+ const window=browser(hash),nodes={},document={hidden:false,activeElement:null,createElement:tag=>new Node(tag,document),getElementById:id=>nodes[id],querySelector:()=>({getBoundingClientRect:()=>({bottom:92})}),listeners:{},addEventListener(type,fn){(this.listeners[type]??=[]).push(fn)},removeEventListener(type,fn){this.listeners[type]=(this.listeners[type]||[]).filter(f=>f!==fn)},emit(type){for(const fn of [...this.listeners[type]||[]])fn()}};
  document.body=new Node('body',document);
  const dialog=nodes['category-story-dialog']=new Node('dialog',document);dialog.id='category-story-dialog';
  for(const id of ['category','title','counter','caption','credit','full-case','direction','progress','prev','next','restart','end','retry','original','media','status','close'])nodes['story-'+id]=new Node(['prev','next','restart','retry','close'].includes(id)?'button':'div',document);
@@ -80,6 +81,27 @@ function mounted(hash='#projects'){
 }
 test('Viewer keeps original captions, credit, case segments and counters; next advances manually only',()=>{
  const f=mounted();f.open('awards');assert(f.dialog.open);assert.equal(f.nodes['story-media'].children[0].src,projects.stdAwards.media[0].src);assert.equal(f.nodes['story-caption'].textContent,projects.stdAwards.media[0].caption);assert.match(f.nodes['story-credit'].textContent,/Технопарка РГСУ/);assert.equal(f.nodes['story-progress'].children.length,3);assert.match(f.nodes['story-counter'].textContent,/Проект 1 из 4 · Кадр 1 из 3/);f.click('next');assert.match(f.window.location.hash,/award-ceremony$/);assert.equal(f.window.history.length,2);
+});
+test('Closing stories reveals the original tile after a viewport change, including late history scroll',()=>{
+ const f=mounted();f.open('sculpture');const tile=f.tiles[1];tile.bounds={top:900,bottom:1069};f.click('close');
+ assert.equal(f.document.activeElement,tile);assert.equal(tile.scrolls,1);assert.equal(tile.scrollOptions.behavior,'instant');
+ f.window.emit('popstate');f.window.emit('hashchange');tile.bounds={top:900,bottom:1069};f.window.emit('scroll');assert.equal(tile.scrolls,2);
+});
+test('An already visible story return stays in place and yields to later visitor scrolling',()=>{
+ const f=mounted();f.open('awards');const tile=f.tiles[2];f.click('close');assert.equal(f.document.activeElement,tile);assert.equal(tile.scrolls,undefined);
+ f.document.emit('wheel');tile.bounds={top:-900,bottom:-731};f.window.emit('scroll');assert.equal(tile.scrolls,undefined);
+});
+test('A direct story link returns to its visible direction without leaving the page',()=>{
+ const f=mounted('#stories/awards/stdAwards/award-series'),tile=f.tiles[2];tile.bounds={top:900,bottom:1069};f.click('close');
+ assert.equal(f.document.activeElement,tile);assert.equal(f.window.location.hash,'#projects');assert.equal(tile.scrolls,1);
+});
+test('Reopening stories cancels the prior return guard before a different direction opens',()=>{
+ const f=mounted();f.open('sculpture');f.click('close');assert.equal(f.window.listeners.scroll.length,1);
+ f.open('awards');assert.equal(f.window.listeners.scroll.length,0);assert(f.dialog.open);
+});
+test('Failed story return focus leaves no correction listeners or forced scroll',()=>{
+ const f=mounted();f.open('sculpture');f.tiles[1].focus=()=>{};f.tiles[1].bounds={top:900,bottom:1069};f.click('close');
+ assert.equal((f.window.listeners.scroll||[]).length,0);assert.equal(f.tiles[1].scrolls,undefined);
 });
 test('Final frame is finite, does not claim video was watched, and offers explicit restart',()=>{
  const f=mounted('#stories/awards/vmeste-prize/vmeste-prize');assert.equal(f.nodes['story-next'].hidden,true);assert.equal(f.nodes['story-restart'].hidden,false);assert.match(f.nodes['story-end'].textContent,/Последний кадр/);f.dialog.emit('keydown',{key:'ArrowRight'});assert.match(f.window.location.hash,/vmeste-prize$/);f.click('restart');assert.match(f.window.location.hash,/stdAwards\/award-series$/);
