@@ -18,13 +18,14 @@ export function appendIdeaPrompt(value,prompt,limit=4000){
 export function initializeBriefExperience({form,document,window,validate}){
  const get=id=>document.getElementById(id),field=name=>form.elements.namedItem(name);
  const idea=field('idea'),progress=get('brief-progress'),optional=get('brief-optional');
+ // Reveal restored values once; later edits respect the visitor's disclosure choice.
+ if(field('budget').value||field('deadline').value)optional.open=true;
  let direction=null;
  function grow(){idea.style.height='auto';idea.style.height=Math.min(360,Math.max(120,idea.scrollHeight))+'px'}
  function refresh(){
   const state=briefCompletion({name:field('name').value,idea:idea.value});
   get('brief-progress-text').textContent=state.text;get('brief-progress-fill').style.width=`${state.done*50}%`;
   progress.dataset.ready=String(state.done===2);
-  if(field('budget').value||field('deadline').value)optional.open=true;
   const selected=field('direction').value;
   if(direction!==selected){
    direction=selected;const host=get('brief-prompt-buttons');host.replaceChildren();

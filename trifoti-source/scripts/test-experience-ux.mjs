@@ -22,7 +22,7 @@ test('Prompt insertion preserves existing text and respects native UTF-16 maxlen
  assert.equal(appendIdeaPrompt('x'.repeat(3990),'Размер: ').length,3999);
  assert.equal(appendIdeaPrompt('x'.repeat(3992),'Размер: '),null);
 });
-function fixture(){
+function fixture(initialValues={}){
  const nodes=new Map(),windowEvents={};let focused=null,printed=0,valid=true;
  const make=()=>({value:'',textContent:'',style:{},dataset:{},hidden:true,open:false,children:[],handlers:{},maxLength:4000,scrollHeight:150,
   addEventListener(type,fn){this.handlers[type]=fn},append(n){this.children.push(n)},replaceChildren(){this.children=[]},
@@ -30,6 +30,7 @@ function fixture(){
  });
  const get=id=>{if(!nodes.has(id))nodes.set(id,make());return nodes.get(id)};
  const fields=Object.fromEntries(['name','idea','direction','budget','deadline','reference'].map(k=>[k,make()]));fields.direction.value='Скульптура';
+ for(const [key,value] of Object.entries(initialValues))fields[key].value=value;
  const classes=new Set(),document={getElementById:get,createElement:make,body:{classList:{add:k=>classes.add(k),remove:k=>classes.delete(k),contains:k=>classes.has(k)}}};
  for(const key of ['name','idea']){const link=make();link.dataset.errorFor=key;get('brief-error-summary').children.push(link)}
  const form={elements:{namedItem:key=>fields[key]}};
@@ -38,9 +39,8 @@ function fixture(){
  const experience=initializeBriefExperience({form,document,window,validate:()=>valid});
  return {get,fields,experience,windowEvents,classes,get focused(){return focused},get printed(){return printed},set valid(v){valid=v},cleanup(){globalThis.FormData=old}};
 }
-test('Restored optional values are discoverable, prompts preserve draft, height is bounded',()=>{
+test('Prompts preserve draft and textarea height is bounded',()=>{
  const f=fixture();try{
-  assert.equal(f.get('brief-optional').open,false);f.fields.budget.value='По согласованию';f.experience.refresh();assert(f.get('brief-optional').open);
   f.fields.idea.value='Уже написано';f.get('brief-prompt-buttons').children[0].handlers.click();
   assert.equal(f.fields.idea.value,'Уже написано\nДля кого и где: ');assert.equal(f.focused,f.fields.idea);
   assert.equal(f.fields.idea.selection[0],f.fields.idea.value.length);
@@ -48,6 +48,42 @@ test('Restored optional values are discoverable, prompts preserve draft, height 
   f.fields.idea.value='x'.repeat(4000);f.experience.refresh();assert(f.get('brief-prompt-buttons').children.every(b=>b.disabled));
   const original=f.fields.idea.value;f.get('brief-prompt-buttons').children[0].handlers.click();assert.equal(f.fields.idea.value,original);
  }finally{f.cleanup()}
+});
+test('Optional fields start collapsed when empty and reveal each restored value on initialization',()=>{
+ for(const values of [{},{budget:'По согласованию'},{deadline:'Весной'},{budget:'1000',deadline:'После согласования'}]){
+  const f=fixture(values);try{
+   assert.equal(f.get('brief-optional').open,Boolean(values.budget||values.deadline));
+   for(const [key,value] of Object.entries(values))assert.equal(f.fields[key].value,value);
+  }finally{f.cleanup()}
+ }
+});
+test('Closing restored optional fields survives edits, prompts and repeated refreshes',()=>{
+ const f=fixture({budget:'По согласованию',deadline:'Весной'});try{
+  const optional=f.get('brief-optional');assert(optional.open);optional.open=false;
+  for(const [key,value] of [['name','Тест'],['idea','Моя идея'],['direction','Дизайн интерьеров'],['reference','Пример']]){
+   f.fields[key].value=value;f.experience.refresh();f.experience.refresh();assert.equal(optional.open,false,key);
+  }
+  f.get('brief-prompt-buttons').children[0].handlers.click();assert.equal(optional.open,false);
+  assert.equal(f.fields.budget.value,'По согласованию');assert.equal(f.fields.deadline.value,'Весной');
+  assert.equal(f.get('brief-progress').dataset.ready,'true');
+ }finally{f.cleanup()}
+});
+test('New optional values do not override later manual closing or reopening',()=>{
+ const f=fixture();try{
+  const optional=f.get('brief-optional');assert.equal(optional.open,false);optional.open=true;
+  f.fields.budget.value='1000';f.fields.deadline.value='Весной';f.experience.refresh();assert(optional.open);
+  optional.open=false;f.fields.idea.value='Моя идея';f.experience.refresh();assert.equal(optional.open,false);
+  optional.open=true;f.fields.name.value='Тест';f.experience.refresh();assert(optional.open);
+  optional.open=false;f.experience.refresh();assert.equal(optional.open,false);
+ }finally{f.cleanup()}
+});
+test('Clearing optional values preserves the current disclosure choice',()=>{
+ for(const open of [false,true]){
+  const f=fixture({budget:'1000'});try{
+   f.get('brief-optional').open=open;f.fields.budget.value='';f.experience.refresh();
+   assert.equal(f.get('brief-optional').open,open);
+  }finally{f.cleanup()}
+ }
 });
 test('Direction changes rebuild relevant prompts without clearing text',()=>{
  const f=fixture();try{f.fields.idea.value='Сохранить';f.fields.direction.value='Дизайн интерьеров';f.experience.refresh();assert.equal(f.fields.idea.value,'Сохранить');assert.equal(f.get('brief-prompt-buttons').children[0].textContent,'+ Пространство')}finally{f.cleanup()}
