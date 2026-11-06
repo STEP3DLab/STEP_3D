@@ -82,7 +82,7 @@ test('Footer case links preserve modified navigation and remember their visible 
  const app=readFileSync(new URL('../dist/app.js',import.meta.url),'utf8');
  assert(app.includes("$$('a[data-case-link]')"));
  assert(app.includes("enhanceProjectCards($$('a[data-case-link]')"));
- assert(app.includes('projectOpener=link;caseNavigation.open(link.dataset.caseLink)'));
+ assert(app.includes('rememberProjectOpener(link);caseNavigation.open(link.dataset.caseLink)'));
  assert(app.includes('projectOpener?.dataset.caseLink===galleryProject'));
  assert(app.includes('visiblePortfolioTarget(projectOpener)&&openerMatches?projectOpener:'));
 });

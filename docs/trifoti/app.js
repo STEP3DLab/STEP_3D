@@ -73,9 +73,24 @@ $$('[data-close]').forEach(b=>b.addEventListener('click',()=>document.getElement
 $$('dialog').forEach(dialog=>{if(dialog.id!=='category-story-dialog')keepDialogFocus(dialog);let backdropPressed=false;dialog.addEventListener('pointerdown',e=>{const r=dialog.getBoundingClientRect();backdropPressed=e.target===dialog&&(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)});dialog.addEventListener('click',e=>{if(backdropPressed&&e.target===dialog)dialog.close();backdropPressed=false})});
 const projectDialog=$('#project-dialog');
 let categoryStories=null;
-let galleryProject=null,galleryIndex=0,slideRevision=0,projectOpener=null,photoDetail=null,exploration=null,selectionSummary=null,unbindCaseSelection=()=>{};
+let galleryProject=null,galleryIndex=0,slideRevision=0,projectOpener=null,projectOpenerFallback=null,photoDetail=null,exploration=null,selectionSummary=null,unbindCaseSelection=()=>{};
 let updateGalleryChapters=()=>{},clearMediaWait=()=>{};
 const frameMemory=createFrameMemory();
+// Comparison cards can be rebuilt while their gallery is open. Keep a stable
+// destination in the source panel before its original button is detached.
+function rememberProjectOpener(opener){
+ projectOpener=opener;projectOpenerFallback=opener?.closest('.exploration-panel')?.querySelector('summary')||null;
+}
+function restoreProjectFocus(mode){
+ const card=$(`[data-project="${galleryProject}"]`),openerMatches=projectOpener?.closest('.exploration-panel')||projectOpener?.dataset.project===galleryProject||projectOpener?.dataset.caseLink===galleryProject||projectOpener?.getAttribute('href')==='#project/'+galleryProject||projectOpener?.dataset.storyCategory;
+ const target=visiblePortfolioTarget(projectOpener)&&openerMatches?projectOpener:visiblePortfolioTarget(projectOpenerFallback)?projectOpenerFallback:visiblePortfolioTarget(card)?card:$('#all-projects-summary');
+ target?.focus({preventScroll:mode!=='fallback'});
+ if(!target||target===projectOpener)return;
+ // Back restores the old page scroll after popstate. Reveal a replacement
+ // target again on the next frame, unless focus or the dialog has moved on.
+ const reveal=()=>{if(!projectDialog.open&&document.activeElement===target&&visiblePortfolioTarget(target))target.scrollIntoView({block:'center',behavior:'instant'})};
+ reveal();if(mode==='back')window.addEventListener('popstate',()=>requestAnimationFrame(reveal),{once:true});
+}
 function showSlide(index,retrying=false,updateRoute=true){
  const project=projects[galleryProject];if(!project?.media.length)return;
  galleryIndex=(index+project.media.length)%project.media.length;const item=project.media[galleryIndex];const viewer=$('#gallery-viewer');
@@ -137,20 +152,20 @@ optionalModule({load:()=>Promise.all([import('./exploration-panel.js?v=20261026-
  requestAnimationFrame(()=>form.elements.namedItem('idea').focus({preventScroll:true}));
  $('#brief-status').textContent=result.added?'Подборка добавлена к отправной точке. Ваше описание сохранено, бриф не отправлен.':'Эти работы уже есть в отправной точке. Бриф не отправлен.';
  return null;
-},onOpen:(key,id,opener)=>{projectOpener=opener;caseNavigation.open(key,id)}});
+},onOpen:(key,id,opener)=>{rememberProjectOpener(opener);caseNavigation.open(key,id)}});
 addEventListener('popstate',exploration.sync);addEventListener('hashchange',exploration.sync);
 const summaryHost=document.createElement('div');$('#all-projects').before(summaryHost);selectionSummary=mountSelectionSummary({host:summaryHost,document,controller:exploration});
 for(const button of $$('[data-selection]')){const feedback=document.createElement('p');feedback.className='form-note selection-feedback';feedback.setAttribute('role','status');feedback.setAttribute('aria-atomic','true');button.after(feedback);bindSelectionButton({button,key:button.dataset.selection,controller:exploration,status:feedback})}
 if(projectDialog.open)unbindCaseSelection=bindSelectionButton({button:$('#case-selection'),key:galleryProject,controller:exploration,status:$('#case-selection-status')});
 },onError:()=>optionalFallback({host:explorationHost,document,message:'Инструменты исследования не загрузились. Все кейсы по-прежнему доступны в галерее и на отдельных страницах.'})})();
-enhanceProjectCards($$('[data-project]'),{dialog:projectDialog,onOpen:card=>{projectOpener=card;caseNavigation.open(card.dataset.project)}});
-enhanceProjectCards($$('a[data-case-link]'),{dialog:projectDialog,onOpen:link=>{projectOpener=link;caseNavigation.open(link.dataset.caseLink)}});
+enhanceProjectCards($$('[data-project]'),{dialog:projectDialog,onOpen:card=>{rememberProjectOpener(card);caseNavigation.open(card.dataset.project)}});
+enhanceProjectCards($$('a[data-case-link]'),{dialog:projectDialog,onOpen:link=>{rememberProjectOpener(link);caseNavigation.open(link.dataset.caseLink)}});
 addEventListener('popstate',caseNavigation.sync);addEventListener('hashchange',caseNavigation.sync);
 projectDialog.addEventListener('cancel',event=>{if(photoDetail?.reset())event.preventDefault()});
 projectDialog.addEventListener('keydown',e=>{if(photoDetail?.key(e))return;if(!projectDialog.open||projects[galleryProject]?.media.length<2)return;const step=galleryArrow(e);if(step){e.preventDefault();showSlide(galleryIndex+step)}});
-projectDialog.addEventListener('close',()=>{if(projectDialog.open)return;photoDetail?.reset();slideRevision++;clearMediaWait();$$('video',projectDialog).forEach(releaseGalleryVideo);const mode=caseNavigation.closed();if(mode!=='route'){const card=$(`[data-project="${galleryProject}"]`),openerMatches=projectOpener?.closest('.exploration-panel')||projectOpener?.dataset.project===galleryProject||projectOpener?.dataset.caseLink===galleryProject||projectOpener?.getAttribute('href')==='#project/'+galleryProject||projectOpener?.dataset.storyCategory,target=visiblePortfolioTarget(projectOpener)&&openerMatches?projectOpener:visiblePortfolioTarget(card)?card:$('#all-projects-summary');target?.focus({preventScroll:mode!=='fallback'})}});
+projectDialog.addEventListener('close',()=>{if(projectDialog.open)return;photoDetail?.reset();slideRevision++;clearMediaWait();$$('video',projectDialog).forEach(releaseGalleryVideo);const mode=caseNavigation.closed();if(mode!=='route')restoreProjectFocus(mode)});
 caseNavigation.sync();
-optionalModule({load:()=>import('./category-stories.js?v=20261026-legacy-links&stories=20261026-story-polish&focus=20261105'),mount:({mountCategoryStories})=>{categoryStories=mountCategoryStories({document,window,beforeOpen:()=>caseNavigation.sync(),onFullCase:(key,id,tile)=>{projectOpener=tile;caseNavigation.sync()}})},onError:()=>{const help=$('.category-story-help');help.textContent='Истории не загрузились. Квадраты открывают каталог с работами или описание направления.'}})();
+optionalModule({load:()=>import('./category-stories.js?v=20261026-legacy-links&stories=20261026-story-polish&focus=20261105'),mount:({mountCategoryStories})=>{categoryStories=mountCategoryStories({document,window,beforeOpen:()=>caseNavigation.sync(),onFullCase:(key,id,tile)=>{rememberProjectOpener(tile);caseNavigation.sync()}})},onError:()=>{const help=$('.category-story-help');help.textContent='Истории не загрузились. Квадраты открывают каталог с работами или описание направления.'}})();
 import('./bear-video.js?v=20261024-ux25').catch(()=>{const status=$('#bear-keyboard-help');if(status)status.textContent='Анимация не загрузилась. Доступен статичный постер настоящей скульптуры.';$$('#rotate-toggle, #bear-reset').forEach(button=>button.disabled=true)});
 
 // Editorial tools are an explicit local mode, separate from the visitor experience.
