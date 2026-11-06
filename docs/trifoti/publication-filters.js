@@ -57,7 +57,12 @@ export function initializePublicationFilters({document, clipboard = globalThis.n
     });
     if (list) {
       const ordered = sortPublications(entries.map((element, index) => ({element, date: records.get(element.dataset.publicationId)?.date, index})), order);
-      ordered.forEach(item => list.append(item.element));
+      // Re-inserting an unchanged entry drops focus from its source link if this
+      // optional enhancement finishes after the visitor has started reading.
+      const current = [...list.children];
+      if (current.length !== ordered.length || ordered.some((item, index) => item.element !== current[index])) {
+        ordered.forEach(item => list.append(item.element));
+      }
     }
     const message = `Показано: ${visible} из ${entries.length}.`;
     if (status.textContent !== message) status.textContent = message;

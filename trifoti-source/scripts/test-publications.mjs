@@ -92,20 +92,45 @@ test('Malformed optional filter group stays unenhanced',()=>{
  const f=fixture();f.buttons.shift();assert.equal(initializePublicationFilters(f),false);assert(f.entries.every(e=>!e.hidden));assert(f.controls.hidden);
 });
 
-function richFixture(clipboard) {
+function richFixture(clipboard, beforeInitialize=()=>{}) {
  const node=(extra={})=>({hidden:true,value:'',textContent:'',listeners:{},attributes:{},dataset:{},addEventListener(t,f){(this.listeners[t]??=[]).push(f)},async emit(t,event={}){for(const f of this.listeners[t]||[])await f(event)},setAttribute(k,v){this.attributes[k]=v},focus(options){this.focused=true;this.focusOptions=options;document.activeElement=this},select(){this.selected=true},scrollIntoView(options){this.scrolled=options},...extra});
  const buttons=Object.keys(publicationCategories).map(key=>node({dataset:{publicationFilter:key}}));
  const entries=publications.map(entry=>node({dataset:{publicationCategory:entry.category,publicationId:entry.id}}));
+ const links=entries.map(entry=>node({parentElement:entry}));
  const copies=publications.map((entry,i)=>node({dataset:{publicationCopy:entry.id},parentElement:{append(panel){panel.host=entries[i]}}}));
  const summary=node();
  const root=node({dataset:{},open:true,querySelectorAll:s=>s==='[data-publication-category]'?entries:copies,querySelector:()=>summary,contains:t=>copies.includes(t)});
  const nodes={'#publication-catalog':root,'#publication-filters':node({querySelectorAll:()=>buttons})};
  for(const id of ['count','search','sort','reset','list','active','empty','citation','copy-status','copy-label','copy-text','collapse','copy-close','tools','sort-note'])nodes[`#publication-${id}`]=node();
- nodes['#publication-list'].children=[];nodes['#publication-list'].append=function(el){this.children=this.children.filter(x=>x!==el);this.children.push(el)};
+ nodes['#publication-list'].children=[...entries];nodes['#publication-list'].moves=0;nodes['#publication-list'].append=function(el){this.moves++;if(document.activeElement?.parentElement===el)document.activeElement=null;this.children=this.children.filter(x=>x!==el);this.children.push(el)};
  const document={activeElement:null,querySelector:s=>nodes[s]||null};
+ beforeInitialize({document,links,entries,list:nodes['#publication-list']});
  initializePublicationFilters({document,clipboard});
- return {root,nodes,buttons,entries,copies,summary,document,get:id=>nodes[`#publication-${id}`],copy:i=>{copies[i].focus();return root.emit('click',{target:{closest:()=>copies[i]}})}};
+ return {root,nodes,buttons,entries,links,copies,summary,document,get:id=>nodes[`#publication-${id}`],copy:i=>{copies[i].focus();return root.emit('click',{target:{closest:()=>copies[i]}})}};
 }
+for(const index of [0,10,20])test(`Delayed catalogue enhancement preserves the already focused source ${index+1}`,()=>{
+ const f=richFixture(undefined,({links})=>links[index].focus());
+ assert.equal(f.document.activeElement,f.links[index]);
+ assert.equal(f.get('list').moves,0);
+ assert.deepEqual(f.get('list').children,f.entries);
+ assert.equal(f.root.dataset.enhanced,'true');
+});
+test('Filtering and searching do not move entries whose order is unchanged',async()=>{
+ const f=richFixture();
+ await f.buttons.find(x=>x.dataset.publicationFilter==='interviews').emit('click');
+ f.get('search').value='Фёдор';await f.get('search').emit('input');
+ await f.get('reset').emit('click');
+ assert.equal(f.get('list').moves,0);assert.deepEqual(f.get('list').children,f.entries);
+});
+test('An actual sort is applied once and repeated filtering keeps that order without moving nodes',async()=>{
+ const f=richFixture(undefined,({entries,list})=>{entries.reverse();list.children=[...entries]});
+ f.get('sort').value='newest';await f.get('sort').emit('change');
+ const moves=f.get('list').moves,ordered=[...f.get('list').children];
+ assert(moves>0);assert.deepEqual(ordered.map(x=>x.dataset.publicationId),sortPublications([...publications].reverse(),'newest').map(x=>x.id));
+ await f.get('sort').emit('change');await f.buttons.find(x=>x.dataset.publicationFilter==='video').emit('click');
+ assert.equal(f.get('list').moves,moves);assert.deepEqual(f.get('list').children,ordered);
+ await f.get('reset').emit('click');assert.deepEqual(f.get('list').children,f.entries);
+});
 test('Search is case/ё/whitespace tolerant, matches title and publisher only',()=>{
  assert(publicationSearchMatches({title:'Фёдор  Паршин',publisher:'Вести'},' федор ВЕСТИ '));
  assert(!publicationSearchMatches({title:'Фёдор',publisher:'Вести',summary:'Лазарев'},'Лазарев'));
