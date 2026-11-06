@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
+import {runInNewContext} from 'node:vm';
 import {projects} from '../dist/project-data.js';
 import {enhanceProjectCards} from '../dist/project-card-links.js';
 import {createProjectNavigation,projectKey,projectLink,copyProjectLink} from '../dist/project-navigation.js';
@@ -101,4 +102,39 @@ test('All nine journal/footer fallback links are full cases while ordinary click
  const ordinary={button:0,preventDefault(){this.prevented=true}};handler(ordinary);assert(ordinary.prevented);assert.equal(open,1);
  let enhanced=false;enhanceProjectCards([{setAttribute(){enhanced=true},addEventListener(){enhanced=true}}],{dialog:{},onOpen(){}});assert(!enhanced);
  }
+});
+
+
+// Exercise the actual registered callback, not a separate model of its behavior.
+function galleryCopyFixture(){
+ const app=readFileSync(new URL('../dist/app.js',import.meta.url),'utf8');
+ const handler=app.match(/shareButton\.addEventListener\('click',async\(\)=>\{[^\n]+\}\);/);
+ assert(handler,'The gallery copy click handler is available for the regression fixture');
+ let click,resolve,reject;
+ const document={activeElement:null},shareStatus={textContent:''},shareFallback={hidden:true},projectDialog={open:true};
+ const shareButton={isConnected:true,addEventListener(type,callback){assert.equal(type,'click');click=callback}};
+ const shareURL={value:'https://step3dlab.github.io/STEP_3D/trifoti/#project/stdAwards/media/award-series',selected:false,focus(){document.activeElement=this},select(){this.selected=true}};
+ const navigator={clipboard:{writeText(){return new Promise((yes,no)=>{resolve=yes;reject=no})}}};
+ runInNewContext(handler[0],{shareButton,shareStatus,shareFallback,shareURL,projectDialog,document,navigator,copyProjectLink});
+ document.activeElement=shareButton;
+ return {shareButton,shareStatus,shareFallback,shareURL,projectDialog,document,click:()=>click(),success:()=>resolve(),failure:()=>reject(new Error('denied'))};
+}
+test('Gallery clipboard denial preserves a newer control focus while revealing the exact fallback',async()=>{
+ const f=galleryCopyFixture(),pending=f.click(),newer={};f.document.activeElement=newer;f.failure();await pending;
+ assert.equal(f.document.activeElement,newer);assert.equal(f.shareURL.selected,false);assert.equal(f.shareFallback.hidden,false);assert.match(f.shareStatus.textContent,/Не удалось/);assert.match(f.shareURL.value,/#project\/stdAwards\/media\/award-series$/);
+});
+test('Gallery clipboard denial selects the fallback when the initiating copy button still owns focus',async()=>{
+ const f=galleryCopyFixture(),pending=f.click();f.failure();await pending;
+ assert.equal(f.document.activeElement,f.shareURL);assert.equal(f.shareURL.selected,true);assert.equal(f.shareFallback.hidden,false);
+});
+test('Gallery clipboard success preserves newer focus and does not reveal a fallback',async()=>{
+ const f=galleryCopyFixture(),pending=f.click(),newer={};f.document.activeElement=newer;f.success();await pending;
+ assert.equal(f.document.activeElement,newer);assert.equal(f.shareFallback.hidden,true);assert.equal(f.shareURL.selected,false);assert.equal(f.shareStatus.textContent,'Ссылка скопирована.');
+});
+for(const stale of ['closed','replaced','frame'])test(`Gallery clipboard denial ignores a ${stale} view`,async()=>{
+ const f=galleryCopyFixture(),pending=f.click(),newer={};f.document.activeElement=newer;
+ if(stale==='closed')f.projectDialog.open=false;
+ if(stale==='replaced')f.shareButton.isConnected=false;
+ if(stale==='frame')f.shareURL.value='https://step3dlab.github.io/STEP_3D/trifoti/#project/stdAwards/media/award-ceremony';
+ f.failure();await pending;assert.equal(f.shareStatus.textContent,'');assert.equal(f.shareFallback.hidden,true);assert.equal(f.document.activeElement,newer);assert.equal(f.shareURL.selected,false);
 });
