@@ -58,7 +58,9 @@ class Node{
  append(...nodes){for(const node of nodes){node.parent=this;this.children.push(node)}}
  replaceChildren(...nodes){if(this.children.some(n=>n.contains(this.doc.activeElement)))this.doc.activeElement=this.doc.body;for(const n of this.children)n.parent=null;this.children=[];this.append(...nodes)}
  setAttribute(k,v){this.attrs[k]=v} removeAttribute(k){delete this.attrs[k];if(k==='src')delete this.src}
- focus(){this.doc.activeElement=this} scrollIntoView(){this.scrolled=true} pause(){this.paused=(this.paused||0)+1}load(){this.loaded=(this.loaded||0)+1}
+ set disabled(value){this._disabled=!!value;if(this._disabled&&this.doc.activeElement===this)this.doc.activeElement=this.doc.body}
+ get disabled(){return this._disabled}
+ focus(options){this.doc.activeElement=this;this.focusOptions=options} scrollIntoView(){this.scrolled=true} pause(){this.paused=(this.paused||0)+1}load(){this.loaded=(this.loaded||0)+1}
  closest(selector){return selector.includes('video')&&['VIDEO','INPUT','TEXTAREA','SELECT'].includes(this.tagName)?this:null}
  contains(other){return other===this||this.children.some(n=>n.contains(other))}
  click(){this.clicks=(this.clicks||0)+1;this.emit('click')}
@@ -134,10 +136,31 @@ for(const event of ['hashchange','popstate']){
   assert.equal(f.changes.length,0);
  });
  test(`Meeting ${event} leaves stable navigation focus alone`,()=>{
-  for(const id of ['meeting-exit','meeting-next','meeting-case']){
+  for(const id of ['meeting-exit','meeting-prev','meeting-next','meeting-case']){
    const f=fixture('#show/gesture,pink/0');initializeMeeting(f);f.nodes[id].focus();
    f.window.location.hash='#show/gesture,pink/1';f.emit(event);
    assert.equal(f.document.activeElement,f.nodes[id],id);
+  }
+ });
+ for(const id of ['meeting-prev','meeting-next'])test(`Meeting ${event} restores focus when ${id} becomes disabled by a single-frame route`,()=>{
+  const f=fixture('#show/gesture,pink/1');initializeMeeting(f);f.nodes[id].focus();
+  f.window.location.hash='#show/gesture/0';f.emit(event);
+  assert.equal(f.nodes['meeting-prev'].disabled,true);assert.equal(f.nodes['meeting-next'].disabled,true);
+  assert.equal(f.document.activeElement,f.nodes['meeting-stage']);assert.deepEqual(f.nodes['meeting-stage'].focusOptions,{preventScroll:true});
+  assert.equal(f.nodes['meeting-counter'].textContent,'1 / 1');assert.equal(f.nodes['meeting-title'].textContent,projects.gesture.title);
+  assert.equal(f.nodes['meeting-media'].children[0].tagName,'IMG');assert.equal(f.changes.length,0);
+  f.nodes['meeting-load'].emit('click');const video=f.nodes['meeting-media'].children[0];video.focus();
+  f.emit('popstate');f.emit('hashchange');
+  assert.equal(f.document.activeElement,video);assert.equal(f.nodes['meeting-media'].children[0],video);assert.equal(video.paused,undefined);
+  f.window.location.hash='#show/gesture,pink/1';f.emit(event);
+  assert.equal(f.nodes['meeting-prev'].disabled,false);assert.equal(f.nodes['meeting-next'].disabled,false);
+  assert.equal(f.document.activeElement,f.nodes['meeting-stage']);assert.equal(video.paused,1);assert.equal(video.src,undefined);
+ });
+ test(`Meeting ${event} single-frame route leaves usable controls and outside focus alone`,()=>{
+  for(const id of ['meeting-exit','meeting-case','meeting-stage','meeting-skip']){
+   const f=fixture('#show/gesture,pink/0');initializeMeeting(f);f.nodes[id].focus();
+   f.window.location.hash='#show/gesture/0';f.emit(event);
+   assert.equal(f.document.activeElement,f.nodes[id],id);assert.equal(f.nodes['meeting-next'].disabled,true);
   }
  });
  test(`Meeting ${event} returns focus outside a player hidden by an invalid route`,()=>{

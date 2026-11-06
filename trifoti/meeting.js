@@ -15,13 +15,15 @@ export function initializeMeeting({document,window}){
  let ids=[],frames=[],index=0;const slot=createMediaSlot({document,host,status,onError:()=>{load.hidden=false;load.textContent='Повторить загрузку'}});
  function render(){
   const frame=frames[index];if(!frame)return;const p=projects[frame.key],item=frame.item;
-  const displaced=get('meeting-sources').contains?.(document.activeElement)||host.contains?.(document.activeElement)||document.activeElement===load;
+  const active=document.activeElement,prev=get('meeting-prev'),next=get('meeting-next'),singleFrame=frames.length<2;
+  // Disabling a focused button also removes focus, just like replacing media.
+  const displaced=get('meeting-sources').contains?.(active)||host.contains?.(active)||active===load||(singleFrame&&(active===prev||active===next));
   get('meeting-title').textContent=p.title;get('meeting-direction').textContent=p.direction;
   get('meeting-caption').textContent=(item.type==='video'?'Постер видео. ':'')+item.caption;
   get('meeting-credit').textContent=(p.attribution||p.type)+(!p.attribution?' Персональные роли участников в этом кейсе не уточнены.':'');
   get('meeting-counter').textContent=`${index+1} / ${frames.length}`;get('meeting-case-link').href='cases/'+frame.key+'.html#media-'+item.src.split('/').pop().replace(/\.[^.]+$/,'');
   const sources=get('meeting-sources');sources.replaceChildren();for(const source of p.sources||[]){const li=document.createElement('li'),a=document.createElement('a');a.href=source.url;a.textContent=source.label;a.target='_blank';a.rel='noopener noreferrer';a.setAttribute('aria-label',source.label+' — новая вкладка');li.append(a);sources.append(li)}
-  select.value=frame.key;get('meeting-prev').disabled=get('meeting-next').disabled=frames.length<2;
+  select.value=frame.key;prev.disabled=next.disabled=singleFrame;
   load.hidden=item.type!=='video';load.textContent='Показать управление видео';slot.show(item);
   exit.href='index.html?from=meeting#explore/'+ids.join(',');
   if(displaced)get('meeting-stage').focus({preventScroll:true});
