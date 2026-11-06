@@ -65,11 +65,11 @@ class Element{
  replaceChildren(...children){this.children=children.flatMap(child=>child.tag==='fragment'?child.children:[child])}
  setAttribute(name,value){this[name]=value}
  addEventListener(name,callback){this.listeners[name]=callback}
- fire(name){this.listeners[name]?.()}
+ fire(name,event={}){this.listeners[name]?.(event)}
 }
 function panel(getStorage=()=>memory(),download=()=>{}){
  const ids=Object.fromEntries(['review-sections','review-notes','review-save-status','export-review','review-status'].map(id=>[id,new Element()]));
- const document={getElementById:id=>ids[id]||null,createElement:tag=>new Element(tag),createDocumentFragment:()=>new Element('fragment')};
+ const document={defaultView:new Element('window'),getElementById:id=>ids[id]||null,createElement:tag=>new Element(tag),createDocumentFragment:()=>new Element('fragment')};
  initializeReviewPanel({document,download,getStorage});return{ids,document};
 }
 test('Every legacy shape initializes all six controls and preserves recoverable note text',()=>{
@@ -116,4 +116,72 @@ test('Optional review loads after all core initialization and has a visible fail
  assert(app.slice(at).includes('.catch('));assert(app.slice(at).includes("control.disabled=true"));assert(!app.includes('review.sections['));
  const html=readFileSync(new URL('../dist/index.html',import.meta.url),'utf8');assert(html.includes('id="review-save-status" class="form-note" role="status" aria-atomic="true"'));
  assert(html.includes('<textarea id="review-notes" disabled'));assert(html.includes('id="export-review" disabled'));assert(!html.includes('Заметки сохраняются в этом браузере.</p>'));
+});
+
+test('A stale panel cannot overwrite notes saved in another tab, even before a storage event',()=>{
+ const storage=memory(JSON.stringify(valid)),first=panel(()=>storage),second=panel(()=>storage);
+ first.ids['review-notes'].value='New notes from the first tab';first.ids['review-notes'].fire('input');
+ const select=second.ids['review-sections'].children[1].children[2];select.value='Убрать';select.fire('change');
+ assert.equal(storage.writes,1);assert.equal(JSON.parse(storage.raw).notes,'New notes from the first tab');
+ assert.equal(second.ids['review-notes'].value,valid.notes);assert.equal(select.value,'Убрать');
+ assert.match(second.ids['review-save-status'].textContent,/другой вкладке/);assert.equal(second.ids['review-save-status'].dataset.state,'error');
+});
+test('Storage events warn immediately without changing visible notes or decisions',()=>{
+ const storage=memory(JSON.stringify(valid)),{ids,document}=panel(()=>storage);
+ storage.raw=JSON.stringify({sections:{},notes:'Elsewhere'});document.defaultView.fire('storage',{key:REVIEW_KEY});
+ assert.match(ids['review-save-status'].textContent,/другой вкладке/);assert.equal(ids['review-notes'].value,valid.notes);
+ assert.equal(ids['review-sections'].children[0].children[2].value,'Оставляем');assert.equal(storage.writes,0);
+});
+test('A cleared saved review is treated as a conflict instead of silently resurrected',()=>{
+ for(const key of [REVIEW_KEY,null]){
+  const storage=memory(JSON.stringify(valid)),{ids,document}=panel(()=>storage);
+  storage.raw=null;document.defaultView.fire('storage',{key});
+  ids['review-notes'].value='Keep locally';ids['review-notes'].fire('input');
+  assert.equal(storage.raw,null);assert.equal(storage.writes,0);assert.match(ids['review-save-status'].textContent,/другой вкладке/);
+ }
+});
+test('Conflicts stay latched after later edits or restoration of the old storage bytes',()=>{
+ const storage=memory(JSON.stringify(valid)),{ids,document}=panel(()=>storage);
+ storage.raw='changed';document.defaultView.fire('storage',{key:REVIEW_KEY});storage.raw=JSON.stringify(valid);
+ ids['review-notes'].value='Local version';ids['review-notes'].fire('input');
+ assert.equal(storage.writes,0);assert.match(ids['review-save-status'].textContent,/другой вкладке/);
+});
+test('Current local notes and decisions remain exportable during a conflict',()=>{
+ let exported;const storage=memory(JSON.stringify(valid)),{ids}=panel(()=>storage,text=>{exported=text});
+ storage.raw=JSON.stringify({sections:{},notes:'Saved elsewhere'});
+ ids['review-notes'].value='Unsaved local notes';ids['review-notes'].fire('input');
+ const select=ids['review-sections'].children[1].children[2];select.value='Убрать';select.fire('change');
+ ids['export-review'].fire('click');assert.match(exported,/Unsaved local notes/);assert.match(exported,/2\. Направления: Убрать/);
+ assert.equal(JSON.parse(storage.raw).notes,'Saved elsewhere');assert.equal(ids['review-save-status'].dataset.state,'error');
+});
+test('Unrelated and unchanged storage events do not create false conflicts',()=>{
+ const storage=memory(JSON.stringify(valid)),{ids,document}=panel(()=>storage);
+ document.defaultView.fire('storage',{key:REVIEW_KEY});document.defaultView.fire('storage',{key:null});
+ assert.equal(ids['review-save-status'].dataset.state,'ready');
+ storage.raw='changed';document.defaultView.fire('storage',{key:'unrelated'});assert.equal(ids['review-save-status'].dataset.state,'ready');
+});
+test('Consecutive own saves advance the expected snapshot and a reopened panel uses the latest notes',()=>{
+ const storage=memory(JSON.stringify(valid)),{ids}=panel(()=>storage);
+ for(const value of ['One','Two']){ids['review-notes'].value=value;ids['review-notes'].fire('input');assert.equal(ids['review-save-status'].dataset.state,'ready')}
+ const reopened=panel(()=>storage);assert.equal(reopened.ids['review-notes'].value,'Two');
+ reopened.ids['review-notes'].value='Three';reopened.ids['review-notes'].fire('input');assert.equal(JSON.parse(storage.raw).notes,'Three');assert.equal(storage.writes,3);
+});
+test('An unreadable initial snapshot cannot overwrite unseen notes after storage recovers',()=>{
+ const storage=memory(JSON.stringify(valid));let blocked=true;
+ const getStorage=()=>{if(blocked)throw new Error('Unavailable');return storage};
+ const {ids}=panel(getStorage);blocked=false;ids['review-notes'].value='Local';ids['review-notes'].fire('input');
+ assert.equal(storage.writes,0);assert.deepEqual(JSON.parse(storage.raw),valid);assert.equal(ids['review-save-status'].dataset.state,'error');
+});
+test('A temporary read failure prevents saving and can recover if the snapshot is unchanged',()=>{
+ const storage=memory(JSON.stringify(valid));let blocked=false;
+ const getStorage=()=>({getItem(key){if(blocked)throw new Error('Unavailable');return storage.getItem(key)},setItem:(...args)=>storage.setItem(...args)});
+ const {ids}=panel(getStorage);blocked=true;ids['review-notes'].value='Local';ids['review-notes'].fire('input');
+ assert.equal(storage.writes,0);assert.equal(ids['review-save-status'].dataset.state,'error');
+ blocked=false;ids['review-notes'].fire('input');assert.equal(storage.writes,1);assert.equal(JSON.parse(storage.raw).notes,'Local');
+});
+test('Malformed and partial snapshots can still be repaired by explicit edits if unchanged',()=>{
+ for(const raw of ['{bad',JSON.stringify({notes:'Recoverable'})]){
+  const storage=memory(raw),{ids}=panel(()=>storage);ids['review-notes'].value='Repaired';ids['review-notes'].fire('input');
+  assert.equal(JSON.parse(storage.raw).notes,'Repaired');assert.equal(ids['review-save-status'].dataset.state,'ready');
+ }
 });

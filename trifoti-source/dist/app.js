@@ -200,7 +200,7 @@ const reviewMode=new URLSearchParams(location.search).get('review')==='1';
 if(reviewMode&&typeof $('#review-dialog')?.showModal==='function'){
  $('#review-launch').hidden=false;
  $('#review-launch')?.addEventListener('click',()=>$('#review-dialog')?.showModal());
- import('./review-panel.js?v=20261022-identity').then(({initializeReviewPanel})=>initializeReviewPanel({document,download})).catch(()=>{
+ import('./review-panel.js?v=20261106-conflict').then(({initializeReviewPanel})=>initializeReviewPanel({document,download})).catch(()=>{
   const status=$('#review-save-status');if(status){status.textContent='Панель заметок не загрузилась. Обновите страницу, чтобы попробовать снова.';status.dataset.state='error'}
   $$('#review-dialog textarea, #review-dialog select, #export-review').forEach(control=>control.disabled=true);
  });
