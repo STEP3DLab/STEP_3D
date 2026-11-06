@@ -14,7 +14,7 @@ test('One explicit Close precedes and stays outside the scrolling case',()=>{
  assert.match(html,/<dialog id="project-dialog" class="project-dialog" aria-labelledby="case-title" aria-describedby="case-description">/);
 });
 test('Only open native dialogs receive the flex layout',()=>{
- assert.match(layout,/\.project-dialog\{padding:0;overflow:hidden\}/);
+ assert.match(layout,/\.project-dialog\{padding:0;overflow:hidden;overflow:clip\}/);
  assert.match(layout,/\.project-dialog\[open\]\{display:flex;flex-direction:column\}/);
  assert.doesNotMatch(layout,/\.project-dialog\{[^}]*display:/);
 });
@@ -30,6 +30,13 @@ test('Only case content scrolls, can shrink, and keeps previous content insets',
  assert.match(layout,/@media\(max-width:800px\)\{#project-content\{padding:6px 20px 25px\}\}/);
  assert.equal(60+6,66); // Original media/content top inset, with room for focus outlines.
  assert.doesNotMatch(layout,/height:100vh|touch-action:none|transition|animation/);
+});
+test('The outer shell cannot scroll on focus, with a hidden fallback for older engines',()=>{
+ const shells=[...css.matchAll(/\.project-dialog(?:\[open\])?\{([^}]*)\}/g)];
+ const overflow=shells.flatMap(match=>[...match[1].matchAll(/(?:^|;)overflow:([^;}]*)/g)].map(rule=>rule[1]));
+ assert.deepEqual(overflow.slice(-2),['hidden','clip']);
+ assert.match(layout,/#project-content\{[^}]*overflow:auto/);
+ assert.match(html,/style\.css\?[^\"]*&amp;gallery=20261106-fixed-shell/);
 });
 for(const wasOpen of [false,true])test(`Opening a case resets its new scroll area after modal initialization (already open: ${wasOpen})`,()=>{
  const events=[];
