@@ -149,7 +149,7 @@ function openProject(key,routeMedia){
 }
 const caseNavigation=createProjectNavigation({keys:Object.keys(projects),location,history,onOpen:openProject,onClose:()=>{if(projectDialog.open)projectDialog.close()}});
 const explorationHost=$('#portfolio-exploration');
-optionalModule({load:()=>Promise.all([import('./exploration-panel.js?v=20261026-directions&audit=20261026-design-r1&copy=20261106-focus'),import('./selection-controls.js?v=20261026-directions&audit=20261026-design-r1&return=20261106-summary')]),mount:([{mountExploration},selectionTools])=>{
+optionalModule({load:()=>Promise.all([import('./exploration-panel.js?v=20261026-directions&audit=20261026-design-r1&copy=20261106-focus&history=20261106-comparison'),import('./selection-controls.js?v=20261026-directions&audit=20261026-design-r1&return=20261106-summary')]),mount:([{mountExploration},selectionTools])=>{
  bindSelectionButton=selectionTools.bindSelectionButton;const mountSelectionSummary=selectionTools.mountSelectionSummary;
  exploration=mountExploration({host:explorationHost,document,location,history,clipboard:navigator.clipboard,onBrief:keys=>{
  const reference=form.elements.namedItem('reference'),result=appendSelectionReference(reference.value,keys);
