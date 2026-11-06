@@ -1,0 +1,207 @@
+/* TRIFOTI · spectrum / 2026-11-06
+   Art + digital form + engineering. Shared palette for the independent /warm/ edition.
+   Photographs retain their original color; gradients belong to the interface. */
+:root {
+  --paper: #f7f8fc;
+  --ink: #18223b;
+  --muted: #53617a;
+  --line: #d6ddec;
+  --red: #3457d5;
+  --red-text: #3457d5;
+  --gold: #087f92;
+  --studio-blue: #3457d5;
+  --studio-teal: #087f92;
+  --studio-iris: #7250c7;
+  --studio-dark: #141e35;
+  --studio-action: linear-gradient(115deg, #08788c 0%, #3457d5 52%, #7250c7 100%);
+  --studio-action-hover: linear-gradient(115deg, #066475 0%, #2846b5 52%, #603fad 100%);
+  --studio-text: linear-gradient(105deg, #08788c 0%, #3457d5 48%, #7250c7 100%);
+}
+
+html { background: var(--paper); }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  accent-color: var(--studio-blue);
+}
+::selection { background: #dcd5ff; color: #20234a; }
+:focus-visible { outline: 3px solid var(--studio-blue); outline-offset: 4px; }
+.red, .text-link:hover { color: var(--studio-blue); }
+
+/* A deep blue brand bar, framed by a narrow light spectrum. */
+.header {
+  background: linear-gradient(112deg, #142039 0%, #172c49 53%, #28274c 100%);
+  border-bottom: 1px solid #50617f;
+  box-shadow: 0 4px 24px #10182b12;
+}
+.header::after {
+  content: "";
+  position: absolute;
+  height: 2px;
+  inset: auto 0 0;
+  background: linear-gradient(90deg, #4ed8dc, #80a9ff 52%, #bf97f5);
+  pointer-events: none;
+}
+.brand.brand-blue-origin, .header nav a { color: #f5f7ff; }
+.header nav a:hover, .header nav a[aria-current="location"] { color: #a8e9f1; }
+.header nav a:after { background: linear-gradient(90deg, #4ed8dc, #aaa1ff); }
+.header .menu-button { color: #f5f7ff; border-color: #8b9bb6; }
+.header .menu-button span { background: #f5f7ff; }
+.header :focus-visible { outline-color: #a8e9f1; }
+.warm-brand-mark { box-shadow: 0 0 0 1px #a5b7d85c; }
+
+/* Luminous accents stay concentrated around the first screen. */
+.hero {
+  background:
+    radial-gradient(ellipse at 8% 12%, #d9f3f8 0%, transparent 45%),
+    radial-gradient(ellipse at 54% 70%, #e7e1fc 0%, transparent 47%),
+    linear-gradient(125deg, #f7fbfd 0%, #f4f6fc 54%, #f7f3fc 100%);
+}
+.hero h1 { color: var(--ink); }
+.hero h1 .red { color: var(--studio-blue); }
+@supports ((background-clip: text) or (-webkit-background-clip: text)) {
+  .hero h1 .red {
+    background: var(--studio-text);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+  }
+}
+.hero .eyebrow, .hero-description { color: #465570; }
+.hero-location, .hero-signature { color: #5a6680; }
+.red-dot { background: var(--studio-action); box-shadow: 0 0 0 4px #3457d50c; }
+.hero-directions a { color: #415473; border-color: #bdcce2; }
+.hero-directions a:hover { background: #e8e8fc; color: #3145aa; border-color: #9ca5dc; }
+.warm-hero-art {
+  background: #e8e7f2;
+  box-shadow: 0 18px 50px #3c3b6a16, 0 0 0 1px #cbcce4;
+}
+.warm-hero-art figcaption>span:last-child {
+  background: #18223bee; color: #fff; border: 1px solid #ffffff3b; border-radius: 20px;
+}
+.warm-original-link {
+  background: #fffffff0; color: #3243a2; border-color: #d4d9ed; border-radius: 8px;
+  box-shadow: 0 4px 18px #18223b12;
+}
+.warm-original-link:hover { background: #f2f2ff; color: #293a8b; }
+
+/* Primary actions use one gradient across every page and state. */
+.button, .button-dark, .contact .button {
+  background: var(--studio-action); color: #fff; border: 1px solid #3e5cb7;
+  border-radius: 10px; box-shadow: 0 7px 20px #3457d51c;
+}
+.button:hover, .button-dark:hover, .contact .button:hover {
+  background: var(--studio-action-hover); color: #fff;
+}
+.button-light, .button-outline, .contact .button-outline {
+  background: #fff; color: #344ba3; border-color: #9daedb; box-shadow: none;
+}
+.button-light:hover, .button-outline:hover, .contact .button-outline:hover {
+  background: #e9edff; color: #283d8b;
+}
+.button:disabled, .button[aria-disabled="true"] {
+  background: #dde2ee; border-color: #c7cedd; color: #55617a; box-shadow: none;
+}
+.header .header-cta {
+  background: linear-gradient(110deg, #b5eff0, #c5d9ff 55%, #dec9ff);
+  color: #172a4b; border-color: #cadbff; box-shadow: 0 4px 18px #00000012;
+}
+.header .header-cta:hover { background: #e4eeff; color: #172a4b; }
+
+/* Neutral exhibition surfaces balance the cooler digital accents. */
+.warm-mood { background: #fff; border-color: var(--line); }
+.warm-mood-grid img { border-radius: 12px; }
+.warm-original { background: #fff; }
+.warm-original details { background: linear-gradient(120deg, #f1f8fb, #f0edfc); border-color: #d4dced; border-radius: 12px; }
+.warm-original summary .eyebrow { color: #56637b; }
+.projects { background: #f7f8fc; border-color: var(--line); }
+.concept-gallery { background: #fff; }
+.concept-grid img { background: #f0f2f8; border-color: var(--line); border-radius: 12px; }
+.process { background: #f1f3fb; border-color: var(--line); }
+.studio { background: #fff; border-color: var(--line); }
+.brief-bridge {
+  background: linear-gradient(110deg, #e1f5f6, #e8edff 54%, #eee3fc);
+  border-color: #6a75c8;
+}
+.filters button { background: #fff; color: #42536f; border-color: #c4cfe2; }
+.filters button:hover { background: #eef0fd; border-color: #6a80c7; }
+.filters button.active { background: var(--studio-action); border-color: #3457d5; color: #fff; }
+.filter-count { background: #eef0fb; color: #2e4272; }
+.service-list { border-color: #9fafd1; }
+.service-list details[open] h3 { color: var(--studio-blue); }
+
+/* Category identities are subtle; the images keep their actual materials and finishes. */
+.category-story-tile { background: #1c2943; border-color: #cbd5e8; border-radius: 16px; }
+.category-story-tile.has-photo::after {
+  background: linear-gradient(180deg, #111c3024, transparent 32%, #121c3333 47%, #121c33de 79%, #121c33fa);
+}
+.category-story-tile.has-photo .category-tile-count { color: #edf2ff; }
+.category-tile-cta { background: #17243de8; border-color: #ffffff70; color: #fff; }
+.category-story-tile.is-intro { background: linear-gradient(140deg, #d8f2ef, #dceaf9 65%, #e6e5fa); color: #1b344b; }
+.category-story-tile.is-intro:hover { background: linear-gradient(140deg, #ceeee9, #d2e2f8 65%, #dedbf5); }
+.category-story-tile.is-intro[data-story-category="industrial"] { background: linear-gradient(135deg, #e7e0fc, #dde6fb 60%, #daf1f4); }
+.is-intro .category-tile-copy { background: linear-gradient(180deg, #f4f7fc00, #f4f7fced 35%); }
+.is-intro .category-tile-count { color: #52617b; }
+.is-intro .category-tile-cta { background: #fffffff2; color: #3454ac; border-color: #b3c2e2; }
+.category-art-interiors i { border-color: #27798c; background: #54bbc51a; }
+.category-art-interiors i:last-child { border-color: #6f7ac2; background: #eee9fc99; }
+.category-art-industrial i { border-color: #6a53b3; background: #8e78d912; }
+.category-art-industrial i:last-child { border-color: #267d98; background: #67bfd51a; }
+.category-story-tile:hover, .category-story-tile:focus-visible { outline-color: #6576c8; }
+
+/* The brief stays light, including errors and secondary instructions. */
+.contact {
+  background: radial-gradient(ellipse at 0% 0%, #d9f2f2, transparent 52%), linear-gradient(125deg, #f0f5fc, #ece9fb);
+  border-color: #b9c7e4; color: var(--ink);
+}
+.contact p, .contact .eyebrow { color: #4a5b75; }
+.contact input, .contact textarea, .contact select { background: #ffffffed; color: var(--ink); border-color: #9fafd0; }
+.contact input:focus, .contact textarea:focus, .contact select:focus { border-color: #3457d5; outline-color: #3457d5; }
+.contact input::placeholder, .contact textarea::placeholder { color: #68758b; opacity: 1; }
+.contact .brief-field-error, .contact .brief-error-summary, .contact .brief-error-summary a { color: #9e294d; border-color: #ad4465; }
+.brief-reset-confirm { border-color: #b5a4db; }
+.brief-preparation, .brief-direction-option { border-color: #bdc8df; }
+.brief-preparation input[type=checkbox] { accent-color: #3457d5; }
+
+footer.site-footer {
+  --ink: #f2f5ff; --muted: #c2cde1; --line: #42516c; --red-text: #a9e4f1;
+  background: linear-gradient(115deg, #141f36, #1d2442 60%, #292745);
+  color: #f2f5ff; border-top: 1px solid #53617d;
+}
+.site-footer .footer-brand-blue-origin { color: #f2f5ff; }
+.site-footer .footer-column a:hover, .site-footer .footer-top:hover { color: #a9e4f1; }
+.site-footer :focus-visible { outline-color: #a9e4f1; }
+
+/* Case studies, catalogue and meeting view share the same visual language. */
+.resource-nav, .meeting-top { background: linear-gradient(110deg, #e8f4f7, #edeafb); border-color: var(--line); }
+.resource-nav a, .meeting-top a { color: #314a93; }
+.catalog-card, .light-case { border-color: var(--line); }
+
+@media (max-width: 800px) {
+  .header nav { background: linear-gradient(125deg, #16253f, #27294a); border-color: #52617c; }
+  .hero { background: radial-gradient(ellipse at 0% 0%, #dcf4f6, transparent 58%), linear-gradient(145deg, #f9fbfd, #ece8fa); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .button { transition: none; }
+  .button:hover { transform: none; }
+}
+@media (forced-colors: active) {
+  body, .header, .hero, .warm-mood, .warm-original, .projects, .process, .studio, .contact,
+  footer.site-footer, .resource-nav, .meeting-top, .brief-bridge, .header nav,
+  .category-story-tile, .category-story-tile.is-intro, .is-intro .category-tile-copy {
+    background: Canvas; color: CanvasText; border-color: CanvasText; box-shadow: none;
+  }
+  .hero h1 .red { background: none; color: CanvasText; -webkit-text-fill-color: CanvasText; }
+  .header::after { display: none; }
+  .header .menu-button span { background: ButtonText; }
+  .button, .header .header-cta, .contact .button, .filters button { background: ButtonFace; color: ButtonText; border-color: ButtonText; box-shadow: none; }
+  .header nav a, .brand.brand-blue-origin, .site-footer .footer-column a,
+  .site-footer .footer-brand-blue-origin, .site-footer .footer-top { color: LinkText; }
+  .header :focus-visible, .site-footer :focus-visible, :focus-visible { outline-color: Highlight; }
+}
+@media print {
+  body, .hero, .header, .contact, footer.site-footer, .resource-nav, .meeting-top { background: #fff; color: #000; box-shadow: none; }
+  .hero h1 .red { background: none; color: #000; -webkit-text-fill-color: #000; }
+  .warm-hero-art { box-shadow: none; }
+}

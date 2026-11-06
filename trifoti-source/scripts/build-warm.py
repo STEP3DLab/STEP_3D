@@ -67,6 +67,14 @@ shutil.copyfile(root/'trifoti-source/warm/warm-ui.js',target/'warm-ui.js')
 import runpy
 runpy.run_path(str(root/'trifoti-source/warm/directions/apply.py'))['apply'](target)
 runpy.run_path(str(root/'trifoti-source/warm/red7/apply.py'))['apply'](target)
+# Keep the independent studio palette after all generated styles and direction updates.
+shutil.copyfile(root/'trifoti-source/warm/studio-palette.css', target/'studio-palette.css')
+for page in target.rglob('*.html'):
+    palette = '../studio-palette.css' if page.parent.name == 'cases' else 'studio-palette.css'
+    content = page.read_text()
+    content = re.sub(r'<meta name="theme-color" content="[^"]*">', '<meta name="theme-color" content="#142039">', content)
+    content = content.replace('</head>', f'<link rel="stylesheet" href="{palette}?v=20261106-spectrum">\n</head>')
+    page.write_text(content)
 # Publish identical files for either GitHub Pages source layout.
 mirror=root/'docs/trifoti/warm'
 shutil.copytree(target,mirror,dirs_exist_ok=True)
