@@ -93,8 +93,9 @@ function restoreProjectFocus(mode){
  const card=$(`[data-project="${galleryProject}"]`),openerMatches=projectOpener?.closest('.exploration-panel')||projectOpener?.dataset.project===galleryProject||projectOpener?.dataset.caseLink===galleryProject||projectOpener?.getAttribute('href')==='#project/'+galleryProject||projectOpener?.dataset.storyCategory;
  const target=visiblePortfolioTarget(projectOpener)&&openerMatches?projectOpener:visiblePortfolioTarget(projectOpenerFallback)?projectOpenerFallback:visiblePortfolioTarget(card)?card:$('#all-projects-summary');
  target?.focus({preventScroll:mode!=='fallback'});
- if(!target||target===projectOpener)return;
+ if(!target)return;
  // History restoration can arrive after both a frame and a zero-delay task.
+ // Even the original opener can move offscreen after zoom or viewport changes.
  // Guard this focused return target, yielding immediately to any user input.
  let active=true,awaitingBack=mode==='back',returnHash=window.location.hash;
  const inputs=['keydown','pointerdown','touchstart','wheel'];
@@ -113,7 +114,9 @@ function restoreProjectFocus(mode){
   if(rect.bottom>header&&rect.top<window.innerHeight)return;
   target.scrollIntoView({block:'center',behavior:'instant'});
  }
- target.scrollIntoView({block:'center',behavior:'instant'});cancelProjectReturn=cancel;
+ if(target===projectOpener)check();else target.scrollIntoView({block:'center',behavior:'instant'});
+ if(!active)return;
+ cancelProjectReturn=cancel;
  window.addEventListener('scroll',check,{passive:true});window.addEventListener('popstate',route);window.addEventListener('hashchange',hashChanged);window.addEventListener('blur',cancel);window.addEventListener('pagehide',cancel);
  for(const type of inputs)document.addEventListener(type,cancel,{capture:true,passive:true});document.addEventListener('focusin',focusChanged,true);
 

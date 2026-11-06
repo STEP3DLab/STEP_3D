@@ -18,7 +18,7 @@ function fixture({mode='back',source='comparison',open=false}={}){
   scrollIntoView(options){scroll.push({id,options});this.bounds={top:300,bottom:346}},...extra});
  const summary=node('explore-summary'),panel=node('explore',{querySelector:selector=>selector==='summary'?summary:null});
  const card=node('card',{dataset:{project:'mascot'}}),catalog=node('catalog-summary'),outside=node('outside');
- const opener=source==='card'?card:node('comparison-open',{closest:selector=>selector==='.exploration-panel'?panel:null});
+ const opener=source==='card'?card:source==='story'?node('story-tile',{dataset:{storyCategory:'sculpture'}}):node('comparison-open',{closest:selector=>selector==='.exploration-panel'?panel:null});
  document.querySelector=()=>({getBoundingClientRect:()=>({bottom:92})});
  const context={document,window,visiblePortfolioTarget,cancelProjectReturn:()=>{},projectOpener:null,projectOpenerFallback:null,galleryProject:'mascot',
   projectDialog:{open,addEventListener(type,handler){assert.equal(type,'close');close=handler}},
@@ -48,8 +48,17 @@ test('Corrective scroll events are no-ops while the target is already visible',(
 test('Hidden behind sticky header or below viewport is revealed instantly',()=>{
  for(const bounds of [{top:0,bottom:46},{top:900,bottom:946}]){const f=fixture();f.removeOpener();f.close();f.displace(f.summary,bounds);assert.equal(f.scroll.length,2);assert.equal(f.scroll[1].options.block,'center');assert.equal(f.scroll[1].options.behavior,'instant')}
 });
-for(const source of ['comparison','card'])test(`Unchanged opener retains focus without a scroll guard: ${source}`,()=>{
- const f=fixture({source});f.close();assert.equal(f.document.activeElement,f.opener);assert.equal(f.focus[0].options.preventScroll,true);assert.equal(f.listeners.length,0);assert.equal(f.scroll.length,0);
+for(const source of ['comparison','card','story'])test(`Unchanged visible opener keeps its position and guards later history restoration: ${source}`,()=>{
+ const f=fixture({source});f.close();assert.equal(f.document.activeElement,f.opener);assert.equal(f.focus[0].options.preventScroll,true);assert(f.listeners.length);assert.equal(f.scroll.length,0);
+ f.returned();f.displace(f.opener,{top:900,bottom:1069});assert.equal(f.scroll.length,1);assert.equal(f.scroll[0].id,f.opener.id);assert.equal(f.document.activeElement,f.opener);
+});
+for(const source of ['card','story'])test(`Zoom or resize while open reveals the unchanged return target: ${source}`,()=>{
+ const f=fixture({source});f.opener.bounds={top:900,bottom:1069};f.close();assert.equal(f.document.activeElement,f.opener);assert.equal(f.scroll.length,1);assert.equal(f.scroll[0].options.behavior,'instant');
+ f.returned();f.displace(f.opener);assert.equal(f.scroll.length,2);
+ f.emitDocument('wheel');assert.equal(f.listeners.length,0);f.displace(f.opener);assert.equal(f.scroll.length,2);
+});
+test('Failed return focus does not leave an inactive viewport guard attached',()=>{
+ const f=fixture({source:'story'});f.opener.focus=()=>{};f.close();assert.equal(f.listeners.length,0);assert.equal(f.scroll.length,0);
 });
 test('Unavailable panel or filtered card falls back to a visible catalog destination',()=>{
  const f=fixture();f.removeOpener();f.summary.hidden=true;f.card.hidden=true;f.close();assert.equal(f.document.activeElement,f.catalog);assert.equal(f.scroll[0].id,'catalog-summary');
@@ -84,6 +93,6 @@ test('New explicit opening removes listeners and resets the old fallback',()=>{
 });
 test('All opening paths remember current return context and cache key is refreshed',()=>{
  for(const [entry,arg] of [['onOpen:(key,id,opener)','opener'],['onOpen:card','card'],['onOpen:link','link'],['onFullCase:(key,id,tile)','tile']])assert(app.includes(entry+'=>{rememberProjectOpener('+arg+');'));
- assert.match(readFileSync(new URL('../dist/index.html',import.meta.url),'utf8'),/return=20261106-visible-return/);
+ assert.match(readFileSync(new URL('../dist/index.html',import.meta.url),'utf8'),/return=20261106-resized-return/);
  assert.doesNotMatch(app.slice(app.indexOf('function restoreProjectFocus'),app.indexOf('function showSlide')),/setTimeout|requestAnimationFrame|scrollRestoration\s*=/);
 });
