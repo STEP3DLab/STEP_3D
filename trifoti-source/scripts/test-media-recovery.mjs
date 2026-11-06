@@ -124,4 +124,41 @@ test('Entry point and changed media module both receive fresh cache keys',()=>{
  const app=readFileSync(new URL('../dist/app.js',import.meta.url),'utf8'),html=readFileSync(new URL('../dist/index.html',import.meta.url),'utf8');
  assert.match(app,/import \{watchGalleryMedia,releaseGalleryVideo\} from '\.\/media-recovery.js\?v=20261106-release-video'/);
  assert.match(html,/app\.js\?[^\"]*&amp;media=20261106-release-video/);
+ assert.match(html,/app\.js\?[^\"]*&amp;playback=20261106-background-pause/);
+});
+
+function backgroundFixture(){
+ const app=readFileSync(new URL('../dist/app.js',import.meta.url),'utf8'),handlers={};
+ const document={hidden:false,pictureInPictureElement:null,addEventListener(type,fn){handlers['document:'+type]=fn}},window={addEventListener(type,fn){handlers['window:'+type]=fn}};
+ const dialog={open:true};let videos=[];
+ const context={document,window,$:selector=>{assert.equal(selector,'#project-dialog');return dialog},$$:(selector,root)=>{assert.equal(selector,'video');assert.equal(root,dialog);return videos}};
+ vm.runInNewContext(app.slice(app.indexOf("const projectDialog=$('#project-dialog');"),app.indexOf('let categoryStories=null;')),context);
+ const video=()=>({src:'assets/projects/gesture/gesture-turntable.mp4',currentTime:3.25,paused:false,pauses:0,pause(){this.pauses++;this.paused=true},play(){throw Error('No automatic resume')},load(){throw Error('Keep the current resource on tab changes')},removeAttribute(){throw Error('Keep the current resource on tab changes')}});
+ const first=video();videos=[first];
+ return {first,document,dialog,video,setVideos(value){videos=value},emit(owner,type){handlers[owner+':'+type]?.()}};
+}
+test('Hiding the page pauses full-gallery playback without discarding its source or position',()=>{
+ const f=backgroundFixture();f.document.hidden=true;f.emit('document','visibilitychange');
+ assert.equal(f.first.paused,true);assert.equal(f.first.currentTime,3.25);assert.equal(f.first.src,'assets/projects/gesture/gesture-turntable.mp4');assert.equal(f.first.pauses,1);
+});
+test('A visible page does not interrupt active full-gallery playback',()=>{
+ const f=backgroundFixture();f.emit('document','visibilitychange');assert.equal(f.first.pauses,0);assert.equal(f.first.paused,false);
+});
+test('Returning to the page never resumes a video, including repeated hide/show cycles',()=>{
+ const f=backgroundFixture();for(let i=0;i<3;i++){f.document.hidden=true;f.emit('document','visibilitychange');f.document.hidden=false;f.emit('document','visibilitychange');assert.equal(f.first.paused,true)}assert.equal(f.first.pauses,3);
+});
+test('Page departure pauses full-gallery media even without a preceding hidden event',()=>{
+ const f=backgroundFixture();f.emit('window','pagehide');assert.equal(f.first.paused,true);assert.equal(f.first.currentTime,3.25);assert.equal(f.first.pauses,1);
+});
+test('Background handling reads the current media, not a previously replaced frame',()=>{
+ const f=backgroundFixture(),current=f.video();f.setVideos([current]);f.document.hidden=true;f.emit('document','visibilitychange');assert.equal(current.paused,true);assert.equal(f.first.pauses,0);
+});
+test('Photo-only and empty galleries safely ignore page lifecycle changes',()=>{
+ const f=backgroundFixture();f.setVideos([]);f.document.hidden=true;f.emit('document','visibilitychange');f.emit('window','pagehide');assert.equal(f.first.pauses,0);
+});
+test('An explicitly floating picture-in-picture video remains playing on tab changes',()=>{
+ const f=backgroundFixture();f.document.pictureInPictureElement=f.first;f.document.hidden=true;f.emit('document','visibilitychange');assert.equal(f.first.pauses,0);assert.equal(f.first.paused,false);f.emit('window','pagehide');assert.equal(f.first.paused,true);
+});
+test('A different picture-in-picture video does not exempt the current gallery',()=>{
+ const f=backgroundFixture();f.document.pictureInPictureElement=f.video();f.document.hidden=true;f.emit('document','visibilitychange');assert.equal(f.first.paused,true);
 });

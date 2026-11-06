@@ -72,6 +72,13 @@ optionalModule({load:()=>import('./brief-preparation.js?v=20261026-directions'),
 $$('[data-close]').forEach(b=>b.addEventListener('click',()=>document.getElementById(b.dataset.close).close()));
 $$('dialog').forEach(dialog=>{if(dialog.id!=='category-story-dialog')keepDialogFocus(dialog);let backdropPressed=false;dialog.addEventListener('pointerdown',e=>{const r=dialog.getBoundingClientRect();backdropPressed=e.target===dialog&&(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)});dialog.addEventListener('click',e=>{if(backdropPressed&&e.target===dialog)dialog.close();backdropPressed=false})});
 const projectDialog=$('#project-dialog');
+// Keep the visitor's place when leaving the page, without restarting on return.
+// Explicit picture-in-picture remains visible outside the tab until page departure.
+function pauseProjectMedia(keepFloating=false){
+ $$('video',projectDialog).forEach(video=>{if(!keepFloating||document.pictureInPictureElement!==video)video.pause()});
+}
+document.addEventListener('visibilitychange',()=>{if(document.hidden)pauseProjectMedia(true)});
+window.addEventListener('pagehide',()=>pauseProjectMedia());
 let categoryStories=null;
 let galleryProject=null,galleryIndex=0,slideRevision=0,projectOpener=null,projectOpenerFallback=null,photoDetail=null,exploration=null,selectionSummary=null,unbindCaseSelection=()=>{};
 let updateGalleryChapters=()=>{},clearMediaWait=()=>{},cancelProjectReturn=()=>{};
