@@ -44,6 +44,18 @@ test('Existing six cards now fall back to generated pages; original hash navigat
  assert.match(html,/href="light.html"/);assert.match(html,/href="catalog.html"/);assert.match(app,/caseNavigation\.open\(card\.dataset\.project\)/);
  assert.match(read('exploration-panel.js'),/meeting\.hidden=!selected.length/);assert(read('exploration-panel.js').includes("meeting.href='meeting.html#show/'"));
 });
+test('Meeting HTML exposes recovery links without any script and hides premature selection advice',()=>{
+ const html=outputs.get('meeting.html'),withoutNoscript=html.replace(/<noscript>[\s\S]*?<\/noscript>/g,'');
+ const loading=withoutNoscript.match(/<div id="meeting-loading">([\s\S]*?)<\/div>/)[1];
+ assert.match(loading,/Открываем выбранные работы/);assert.match(loading,/Если показ не открылся/);
+ assert.doesNotMatch(loading,/Выберите до трёх|Выбрать работы/);
+ for(const [key,p] of Object.entries(projects))assert(loading.includes(`<a href="${casePath(key)}">${p.title}</a>`),key);
+ assert.match(withoutNoscript,/<div id="meeting-selection" hidden>/);
+ assert.match(withoutNoscript,/<section id="meeting-player" hidden/);
+ assert.match(withoutNoscript,/<a class="skip" id="meeting-skip" href="#meeting-stage" hidden>/);
+ assert.match(withoutNoscript,/meeting\.js[^"<>]*fallback=20261106-loading/);
+ assert.match(read('portfolio-resources.css'),/\.light-index a\{[^}]*min-height:44px/);
+});
 test('Meeting route validates and limits IDs, clamps frames and never embeds arbitrary text',()=>{
  assert.deepEqual(meetingRoute('#show/mascot,stdAwards,gesture,pink/99'),{ids:['mascot','stdAwards','gesture'],index:13});
  assert.equal(meetingFrames(['mascot','stdAwards']).length,13);
@@ -68,13 +80,48 @@ class Node{
 }
 function fixture(hash='#show/mascot,gesture/0'){
  const nodes={},listeners={},changes=[];const document={hidden:false,activeElement:null,createElement:tag=>new Node(tag,document),getElementById:id=>nodes[id],addEventListener(type,fn){(listeners[type]??=[]).push(fn)},querySelectorAll(){return []},querySelector(selector){return selector==='.meeting-top'?{getBoundingClientRect:()=>({height:78})}:null}};
- for(const id of ['meeting-player','meeting-media','meeting-media-status','meeting-load','meeting-case','meeting-exit','meeting-title','meeting-direction','meeting-caption','meeting-credit','meeting-counter','meeting-case-link','meeting-sources','meeting-prev','meeting-next','meeting-empty','meeting-skip','meeting-stage','light-posters','light-mode'])nodes[id]=new Node(id==='meeting-case'?'select':id==='light-posters'?'input':id.endsWith('-next')||id.endsWith('-prev')||id.endsWith('-load')?'button':'div',document);
+ for(const id of ['meeting-player','meeting-media','meeting-media-status','meeting-load','meeting-case','meeting-exit','meeting-title','meeting-direction','meeting-caption','meeting-credit','meeting-counter','meeting-case-link','meeting-sources','meeting-prev','meeting-next','meeting-empty','meeting-loading','meeting-selection','meeting-skip','meeting-stage','light-posters','light-mode'])nodes[id]=new Node(id==='meeting-case'?'select':id==='light-posters'?'input':id.endsWith('-next')||id.endsWith('-prev')||id.endsWith('-load')?'button':'div',document);
  document.body=new Node('body',document);document.activeElement=document.body;
+ nodes['meeting-empty'].append(nodes['meeting-loading'],nodes['meeting-selection']);
+ for(const id of ['meeting-player','meeting-selection','meeting-skip'])nodes[id].hidden=true;
  nodes['meeting-stage'].append(nodes['meeting-media'],nodes['meeting-sources'],nodes['meeting-load']);
  nodes['meeting-player'].append(nodes['meeting-prev'],nodes['meeting-next'],nodes['meeting-case'],nodes['meeting-stage']);
  const window={location:{hash},history:{state:{existing:true},replaceState(state,_,hash){changes.push([state,hash]);window.location.hash=hash}},addEventListener(type,fn){(listeners[type]??=[]).push(fn)}};
  return {document,window,nodes,changes,emit(type,event={}){for(const fn of listeners[type]||[])fn({target:nodes['meeting-next'],preventDefault(){this.defaultPrevented=true},...event})}};
 }
+test('Meeting only replaces the loading fallback after a successful initialization',()=>{
+ for(const hash of ['#show/pink/1','']){
+  const f=fixture(hash);initializeMeeting(f);
+  assert(f.nodes['meeting-loading'].hidden);assert.equal(f.nodes['meeting-selection'].hidden,false);
+  assert.equal(f.nodes['meeting-player'].hidden,!hash);assert.equal(f.nodes['meeting-empty'].hidden,!!hash);
+  assert.equal(f.nodes['meeting-skip'].hidden,!hash);assert.equal(f.document.activeElement,f.document.body);
+  assert.equal(f.changes.length,0);
+ }
+});
+test('Meeting fallback survives an incomplete scaffold or failure during the first render',()=>{
+ for(const missing of ['meeting-player','meeting-selection','meeting-skip']){
+  const f=fixture();delete f.nodes[missing];assert.equal(initializeMeeting(f),null);
+  assert.equal(f.nodes['meeting-empty'].hidden,false);assert.equal(f.nodes['meeting-loading'].hidden,false);
+ }
+ const f=fixture();delete f.nodes['meeting-title'];assert.throws(()=>initializeMeeting(f));
+ assert.equal(f.nodes['meeting-empty'].hidden,false);assert.equal(f.nodes['meeting-loading'].hidden,false);
+ assert(f.nodes['meeting-player'].hidden);assert(f.nodes['meeting-selection'].hidden);assert(f.nodes['meeting-skip'].hidden);
+});
+test('Delayed meeting initialization restores focus only when it hides a focused fallback link',()=>{
+ for(const hash of ['#show/pink/1','']){
+  const f=fixture(hash),link=new Node('a',f.document);f.nodes['meeting-loading'].append(link);link.focus();
+  initializeMeeting(f);const target=f.nodes[hash?'meeting-stage':'meeting-exit'];
+  assert.equal(f.document.activeElement,target);assert.deepEqual(target.focusOptions,{preventScroll:true});
+ }
+ const f=fixture();f.nodes['meeting-exit'].focus();initializeMeeting(f);
+ assert.equal(f.document.activeElement,f.nodes['meeting-exit']);
+});
+test('Meeting route from the selection prompt to a valid show retains a visible focus',()=>{
+ const f=fixture('');initializeMeeting(f);const link=new Node('a',f.document);f.nodes['meeting-selection'].append(link);link.focus();
+ f.window.location.hash='#show/pink/1';f.emit('hashchange');
+ assert.equal(f.document.activeElement,f.nodes['meeting-stage']);assert.equal(f.nodes['meeting-skip'].hidden,false);
+ assert.equal(f.nodes['meeting-counter'].textContent,'2 / 2');assert(f.nodes['meeting-empty'].hidden);
+});
 test('Media slot ignores obsolete loads/errors, explicitly pauses replaced video and never autoplays',()=>{
  const f=fixture(),host=new Node('div',f.document),status=new Node('p',f.document);let errors=0;
  const slot=createMediaSlot({document:f.document,host,status,onError(){errors++}}),item=projects.mascot.media[9];
@@ -180,9 +227,12 @@ test('Meeting repeated route events keep the current video and its native focus'
  assert.equal(f.document.activeElement,video);assert.equal(f.nodes['meeting-media'].children[0],video);
  assert.equal(video.paused,undefined);assert.equal(f.changes.length,0);
 });
-test('Meeting an invalid route does not steal focus from outside the player',()=>{
- const f=fixture('#show/gesture,pink/0');initializeMeeting(f);f.nodes['meeting-skip'].focus();
- f.window.location.hash='#bad';f.emit('hashchange');assert.equal(f.document.activeElement,f.nodes['meeting-skip']);
+test('Meeting an invalid route preserves outside focus but moves focus from the disappearing skip link',()=>{
+ for(const id of ['meeting-exit','meeting-skip']){
+  const f=fixture('#show/gesture,pink/0');initializeMeeting(f);f.nodes[id].focus();
+  f.window.location.hash='#bad';f.emit('hashchange');assert.equal(f.document.activeElement,f.nodes['meeting-exit']);
+  assert(f.nodes['meeting-skip'].hidden);
+ }
 });
 test('Lightweight native request measurements reconcile and prove a bounded reduction',()=>{
  const measurements=JSON.parse(readFileSync(new URL('./lightweight-measurements.json',import.meta.url),'utf8'));

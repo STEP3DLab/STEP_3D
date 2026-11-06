@@ -10,7 +10,8 @@ export function meetingRoute(hash){
 }
 export function meetingHash(ids,index=0){const safe=selectionIds(ids.join(',')),length=meetingFrames(safe).length;return safe.length?'#show/'+safe.join(',')+'/'+Math.max(0,Math.min(Number.isInteger(index)?index:0,length-1)):''}
 export function initializeMeeting({document,window}){
- const get=id=>document.getElementById(id),player=get('meeting-player');if(!player)return null;
+ const get=id=>document.getElementById(id),player=get('meeting-player'),empty=get('meeting-empty'),loading=get('meeting-loading'),selection=get('meeting-selection'),skip=get('meeting-skip');
+ if(!player||!empty||!loading||!selection||!skip)return null;
  const host=get('meeting-media'),status=get('meeting-media-status'),load=get('meeting-load'),select=get('meeting-case'),exit=get('meeting-exit');
  let ids=[],frames=[],index=0;const slot=createMediaSlot({document,host,status,onError:()=>{load.hidden=false;load.textContent='Повторить загрузку'}});
  function render(){
@@ -32,13 +33,19 @@ export function initializeMeeting({document,window}){
   const route=meetingRoute(window.location.hash);
   if(ids.join(',')===route.ids.join(',')&&index===route.index&&frames.length)return;
   ids=route.ids;index=route.index;frames=meetingFrames(ids);
-  const leavingPlayer=!frames.length&&player.contains(document.activeElement);
-  player.hidden=!frames.length;get('meeting-empty').hidden=!!frames.length;
+  const active=document.activeElement;
+  const leavingPlayer=!frames.length&&(player.contains(active)||active===skip);
+  const leavingEmpty=frames.length&&empty.contains(active);
+  const leavingLoading=!frames.length&&loading.contains(active);
   exit.href=ids.length?'index.html?from=meeting#explore/'+ids.join(','):'index.html#projects';
   select.replaceChildren();for(const key of ids){const option=document.createElement('option');option.value=key;option.textContent=projects[key].title;select.append(option)}
   // render must see focused media before replacing it so it can restore focus.
-  if(frames.length)render();
-  else{slot.clear();if(leavingPlayer)exit.focus({preventScroll:true})}
+  if(frames.length)render();else slot.clear();
+  // Keep the static recovery links until the first render has succeeded.
+  player.hidden=!frames.length;empty.hidden=!!frames.length;skip.hidden=!frames.length;
+  loading.hidden=true;selection.hidden=false;
+  if(leavingEmpty)get('meeting-stage').focus({preventScroll:true});
+  else if(leavingPlayer||leavingLoading)exit.focus({preventScroll:true});
  }
  function go(next){if(!frames.length)return;index=(next+frames.length)%frames.length;window.history.replaceState(window.history.state,'',meetingHash(ids,index));render()}
  get('meeting-prev').addEventListener('click',()=>go(index-1));get('meeting-next').addEventListener('click',()=>go(index+1));
