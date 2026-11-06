@@ -24,7 +24,7 @@ class Node{
  setAttribute(k,v){this.attrs[k]=String(v)} removeAttribute(k){delete this.attrs[k];if(k==='src')delete this.src}
  addEventListener(type,fn){(this.listeners[type]??=[]).push(fn)} removeEventListener(type,fn){this.listeners[type]=(this.listeners[type]||[]).filter(f=>f!==fn)}
  emit(type,event={}){const e={target:this,button:0,preventDefault(){this.defaultPrevented=true},stopPropagation(){this.stopped=true},...event};for(const fn of [...(this.listeners[type]||[])])fn(e);return e}
- focus(){this.doc.activeElement=this} select(){this.selected=true} scrollIntoView(){this.scrolled=true} scrollBy({left,top}){this.scrollLeft+=left;this.scrollTop+=top} pause(){this.paused=true} load(){this.loaded=true}
+ focus(options){this.doc.activeElement=this;this.focusOptions=options} select(){this.selected=true} scrollIntoView(){this.scrolled=true} scrollBy({left,top}){this.scrollLeft+=left;this.scrollTop+=top} pause(){this.paused=true} load(){this.loaded=true}
  contains(n){return n===this||this.children.some(c=>c.contains(n))}
  matches(s){if(s[0]==='#')return this.id===s.slice(1);if(s[0]==='.')return this.className.split(' ').includes(s.slice(1));if(s[0]==='['){const [,name,value]=s.match(/^\[([^=\]]+)(?:="([^"]+)")?\]$/)||[];if(!name)return false;const k=name.replace(/^data-/,'').replace(/-([a-z])/g,(_,c)=>c.toUpperCase());return name.startsWith('data-')?k in this.dataset&&(value===undefined||this.dataset[k]===value):name in this.attrs&&(value===undefined||this.attrs[name]===value)}return this.tagName===s.toUpperCase()}
  querySelectorAll(s){return this.children.flatMap(c=>[...(c.matches(s)?[c]:[]),...c.querySelectorAll(s)])} querySelector(s){return this.querySelectorAll(s)[0]||null}
@@ -177,3 +177,26 @@ test('Selection removal never focuses a hidden, detached or closed-disclosure co
 
 
 test('Photo resize release refreshes both entry and inspection module URLs',()=>{assert.match(read('index.html'),/app\.js\?[^"]*&amp;photo=20261106-resize/);assert.match(read('app.js'),/gallery-photo-detail\.js\?v=20261106-photo-resize/)});
+
+for(const destination of ['card','filter','closed-catalog','detached-card'])test(`Last summary removal allows native focus scrolling to ${destination}`,()=>{
+ const f=exploration(),catalog=f.el('details'),summary=f.el('summary'),card=f.el('button'),filter=f.el('button'),summaryHost=f.el('div');
+ catalog.id='all-projects';summary.id='all-projects-summary';card.dataset.selection='mascot';filter.dataset.filter='all';filter.setAttribute('aria-pressed','true');
+ catalog.append(summary,card,filter);f.host.append(summaryHost,catalog);catalog.open=destination!=='closed-catalog';
+ if(destination==='filter')card.hidden=true;
+ if(destination==='detached-card'){card.remove();filter.hidden=true}
+ f.document.querySelector=selector=>selector.startsWith('[data-selection')?card:filter;
+ const {region}=mountSelectionSummary({host:summaryHost,document:f.document,controller:f.controller});f.controller.toggle('mascot');
+ const remove=region.querySelector('button');remove.focus();remove.emit('click');
+ const target=destination==='card'?card:destination==='filter'?filter:summary;
+ assert(region.hidden);assert.deepEqual(f.controller.getSelected(),[]);assert.equal(f.document.activeElement,target);
+ assert.equal(target.focusOptions,undefined,'Returning focus must not suppress the browser scroll into view');
+ assert.equal(f.location.hash,'#projects');
+});
+test('Removing one of several summary items keeps focus local without forcing a scroll',()=>{
+ const f=exploration(),host=f.el('div');f.host.append(host);const {region}=mountSelectionSummary({host,document:f.document,controller:f.controller});
+ f.controller.toggle('mascot');f.controller.toggle('pink');region.querySelector('button').emit('click');
+ assert(!region.hidden);assert(region.contains(f.document.activeElement));assert.deepEqual(f.document.activeElement.focusOptions,{preventScroll:true});
+ assert.deepEqual(f.controller.getSelected(),['pink']);
+ assert.match(read('app.js'),/selection-controls\.js\?[^']*&return=20261106-summary/);
+ assert.match(read('index.html'),/app\.js\?[^"]*&amp;selection=20261106-summary-return/);
+});
