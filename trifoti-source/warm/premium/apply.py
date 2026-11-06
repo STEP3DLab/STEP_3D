@@ -86,6 +86,9 @@ def apply(target):
     nav = target / 'section-navigation.js'
     text = nav.read_text().replace('(design|sculpture|modelmaking|awards)', '(corporate|sculpture|design|awards|industrial|artobjects)')
     nav.write_text(text)
+    # Retain the requested interior hero during future editorial builds.
+    import runpy
+    runpy.run_path(str(source.parent / "interior/apply.py"))["apply"](target)
 
 if __name__ == '__main__':
     root = Path(__file__).resolve().parents[3]

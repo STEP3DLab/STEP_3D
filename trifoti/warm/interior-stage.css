@@ -1,0 +1,70 @@
+/* Interior installation / 6 November 2026. A conceptual atelier, not a documentary photograph. */
+.header {
+  background: linear-gradient(110deg, #1759c9 0%, #1971ce 62%, #2464d5 100%);
+  border-color: #3589e2;
+  box-shadow: 0 4px 24px #1654bc1a;
+}
+.header::after { background: linear-gradient(90deg,#80dafa,#a7d8ff 55%,#c4c7ff); }
+.header nav a, .header nav a:hover, .header nav a[aria-current="location"] { color: #fff; }
+.header nav a:after { background: #c1ecff; }
+.header .header-cta { background: #f0f6ff; color: #164ca5; border-color: #d5e5ff; box-shadow: 0 4px 15px #1044991a; }
+.header .header-cta:hover { background: #fff; color: #164ca5; }
+.header :focus-visible { outline-color: #fff; }
+.hero.interior-hero {
+  grid-template-columns: minmax(0,.84fr) minmax(0,1.36fr);
+  gap: 0 4%; padding-top: 56px; padding-bottom: 56px;
+  background: radial-gradient(ellipse at 4% 0%,#e3f4fa,transparent 48%),radial-gradient(ellipse at 58% 90%,#e9e6fa,transparent 48%),#f7f9fd;
+}
+.interior-hero .hero-copy { padding-top: 0; }
+.interior-hero .eyebrow { font-size: 11px; letter-spacing: .045em; margin-bottom: 30px; }
+.hero.interior-hero h1 { font-size: clamp(40px,4.25vw,70px); line-height: 1.14; letter-spacing: -.055em; }
+.interior-hero .hero-description { font-size: 16px; line-height: 1.8; margin-top: 24px; }
+.interior-hero .hero-actions { gap: 12px 20px; margin-top: 26px; }
+.interior-hero .hero-signature { margin-top: 28px; padding-top: 17px; font-size: 11px; }
+.interior-hero .interior-stage {
+  align-self: center; width: 100%; max-width: none; border-radius: 18px;
+  background: #fff; box-shadow: 0 18px 46px #3f426115; border: 1px solid #dfe4ef;
+}
+.interior-hero .interior-stage>img { display: block; width: 100%; height: auto; aspect-ratio: 1672 / 941; object-fit: contain; object-position: center; }
+.interior-hero .interior-stage figcaption { position: static; display: flex; justify-content: space-between; align-items: center; gap: 18px; padding: 18px 22px; text-align: left; color: #18223b; text-shadow: none; letter-spacing: 0; }
+.interior-hero .interior-stage figcaption>span:first-child { display: grid; gap: 6px; }
+.interior-caption strong { font-size: 13px; font-weight: 650; line-height: 1.4; }
+.interior-caption small { font-size: 11px; color: #53617a; line-height: 1.5; }
+.interior-direction-link { display: inline-flex; align-items: center; justify-content: space-between; gap: 20px; min-height: 44px; color: #2457b2; font-size: 12px; line-height: 1.5; }
+.interior-direction-link:hover { color: #123d8f; text-decoration: underline; text-underline-offset: 4px; }
+@media(min-width:1600px) { .hero.interior-hero { padding-top: 70px; padding-bottom: 70px; } }
+@media(max-width:1100px) {
+  .hero.interior-hero { grid-template-columns: minmax(0,.9fr) minmax(0,1.1fr); column-gap: 3%; padding-top: 40px; }
+  .hero.interior-hero h1 { font-size: clamp(38px,4.25vw,52px); }
+  .interior-hero .hero-signature { display: none; }
+  .interior-hero .hero-description { font-size: 15px; }
+  .interior-hero .interior-stage figcaption { display: block; padding: 16px 18px; }
+  .interior-direction-link { margin-top: 6px; width: 100%; }
+}
+@media(max-width:800px) {
+  .header nav { background: #1963c9; border-color: #85b8f0; }
+  .hero.interior-hero { display: flex; padding-top: 32px; padding-bottom: 38px; }
+  .hero.interior-hero h1 { font-size: clamp(36px,8.2vw,62px); }
+  .interior-hero .eyebrow { margin-bottom: 24px; font-size: 10px; }
+  .interior-hero .hero-description { margin-top: 21px; max-width: 600px; }
+  .interior-hero .hero-actions { margin-top: 23px; margin-bottom: 26px; }
+  .interior-hero .interior-stage { align-self: stretch; border-radius: 12px; }
+  .interior-hero .interior-stage figcaption { display: flex; padding: 16px; }
+  .interior-direction-link { margin: 0; width: auto; }
+}
+@media(max-width:560px) {
+  .interior-hero .interior-stage figcaption { display: block; padding: 15px 16px 10px; }
+  .interior-direction-link { width: 100%; margin-top: 6px; min-height: 44px; }
+  .interior-caption strong { font-size: 13px; }
+  .interior-caption small { font-size: 11px; }
+}
+@media(forced-colors:active) {
+  .header, .header nav, .header .header-cta, .hero.interior-hero, .interior-hero .interior-stage { background: Canvas; color: CanvasText; box-shadow: none; }
+  .header nav a, .header nav a:hover, .header nav a[aria-current="location"], .interior-direction-link { color: LinkText; }
+}
+@media print {
+  .hero.interior-hero { background: #fff; padding: 20px 0; }
+  .interior-hero .interior-stage { display: block; border: 0; box-shadow: none; }
+  .interior-hero .interior-stage>img { width: 100%; height: auto; }
+  .interior-direction-link { display: none; }
+}
