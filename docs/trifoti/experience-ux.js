@@ -49,7 +49,8 @@ export function initializeBriefExperience({form,document,window,validate}){
  });
  function preparePrint(){get('brief-print-text').textContent=formatBrief(Object.fromEntries(new FormData(form)));document.body.classList.add('brief-printing')}
  get('brief-print').addEventListener('click',()=>{if(validate()){preparePrint();window.print()}});
- window.addEventListener('beforeprint',preparePrint);
+ // Browser printing must not silently replace the page with a local draft.
+ window.addEventListener('beforeprint',()=>{if(document.body.classList.contains('brief-printing'))preparePrint()});
  window.addEventListener('afterprint',()=>document.body.classList.remove('brief-printing'));
  window.addEventListener('resize',grow);
  progress.hidden=false;get('brief-prompts').hidden=false;get('brief-print').hidden=false;refresh();
