@@ -62,7 +62,7 @@ function fixture(hash='#cases/mascot,stdAwards'){
  let focus=null,prints=0;const listeners={},history=[];const node=extra=>({hidden:true,disabled:false,textContent:'',checked:false,listeners:{},value:'',addEventListener(type,fn){this.listeners[type]=fn},focus(){focus=this},select(){this.selected=true},scrollIntoView(options){this.scrolled=options},...extra});
  const cards=Object.keys(projects).map(key=>node({dataset:{packCase:key}})),choices=Object.keys(projects).map(key=>node({dataset:{packChoice:key}}));
  const ids=['information-pack','pack-skip','pack-feedback','pack-copy-fallback','pack-url','pack-reset','pack-selection-status','pack-print','pack-copy','pack-actions','pack-chooser'];const nodes=Object.fromEntries(ids.map(id=>[id,node()]));
- const document={getElementById:id=>nodes[id],querySelectorAll:selector=>selector==='[data-pack-case]'?cards:choices};
+ const document={get activeElement(){return focus},getElementById:id=>nodes[id],querySelectorAll:selector=>selector==='[data-pack-case]'?cards:choices};
  const window={location:{hash,pathname:'/information-pack.html'},history:{replaceState(state,title,hash){history.push(hash);window.location.hash=hash.startsWith('#')?hash:''}},navigator:{},print(){prints++},addEventListener(type,fn){listeners[type]=fn}};
  const controller=initializeInformationPack({document,window});return {document,window,nodes,cards,choices,controller,listeners,history,get prints(){return prints},get focus(){return focus}};
 }
@@ -82,8 +82,34 @@ test('Packet copy reports success only after clipboard resolution and ignores ob
  const stale=f.nodes['pack-copy'].listeners.click();f.nodes['pack-reset'].listeners.click();finish();await stale;assert.equal(f.nodes['pack-feedback'].textContent,'');
 });
 test('Packet clipboard denial retains a selectable exact URL; print requests no false completion',async()=>{
- const f=fixture('#cases/gesture');f.window.navigator.clipboard={writeText(){throw Error('denied')}};await f.nodes['pack-copy'].listeners.click();assert.equal(f.nodes['pack-copy-fallback'].hidden,false);assert.equal(f.nodes['pack-url'].value,packetURL(['gesture']));assert.equal(f.focus,f.nodes['pack-url']);assert.equal(f.nodes['pack-url'].selected,true);assert.match(f.nodes['pack-feedback'].textContent,/недоступно/);
+ const f=fixture('#cases/gesture');f.window.navigator.clipboard={writeText(){throw Error('denied')}};f.nodes['pack-copy'].focus();await f.nodes['pack-copy'].listeners.click();assert.equal(f.nodes['pack-copy-fallback'].hidden,false);assert.equal(f.nodes['pack-url'].value,packetURL(['gesture']));assert.equal(f.focus,f.nodes['pack-url']);assert.equal(f.nodes['pack-url'].selected,true);assert.match(f.nodes['pack-feedback'].textContent,/недоступно/);
  f.nodes['pack-print'].listeners.click();assert.equal(f.prints,1);assert.doesNotMatch(f.nodes['pack-feedback'].textContent,/сохранён|напечатан/);
+});
+test('Packet delayed copy failure preserves a newer control focus while revealing the exact URL',async()=>{
+ const f=fixture();let reject;f.window.navigator.clipboard={writeText(){return new Promise((resolve,fail)=>reject=fail)}};
+ f.nodes['pack-copy'].focus();const pending=f.nodes['pack-copy'].listeners.click();f.nodes['pack-print'].focus();reject(Error('denied'));await pending;
+ assert.equal(f.focus,f.nodes['pack-print']);assert.equal(f.nodes['pack-copy-fallback'].hidden,false);assert.equal(f.nodes['pack-url'].value,packetURL(['mascot','stdAwards']));assert.notEqual(f.nodes['pack-url'].selected,true);assert.match(f.nodes['pack-feedback'].textContent,/недоступно/);
+});
+test('Packet delayed copy failure selects the fallback when the initiating button retains focus',async()=>{
+ const f=fixture();let reject;f.window.navigator.clipboard={writeText(){return new Promise((resolve,fail)=>reject=fail)}};
+ f.nodes['pack-copy'].focus();const pending=f.nodes['pack-copy'].listeners.click();reject(Error('denied'));await pending;
+ assert.equal(f.focus,f.nodes['pack-url']);assert.equal(f.nodes['pack-url'].selected,true);assert.equal(f.nodes['pack-copy-fallback'].hidden,false);
+});
+test('Packet delayed copy success does not move focus to the hidden fallback',async()=>{
+ const f=fixture();let resolve;f.window.navigator.clipboard={writeText(){return new Promise(done=>resolve=done)}};
+ f.nodes['pack-copy'].focus();const pending=f.nodes['pack-copy'].listeners.click();f.nodes['pack-print'].focus();resolve();await pending;
+ assert.equal(f.focus,f.nodes['pack-print']);assert.equal(f.nodes['pack-copy-fallback'].hidden,true);assert.notEqual(f.nodes['pack-url'].selected,true);assert.match(f.nodes['pack-feedback'].textContent,/Ссылка скопирована/);
+});
+test('Packet selection changes invalidate a delayed failure without overriding reset focus',async()=>{
+ const f=fixture();let reject;f.window.navigator.clipboard={writeText(){return new Promise((resolve,fail)=>reject=fail)}};
+ f.nodes['pack-copy'].focus();const pending=f.nodes['pack-copy'].listeners.click();f.nodes['pack-reset'].listeners.click();reject(Error('denied'));await pending;
+ assert.equal(f.focus,f.choices[0]);assert.equal(f.nodes['pack-copy-fallback'].hidden,true);assert.equal(f.nodes['pack-feedback'].textContent,'');
+});
+test('Packet repeated copy ignores an older rejection and keeps the latest attempt usable',async()=>{
+ const f=fixture();const failures=[];f.window.navigator.clipboard={writeText(){return new Promise((resolve,fail)=>failures.push(fail))}};
+ f.nodes['pack-copy'].focus();const first=f.nodes['pack-copy'].listeners.click(),second=f.nodes['pack-copy'].listeners.click();failures[0](Error('old denial'));await first;
+ assert.equal(f.focus,f.nodes['pack-copy']);assert.equal(f.nodes['pack-copy-fallback'].hidden,true);assert.equal(f.nodes['pack-feedback'].textContent,'');
+ failures[1](Error('latest denial'));await second;assert.equal(f.focus,f.nodes['pack-url']);assert.equal(f.nodes['pack-url'].selected,true);assert.equal(f.nodes['pack-copy-fallback'].hidden,false);
 });
 test('Existing exploration passes only current selection IDs into packet link',()=>{
  const source=read('exploration-panel.js');assert.match(source,/packet\.href='information-pack\.html'\+\(selected\.length\?'#cases\/'\+selected\.join\(','\):''\)/);
