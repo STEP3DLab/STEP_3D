@@ -10,7 +10,7 @@ import {mountRelated} from './related-works.js?v=20261026-directions';
 import {enhanceProjectCards} from './project-card-links.js';
 import {createFrameMemory,thumbnailKey,mountPhotoSwipe} from './gallery-interactions.js?v=20261024-gallery-browse';
 import {initializeSectionNavigation} from './section-navigation.js?v=20261026-legacy-links';
-import {initializeBriefTools} from './brief-tools.js?v=20261026-directions';
+import {initializeBriefTools} from './brief-tools.js?v=20261106-copy-focus';
 import {updateGalleryPhotoLink} from './gallery-photo-link.js?v=20261024-photo-details';
 import {updateBriefGuidance} from './brief-guidance.js?v=20261026-directions';
 import {mountCaseSections} from './case-sections.js?v=20261024-case-story';
