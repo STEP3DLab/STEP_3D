@@ -107,8 +107,11 @@ export function initializePublicationFilters({document, clipboard = globalThis.n
       if (generation !== copyGeneration) return;
       copyStatus.textContent = 'Автоматическое копирование недоступно. Выделите и скопируйте текст ниже вручную.';
       copyLabel.hidden = false;
-      copyText.focus();
-      copyText.select();
+      // A delayed denial must not override the visitor's next keyboard action.
+      if (document.activeElement === trigger) {
+        copyText.focus();
+        copyText.select();
+      }
     }
   });
   apply('all');

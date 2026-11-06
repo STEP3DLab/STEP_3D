@@ -93,7 +93,7 @@ test('Malformed optional filter group stays unenhanced',()=>{
 });
 
 function richFixture(clipboard) {
- const node=(extra={})=>({hidden:true,value:'',textContent:'',listeners:{},attributes:{},dataset:{},addEventListener(t,f){(this.listeners[t]??=[]).push(f)},async emit(t,event={}){for(const f of this.listeners[t]||[])await f(event)},setAttribute(k,v){this.attributes[k]=v},focus(options){this.focused=true;this.focusOptions=options},select(){this.selected=true},scrollIntoView(options){this.scrolled=options},...extra});
+ const node=(extra={})=>({hidden:true,value:'',textContent:'',listeners:{},attributes:{},dataset:{},addEventListener(t,f){(this.listeners[t]??=[]).push(f)},async emit(t,event={}){for(const f of this.listeners[t]||[])await f(event)},setAttribute(k,v){this.attributes[k]=v},focus(options){this.focused=true;this.focusOptions=options;document.activeElement=this},select(){this.selected=true},scrollIntoView(options){this.scrolled=options},...extra});
  const buttons=Object.keys(publicationCategories).map(key=>node({dataset:{publicationFilter:key}}));
  const entries=publications.map(entry=>node({dataset:{publicationCategory:entry.category,publicationId:entry.id}}));
  const copies=publications.map((entry,i)=>node({dataset:{publicationCopy:entry.id},parentElement:{append(panel){panel.host=entries[i]}}}));
@@ -102,9 +102,9 @@ function richFixture(clipboard) {
  const nodes={'#publication-catalog':root,'#publication-filters':node({querySelectorAll:()=>buttons})};
  for(const id of ['count','search','sort','reset','list','active','empty','citation','copy-status','copy-label','copy-text','collapse','copy-close','tools','sort-note'])nodes[`#publication-${id}`]=node();
  nodes['#publication-list'].children=[];nodes['#publication-list'].append=function(el){this.children=this.children.filter(x=>x!==el);this.children.push(el)};
- const document={querySelector:s=>nodes[s]||null};
+ const document={activeElement:null,querySelector:s=>nodes[s]||null};
  initializePublicationFilters({document,clipboard});
- return {root,nodes,buttons,entries,copies,summary,get:id=>nodes[`#publication-${id}`],copy:i=>root.emit('click',{target:{closest:()=>copies[i]}})};
+ return {root,nodes,buttons,entries,copies,summary,document,get:id=>nodes[`#publication-${id}`],copy:i=>{copies[i].focus();return root.emit('click',{target:{closest:()=>copies[i]}})}};
 }
 test('Search is case/ё/whitespace tolerant, matches title and publisher only',()=>{
  assert(publicationSearchMatches({title:'Фёдор  Паршин',publisher:'Вести'},' федор ВЕСТИ '));
@@ -152,4 +152,15 @@ test('Late clipboard rejection after reset or collapse never focuses hidden text
 test('More recent copy request wins over earlier asynchronous completion',async()=>{
  const pending=[];const f=richFixture({writeText:()=>new Promise((resolve,reject)=>pending.push({resolve,reject}))});const first=f.copy(0), second=f.copy(1);
  pending[1].resolve();await second;pending[0].reject(new Error('late'));await first;assert.equal(f.get('copy-status').textContent,'Описание и ссылка скопированы.');assert.equal(f.get('copy-text').value,publicationCitation(publications[1]));assert(!f.get('copy-text').focused);
+});
+
+for(const moveFocus of [false,true])test(`Delayed citation fallback preserves newer focus (${moveFocus?'moved':'trigger retained'})`,async()=>{
+ let reject;const f=richFixture({writeText:()=>new Promise((_,r)=>reject=r)});const pending=f.copy(0);
+ if(moveFocus)f.get('search').focus();reject(Error('Denied'));await pending;
+ assert(!f.get('citation').hidden);assert(!f.get('copy-label').hidden);assert.equal(f.get('copy-text').value,publicationCitation(publications[0]));
+ assert.equal(f.document.activeElement,moveFocus?f.get('search'):f.get('copy-text'));assert.equal(!!f.get('copy-text').selected,!moveFocus);
+});
+test('Successful delayed citation copy never moves newer focus',async()=>{
+ let resolve;const f=richFixture({writeText:()=>new Promise(r=>resolve=r)});const pending=f.copy(0);f.get('search').focus();resolve();await pending;
+ assert.equal(f.document.activeElement,f.get('search'));assert.equal(f.get('copy-status').textContent,'Описание и ссылка скопированы.');
 });
