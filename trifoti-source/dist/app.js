@@ -74,22 +74,42 @@ $$('dialog').forEach(dialog=>{if(dialog.id!=='category-story-dialog')keepDialogF
 const projectDialog=$('#project-dialog');
 let categoryStories=null;
 let galleryProject=null,galleryIndex=0,slideRevision=0,projectOpener=null,projectOpenerFallback=null,photoDetail=null,exploration=null,selectionSummary=null,unbindCaseSelection=()=>{};
-let updateGalleryChapters=()=>{},clearMediaWait=()=>{};
+let updateGalleryChapters=()=>{},clearMediaWait=()=>{},cancelProjectReturn=()=>{};
 const frameMemory=createFrameMemory();
 // Comparison cards can be rebuilt while their gallery is open. Keep a stable
 // destination in the source panel before its original button is detached.
 function rememberProjectOpener(opener){
- projectOpener=opener;projectOpenerFallback=opener?.closest('.exploration-panel')?.querySelector('summary')||null;
+ cancelProjectReturn();projectOpener=opener;projectOpenerFallback=opener?.closest('.exploration-panel')?.querySelector('summary')||null;
 }
 function restoreProjectFocus(mode){
+ cancelProjectReturn();
  const card=$(`[data-project="${galleryProject}"]`),openerMatches=projectOpener?.closest('.exploration-panel')||projectOpener?.dataset.project===galleryProject||projectOpener?.dataset.caseLink===galleryProject||projectOpener?.getAttribute('href')==='#project/'+galleryProject||projectOpener?.dataset.storyCategory;
  const target=visiblePortfolioTarget(projectOpener)&&openerMatches?projectOpener:visiblePortfolioTarget(projectOpenerFallback)?projectOpenerFallback:visiblePortfolioTarget(card)?card:$('#all-projects-summary');
  target?.focus({preventScroll:mode!=='fallback'});
  if(!target||target===projectOpener)return;
- // Back restores the old page scroll after popstate. Wait for that event
- // task to finish; an animation frame can run before native restoration.
- const reveal=()=>{if(!projectDialog.open&&document.activeElement===target&&visiblePortfolioTarget(target))target.scrollIntoView({block:'center',behavior:'instant'})};
- reveal();if(mode==='back')window.addEventListener('popstate',()=>setTimeout(reveal,0),{once:true});
+ // History restoration can arrive after both a frame and a zero-delay task.
+ // Guard this focused return target, yielding immediately to any user input.
+ let active=true,awaitingBack=mode==='back',returnHash=window.location.hash;
+ const inputs=['keydown','pointerdown','touchstart','wheel'];
+ function cancel(){
+  if(!active)return;active=false;
+  window.removeEventListener('scroll',check);window.removeEventListener('popstate',route);window.removeEventListener('hashchange',hashChanged);window.removeEventListener('blur',cancel);window.removeEventListener('pagehide',cancel);
+  for(const type of inputs)document.removeEventListener(type,cancel,true);document.removeEventListener('focusin',focusChanged,true);
+  if(cancelProjectReturn===cancel)cancelProjectReturn=()=>{};
+ }
+ function focusChanged(){if(document.activeElement!==target)cancel()}
+ function route(){if(awaitingBack){awaitingBack=false;returnHash=window.location.hash}else cancel()}
+ function hashChanged(){if(!awaitingBack&&window.location.hash!==returnHash)cancel()}
+ function check(){
+  if(projectDialog.open||document.activeElement!==target||!visiblePortfolioTarget(target)){cancel();return}
+  const rect=target.getBoundingClientRect(),header=document.querySelector('.header')?.getBoundingClientRect().bottom||0;
+  if(rect.bottom>header&&rect.top<window.innerHeight)return;
+  target.scrollIntoView({block:'center',behavior:'instant'});
+ }
+ target.scrollIntoView({block:'center',behavior:'instant'});cancelProjectReturn=cancel;
+ window.addEventListener('scroll',check,{passive:true});window.addEventListener('popstate',route);window.addEventListener('hashchange',hashChanged);window.addEventListener('blur',cancel);window.addEventListener('pagehide',cancel);
+ for(const type of inputs)document.addEventListener(type,cancel,{capture:true,passive:true});document.addEventListener('focusin',focusChanged,true);
+
 }
 function showSlide(index,retrying=false,updateRoute=true){
  const project=projects[galleryProject];if(!project?.media.length)return;
