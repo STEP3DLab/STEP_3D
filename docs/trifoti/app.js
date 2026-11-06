@@ -1,6 +1,6 @@
 import {initializePortfolioDisclosure,visiblePortfolioTarget} from './portfolio-disclosure.js?v=20261026-directions';
 import {appendSelectionReference,mountReferenceManager} from './reference-manager.js?v=20261026-directions';
-import {mountPhotoDetail} from './gallery-photo-detail.js?v=20261026-seven';
+import {mountPhotoDetail} from './gallery-photo-detail.js?v=20261106-photo-resize';
 import {modeLinks} from './view-context.js?v=20261026-directions';
 import {optionalModule,optionalFallback} from './optional-module.js?v=20261026-seven';
 import {initializeBriefExperience,initializeBackToTop} from './experience-ux.js?v=20261106-optional-choice';

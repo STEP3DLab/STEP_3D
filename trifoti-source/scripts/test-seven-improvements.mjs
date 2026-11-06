@@ -34,7 +34,7 @@ function fixture(hash='#projects'){
  const listeners={},document={activeElement:null,readyState:'complete',createElement:tag=>new Node(tag,document),createTextNode:text=>Object.assign(new Node('text',document),{textContent:text}),addEventListener(type,fn){(listeners[type]??=[]).push(fn)}};
  const host=document.createElement('main');document.querySelector=s=>host.querySelector(s);document.querySelectorAll=s=>host.querySelectorAll(s);document.getElementById=id=>host.querySelector('#'+id);
  const location={hash,href:'https://example.test/index.html'+hash,pathname:'/index.html',search:''};const history={entries:[],state:null,pushState(state,_,url){this.entries.push(url);this.state=state;location.hash=new URL(url,location.href).hash},replaceState(state,_,url){this.state=state;location.hash=new URL(url,location.href).hash}};
- const window={location,history,addEventListener(type,fn){(listeners[type]??=[]).push(fn)}};document.defaultView=window;
+ const window={location,history,addEventListener(type,fn){(listeners[type]??=[]).push(fn)},removeEventListener(type,fn){listeners[type]=(listeners[type]||[]).filter(f=>f!==fn)}};document.defaultView=window;
  const all=()=>[host,...host.querySelectorAll('*')];const find=text=>{const visit=n=>n.textContent===text?n:n.children.map(visit).find(Boolean);return visit(host)};
  return {document,window,location,history,host,find,el:document.createElement,emit(type,event={}){for(const fn of listeners[type]||[])fn(event)}};
 }
@@ -92,7 +92,24 @@ test('Card and case buttons share max-three state without moving focus or naviga
 test('Compact summary is absent when empty, removes one item and opens comparison deliberately',()=>{
  const f=exploration(),host=f.el('div');f.host.append(host);const {region}=mountSelectionSummary({host,document:f.document,controller:f.controller});assert.equal(region.hidden,true);f.controller.toggle('mascot');f.controller.toggle('pink');assert.equal(region.hidden,false);assert.equal(region.querySelectorAll('li').length,2);region.querySelector('button').emit('click');assert.deepEqual(f.controller.getSelected(),['pink']);assert(region.contains(f.document.activeElement));region.querySelectorAll('button').at(-1).emit('click');assert.equal(f.document.getElementById('explore-selection').hidden,false);
 });
-function zoom(){const f=fixture(),viewer=f.el('div'),host=f.el('div'),image=f.el('img');image.naturalWidth=1200;image.naturalHeight=800;viewer.append(image);f.host.append(viewer,host);const controller=mountPhotoDetail({viewer,host,document:f.document});controller.setItem(image,projects.pink.media[0]);return {...f,viewer,image,controller}}
+function zoom({observe=false}={}){const f=fixture(),viewer=f.el('div'),host=f.el('div'),image=f.el('img');let observer;
+ if(observe)f.window.ResizeObserver=class{constructor(callback){observer=this;this.callback=callback}observe(target,options){this.target=target;this.options=options}disconnect(){this.disconnected=true}};
+ image.naturalWidth=1200;image.naturalHeight=800;viewer.append(image);f.host.append(viewer,host);const controller=mountPhotoDetail({viewer,host,document:f.document});controller.setItem(image,projects.pink.media[0]);return {...f,viewer,image,controller,observer,resize(width,height){viewer.clientWidth=width;viewer.clientHeight=height;if(observer)observer.callback();else f.emit('resize')}}}
+for(const observe of [false,true])test(`Photo inspection refits repeated viewport changes at the selected zoom (${observe?'observer':'window fallback'})`,()=>{
+ const f=zoom({observe});f.image.src='same-original.webp';f.find('Рассмотреть +').emit('click');f.find('Рассмотреть +').emit('click');f.find('Рассмотреть +').focus();
+ for(const [width,height,expected] of [[720,160,480],[320,440,640],[900,400,1200],[320,440,640]]){f.resize(width,height);assert.equal(f.image.style.width,expected+'px');assert.equal(f.image.style.height,expected/1.5+'px');assert.equal(f.find('200% · от вписанного кадра').textContent,'200% · от вписанного кадра');assert.equal(f.document.activeElement,f.find('Рассмотреть +'));assert.equal(f.location.hash,'#projects');assert.equal(f.image.src,'same-original.webp')}
+});
+test('Resize observer uses the stable viewer box, not the content shrunk by scrollbars',()=>{
+ const f=zoom({observe:true});assert.equal(f.observer.target,f.viewer);assert.deepEqual(f.observer.options,{box:'border-box'});f.viewer.offsetWidth=320;f.viewer.offsetHeight=440;f.find('Рассмотреть +').emit('click');assert.equal(f.image.style.width,'480px');
+ for(const width of [305,320,305]){f.resize(width,425);assert.equal(f.image.style.width,'480px')}
+});
+test('Resize never changes fitted photos, video, route or focus; hidden zoom waits for a visible box',()=>{
+ const f=zoom({observe:true});f.find('Рассмотреть +').focus();f.resize(320,440);assert.equal(f.image.style.width,'');f.find('Рассмотреть +').emit('click');f.resize(0,0);assert.equal(f.image.style.width,'480px');f.resize(720,160);assert.equal(f.image.style.width,'360px');f.find('Вписать').emit('click');f.resize(320,440);assert.equal(f.image.style.width,'');assert.equal(f.document.activeElement,f.find('Рассмотреть +'));
+ const video=f.el('video');f.viewer.replaceChildren(video);f.controller.setItem(video,{type:'video'});f.resize(720,160);assert.equal(video.style.width,undefined);assert.equal(f.controller.isZoomed(),false);assert.equal(f.document.activeElement,f.viewer);
+});
+for(const observe of [false,true])test(`Destroy releases resize handling and ignores late callbacks (${observe?'observer':'window fallback'})`,()=>{
+ const f=zoom({observe});f.find('Рассмотреть +').emit('click');f.controller.destroy();if(observe)assert(f.observer.disconnected);assert.equal(f.image.style.width,'');f.image.style.width='unchanged';f.resize(320,440);f.image.emit('load');assert.equal(f.image.style.width,'unchanged');assert.equal(f.host.querySelector('.photo-detail'),null);
+});
 test('Photo zoom uses the same original, bounded dimensions and explicit pan/fit without changing route',()=>{
  const f=zoom();f.image.src='same-original.webp';f.find('Рассмотреть +').emit('click');assert.equal(f.controller.isZoomed(),true);assert.equal(f.image.style.width,'900px');assert.equal(f.image.src,'same-original.webp');const before=f.viewer.scrollLeft;f.host.querySelectorAll('button').find(n=>n.attrs['aria-label']==='Сдвинуть просмотр вправо').emit('click');assert.equal(f.viewer.scrollLeft,before+80);for(let i=0;i<20;i++)f.find('Рассмотреть +').emit('click');assert.equal(f.image.style.width,'2400px');f.find('Вписать').emit('click');assert.equal(f.controller.isZoomed(),false);assert.equal(f.image.style.width,'');assert.equal(f.location.hash,'#projects');
 });
@@ -157,3 +174,6 @@ test('Selection removal never focuses a hidden, detached or closed-disclosure co
  f.document.querySelector=selector=>selector.startsWith('[data-selection')?card:filter;
  assert.equal(selectionReturnTarget(f.document,'mascot'),summary);catalog.open=true;assert.equal(selectionReturnTarget(f.document,'mascot'),card);card.hidden=true;assert.equal(selectionReturnTarget(f.document,'mascot'),filter);filter.hidden=true;assert.equal(selectionReturnTarget(f.document,'mascot'),summary);card.hidden=false;card.remove();assert.equal(selectionReturnTarget(f.document,'mascot'),summary);
 });
+
+
+test('Photo resize release refreshes both entry and inspection module URLs',()=>{assert.match(read('index.html'),/app\.js\?[^"]*&amp;photo=20261106-resize/);assert.match(read('app.js'),/gallery-photo-detail\.js\?v=20261106-photo-resize/)});
