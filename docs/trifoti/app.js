@@ -4,7 +4,7 @@ import {mountPhotoDetail} from './gallery-photo-detail.js?v=20261106-photo-resiz
 import {modeLinks} from './view-context.js?v=20261026-directions';
 import {optionalModule,optionalFallback} from './optional-module.js?v=20261026-seven';
 import {initializeBriefExperience,initializeBackToTop} from './experience-ux.js?v=20261106-optional-choice';
-import {initializePortfolioFilters} from './portfolio-filters.js?v=20261026-directions';
+import {initializePortfolioFilters} from './portfolio-filters.js?v=20261106-ready';
 import {mediaId,mediaIndex} from './exploration-data.js?v=20261026-directions';
 import {mountRelated} from './related-works.js?v=20261026-directions';
 import {enhanceProjectCards} from './project-card-links.js';

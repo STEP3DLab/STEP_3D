@@ -16,16 +16,21 @@ export function initializePortfolioFilters({document,window}){
  if(!root)return false;
  const buttons=[...root.querySelectorAll('button[data-filter]')];
  const cards=[...root.querySelectorAll('.project-card[data-category][data-project]')];
+ const controls=document.getElementById('portfolio-filters');
  const reset=document.getElementById('filter-reset');
  const status=document.getElementById('filter-status');
  const empty=document.getElementById('project-empty');
  const emptyBrief=document.getElementById('empty-category-brief');
- if(!status||!buttons.some(button=>button.dataset.filter==='all'))return false;
+ if(!controls||!status||!buttons.some(button=>button.dataset.filter==='all'))return false;
  const matches=(card,key)=>key==='all'||card.dataset.category.split(/\s+/).includes(key);
  const countFor=key=>cards.filter(card=>matches(card,key)).length;
+ let focusAfterReady=null;
  function select(key,persist=true){
   const selected=buttons.find(button=>button.dataset.filter===key);
   if(!selected)return false;
+  // Capture before hiding: browsers may immediately blur a hidden link/button.
+  const active=document.activeElement;
+  const hidesFocus=active&&cards.some(card=>!matches(card,key)&&(card.closest?.('.project-item')||card).contains?.(active));
   for(const button of buttons){
    const active=button===selected;
    button.classList.toggle('active',active);
@@ -42,6 +47,7 @@ export function initializePortfolioFilters({document,window}){
   if(persist&&window){
    try{const url=new URL(window.location.href);if(key==='all')url.searchParams.delete('filter');else url.searchParams.set('filter',key);window.history.replaceState(window.history.state,'',url.href)}catch{}
   }
+  if(hidesFocus){if(controls.hidden)focusAfterReady=selected;else selected.focus({preventScroll:true})}
   return true;
  }
  for(const [index,button] of buttons.entries()){
@@ -57,10 +63,14 @@ export function initializePortfolioFilters({document,window}){
   // Only choose the collection; the native anchor owns scrolling and history.
   if(ordinaryClick(event))select(link.dataset.showProjects);
  });
- const controller={select};instances.set(document,controller);
+ const controller={select};
  const initial=buttons.find(button=>button.getAttribute('aria-pressed')==='true')?.dataset.filter||'all';
  const fromURL=()=>{const key=new URL(window.location.href).searchParams.get('filter');return buttons.some(button=>button.dataset.filter===key)?key:'all'};
  select(window?fromURL():initial,false);
  window?.addEventListener('popstate',()=>select(fromURL(),false));
+ // Static links remain usable while the optional enhancement is still loading.
+ controls.hidden=false;
+ focusAfterReady?.focus({preventScroll:true});
+ instances.set(document,controller);
  return controller;
 }

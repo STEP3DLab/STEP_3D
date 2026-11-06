@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {readFileSync,existsSync} from 'node:fs';
 import {initializePortfolioFilters} from '../dist/portfolio-filters.js';
 
 function fixture(categories=['sculpture','sculpture','sculpture','sculpture','awards','awards']){
@@ -17,11 +18,11 @@ function fixture(categories=['sculpture','sculpture','sculpture','sculpture','aw
  });
  const cards=categories.map((category,index)=>node({category,project:`project-${index}`}));
  const links=['sculpture','awards','all'].map(showProjects=>node({showProjects}));
- const status=node(),empty=node(),emptyBrief=node();
+ const status=node(),empty=node(),emptyBrief=node(),controls=node();controls.hidden=true;
  const root={querySelectorAll:selector=>selector==='button[data-filter]'?buttons:selector==='.project-card[data-category][data-project]'?cards:[]};
- const nodes={projects:root,'filter-status':status,'project-empty':empty,'empty-category-brief':emptyBrief};
+ const nodes={projects:root,'portfolio-filters':controls,'filter-status':status,'project-empty':empty,'empty-category-brief':emptyBrief};
  const document={getElementById:id=>nodes[id],querySelectorAll:selector=>selector==='a[data-show-projects]'?links:[]};
- return {document,buttons,cards,links,status,empty,emptyBrief,nodes,visible:()=>cards.filter(card=>!card.hidden),active:()=>buttons.filter(button=>button.getAttribute('aria-pressed')==='true').map(button=>button.dataset.filter)};
+ return {document,buttons,cards,links,status,empty,emptyBrief,controls,nodes,visible:()=>cards.filter(card=>!card.hidden),active:()=>buttons.filter(button=>button.getAttribute('aria-pressed')==='true').map(button=>button.dataset.filter)};
 }
 
 test('Portfolio starts with all real cards, live counts and no focus or scroll',()=>{
@@ -76,8 +77,8 @@ test('Repeated initialization preserves the selected filter and does not duplica
 });
 
 test('Missing optional scaffold leaves the static portfolio untouched',()=>{
- for(const missing of ['projects','filter-status']){
-  const f=fixture();delete f.nodes[missing];assert.equal(initializePortfolioFilters(f),false);assert.equal(f.visible().length,6);
+ for(const missing of ['projects','filter-status','portfolio-filters']){
+  const f=fixture();delete f.nodes[missing];assert.equal(initializePortfolioFilters(f),false);assert.equal(f.visible().length,6);assert(f.controls.hidden);
  }
  const f=fixture();f.buttons.shift();assert.equal(initializePortfolioFilters(f),false);assert.equal(f.visible().length,6);
 });
@@ -101,4 +102,72 @@ test('Filter keyboard wraps, Home/End work and modified keystrokes leave selecti
 test('Reset restores all cards and returns focus before hiding itself',()=>{
  const f=fixture();let focusBeforeHide=false;const reset={hidden:true,addEventListener(k,fn){this[k]=fn}};f.nodes['filter-reset']=reset;
  f.buttons[0].focus=()=>focusBeforeHide=!reset.hidden;const c=initializePortfolioFilters(f);c.select('awards');assert(!reset.hidden);reset.click();assert(focusBeforeHide);assert(reset.hidden);assert.equal(f.visible().length,6);
+});
+
+
+test('Static portfolio hides only inert filter controls and keeps all nine case links without JavaScript',()=>{
+ const html=readFileSync(new URL('../dist/index.html',import.meta.url),'utf8');
+ const row=html.match(/<div class="catalog-filters-row"[^>]*>[\s\S]*?<\/div><\/div>/)?.[0];
+ assert(row);assert.match(row,/<div[^>]*id="portfolio-filters"[^>]* hidden>/);
+ assert.equal((row.match(/<button\b/g)||[]).length,3);
+ assert.doesNotMatch(row,/class="project-card|portfolio-resources/);
+ const items=[...html.matchAll(/<article class="project-item"[^>]*>([\s\S]*?)<\/article>/g)];
+ assert.equal(items.length,9);
+ for(const item of items){
+  assert.doesNotMatch(item[0].split('>')[0],/\bhidden\b/);
+  const card=item[1].match(/<a\b[^>]*class="project-card[^>]*>/)?.[0];
+  assert(card);assert.doesNotMatch(card,/\bhidden\b/);
+  const href=card.match(/href="([^"]+)"/)[1];
+  assert(existsSync(new URL('../dist/'+href,import.meta.url)),href);
+ }
+ assert.match(html,/<button[^>]*id="filter-reset"[^>]* hidden>/);
+ assert.match(html,/<p id="filter-status"[^>]*>9 проектов<\/p>/);
+ assert.match(html,/app\.js\?[^"\n]*filters=20261106-ready/);
+ assert.match(readFileSync(new URL('../dist/app.js',import.meta.url),'utf8'),/portfolio-filters\.js\?v=20261106-ready/);
+});
+
+test('The panel is revealed only after listeners, URL selection and live counts are ready',()=>{
+ const f=fixture();let revealed=0;
+ Object.defineProperty(f.controls,'hidden',{get:()=>revealed===0,set:value=>{
+  assert.equal(value,false);assert(f.buttons.every(button=>button.events.click?.length===1&&button.events.keydown?.length===1));
+  assert(f.links.every(link=>link.events.click?.length===1));assert.deepEqual(f.active(),['awards']);assert.equal(f.visible().length,2);
+  assert.equal(f.status.textContent,'2 проекта · Сувениры и призы');assert.deepEqual(f.buttons.map(button=>button.badge.textContent),['6','4','2']);revealed++;
+ }});
+ let popstateReady=false;
+ const window={location:{href:'https://example.test/?filter=awards'},addEventListener(type){assert.equal(type,'popstate');assert(f.controls.hidden);popstateReady=true}};
+ initializePortfolioFilters({...f,window});assert(popstateReady);assert.equal(revealed,1);
+ initializePortfolioFilters({...f,window});assert.equal(revealed,1);
+});
+
+function focusFixture(){
+ const f=fixture();
+ f.cards.forEach(card=>{
+  card.selection={};card.wrapper={contains:element=>element===card||element===card.selection};card.closest=()=>card.wrapper;
+  let hidden=false;
+  Object.defineProperty(card,'hidden',{get:()=>hidden,set:value=>{hidden=value;if(value&&f.document.activeElement===card)f.document.activeElement=null}});
+  Object.defineProperty(card.wrapper,'hidden',{get:()=>hidden,set:value=>{hidden=value;if(value&&card.wrapper.contains(f.document.activeElement))f.document.activeElement=null}});
+ });
+ f.buttons.forEach(button=>button.focus=options=>{assert(!f.controls.hidden);assert.deepEqual(options,{preventScroll:true});f.document.activeElement=button});
+ return f;
+}
+
+test('Delayed URL enhancement transfers focus only when it hides a card or its selection control',()=>{
+ for(const target of ['card','selection']){
+  const f=focusFixture();f.document.activeElement=target==='card'?f.cards[0]:f.cards[0].selection;
+  initializePortfolioFilters({...f,window:{location:{href:'https://example.test/?filter=awards'},addEventListener(){}}});
+  assert.equal(f.document.activeElement,f.buttons[2]);assert(f.cards[0].wrapper.hidden);
+ }
+ for(const target of ['matching','outside']){
+  const f=focusFixture(),active=target==='matching'?f.cards[4]:{};f.document.activeElement=active;
+  initializePortfolioFilters({...f,window:{location:{href:'https://example.test/?filter=awards'},addEventListener(){}}});
+  assert.equal(f.document.activeElement,active);
+ }
+});
+
+test('History filtering preserves visible focus and rescues a newly hidden card',()=>{
+ const f=focusFixture(),events={};let href='https://example.test/';
+ initializePortfolioFilters({...f,window:{location:{get href(){return href}},addEventListener(type,fn){events[type]=fn}}});
+ f.document.activeElement=f.cards[0].selection;href='https://example.test/?filter=awards';events.popstate();
+ assert.equal(f.document.activeElement,f.buttons[2]);
+ f.document.activeElement=f.cards[4];href='https://example.test/';events.popstate();assert.equal(f.document.activeElement,f.cards[4]);
 });
