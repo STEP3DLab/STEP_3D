@@ -11,17 +11,18 @@ class Element extends EventTarget{
 }
 function setup(reduce=false,options={}){
  const els=Object.fromEntries(['bear-stage','bear-video','bear-gif','rotate-toggle','bear-reset','bear-keyboard-help','drag-hint'].map(id=>[id,new Element()]));
- const doc=new EventTarget();doc.hidden=false;doc.getElementById=id=>els[id];doc.querySelector=()=>els['drag-hint'];
- const pref=new EventTarget();pref.matches=reduce;
- const v=els['bear-video'];v.duration=8.8;v.currentTime=0;v.paused=true;v.playCalls=0;v.pause=()=>{v.paused=true};v.play=()=>{v.playCalls++;v.paused=false;return options.play?options.play():Promise.resolve()};
+ for(const id of ['rotate-toggle','bear-reset','bear-keyboard-help','drag-hint'])els[id].hidden=true;
+ const doc=new EventTarget();doc.activeElement=options.nativeFocus?els['bear-video']:null;els['bear-stage'].focus=opts=>{doc.activeElement=els['bear-stage'];els['bear-stage'].focusOptions=opts};doc.hidden=false;doc.getElementById=id=>els[id];doc.querySelector=()=>els['drag-hint'];
+ const pref=new EventTarget();pref.matches=reduce;if(options.failInitialization)pref.addEventListener=()=>{throw Error('missing media-query listener')};
+ const v=els['bear-video'];v.duration=8.8;v.currentTime=0;v.paused=options.nativePaused??true;v.played={length:options.nativePlayed?1:0};v.controls=true;v.playCalls=0;v.pause=()=>{v.paused=true};v.play=()=>{v.playCalls++;v.paused=false;return options.play?options.play():Promise.resolve()};
  v.readyState=options.readyState??0;v.networkState=options.networkState??2;v.error=options.error??null;
  const sources=[new Element(),new Element()];v.querySelectorAll=()=>sources;
  const timers=new Map();let timerId=0;
  const connection=new EventTarget();connection.saveData=options.saveData??false;let observerCallback,observed;
  const Observer=options.observer?class{constructor(callback,config){if(options.observerThrows)throw Error('unavailable');observerCallback=callback;assert.equal(config.threshold,0)}observe(target){observed=target}}:undefined;
- vm.runInNewContext(code,{document:doc,navigator:{connection},IntersectionObserver:Observer,matchMedia:()=>pref,setTimeout:fn=>{timers.set(++timerId,fn);return timerId},clearTimeout:id=>timers.delete(id)});
+ let initializationError;try{vm.runInNewContext(code,{document:doc,navigator:{connection},IntersectionObserver:Observer,matchMedia:()=>pref,setTimeout:fn=>{timers.set(++timerId,fn);return timerId},clearTimeout:id=>timers.delete(id)})}catch(error){if(!options.failInitialization)throw error;initializationError=error}
  const fire=(el,type,props={})=>{const e=new Event(type,{cancelable:true});for(const [k,value]of Object.entries(props))Object.defineProperty(e,k,{value});el.dispatchEvent(e);return e};
- return {els,doc,v,fire,pref,sources,timers,intersect:value=>{assert.equal(observed,els['bear-stage']);observerCallback([{target:observed,isIntersecting:value}])},saveData:value=>{connection.saveData=value;fire(connection,'change')},flush:()=>{const pending=[...timers.values()];timers.clear();pending.forEach(fn=>fn())},click:()=>fire(els['rotate-toggle'],'click'),reduce:value=>{pref.matches=value;fire(pref,'change',{matches:value})},visibility:hidden=>{doc.hidden=hidden;fire(doc,'visibilitychange')}};
+ return {els,doc,v,fire,pref,initializationError,sources,timers,intersect:value=>{assert.equal(observed,els['bear-stage']);observerCallback([{target:observed,isIntersecting:value}])},saveData:value=>{connection.saveData=value;fire(connection,'change')},flush:()=>{const pending=[...timers.values()];timers.clear();pending.forEach(fn=>fn())},click:()=>fire(els['rotate-toggle'],'click'),reduce:value=>{pref.matches=value;fire(pref,'change',{matches:value})},visibility:hidden=>{doc.hidden=hidden;fire(doc,'visibilitychange')}};
 }
 test('visible initial video plays; initial reduced motion stays paused',()=>{assert.equal(setup().v.paused,false);const s=setup(true);assert.equal(s.v.paused,true);assert.equal(s.els['rotate-toggle'].attrs['aria-pressed'],'false')});
 test('enabling reduced motion while open pauses, disabling it does not restart',()=>{const s=setup();s.reduce(true);assert.equal(s.v.paused,true);assert.equal(s.els['rotate-toggle'].attrs['aria-pressed'],'false');s.reduce(false);assert.equal(s.v.paused,true)});
@@ -108,4 +109,47 @@ test('Unsupported or failed observer retains existing visibility and explicit pa
 });
 test('A stale play rejection after viewport pause cannot clear the preserved intent',async()=>{
  let reject;const s=setup(false,{observer:true,play:()=>new Promise((_,r)=>reject=r)});s.intersect(true);s.intersect(false);reject(Error('stale'));await new Promise(setImmediate);assert.equal(s.els['rotate-toggle'].attrs['aria-pressed'],'true');assert.equal(s.v.paused,true);
+});
+
+
+test('HTML exposes native video and no inoperative custom controls without JavaScript',()=>{
+ const html=readFileSync(new URL('../dist/index.html',import.meta.url),'utf8');
+ const tag=id=>html.match(new RegExp('<[^>]+id="'+id+'"[^>]*>'))?.[0]||'';
+ assert.match(tag('bear-video'),/\scontrols(?:\s|>)/);assert.doesNotMatch(tag('bear-video'),/\sautoplay(?:\s|>)/);
+ for(const id of ['rotate-toggle','bear-reset','bear-keyboard-help'])assert.match(tag(id),/\shidden(?:\s|>)/);
+ assert.match(html,/<span class="drag-hint" hidden>/);
+ assert.doesNotMatch(tag('bear-stage'),/aria-describedby|tabindex|aria-keyshortcuts/);
+ const css=readFileSync(new URL('../dist/style.css',import.meta.url),'utf8');
+ assert.match(css,/\.bear-stage:not\(\[data-controls-ready="true"\]\)\{cursor:default\}/);
+ assert.match(css,/\.bear-stage video\[controls\]\{mix-blend-mode:normal\}/);
+});
+test('Successful initialization reveals only ready controls and retires native controls',()=>{
+ const s=setup(true);assert.equal(s.v.controls,false);assert.equal(s.els['bear-stage'].dataset.controlsReady,'true');
+ for(const id of ['rotate-toggle','bear-reset','bear-keyboard-help','drag-hint'])assert.equal(s.els[id].hidden,false);
+ assert.equal(s.els['bear-stage'].attrs['aria-describedby'],'bear-keyboard-help');
+ s.click();assert.equal(s.v.paused,false);s.fire(s.els['bear-reset'],'click');assert.equal(s.v.paused,true);
+});
+test('Incomplete initialization keeps native controls available and custom buttons hidden',()=>{
+ const s=setup(false,{failInitialization:true});assert(s.initializationError);assert.equal(s.v.controls,true);
+ assert.notEqual(s.els['bear-stage'].dataset.controlsReady,'true');
+ assert.equal(s.fire(s.els['bear-stage'],'keydown',{key:' '}).defaultPrevented,false);
+ s.fire(s.els['bear-stage'],'pointerdown',{button:0,isPrimary:true,clientX:50,pointerId:1});assert.equal(s.v.paused,true);
+ assert.equal(s.els['bear-stage'].tabIndex,undefined);
+ for(const id of ['rotate-toggle','bear-reset','bear-keyboard-help','drag-hint'])assert.equal(s.els[id].hidden,true);
+});
+test('A slow module preserves a prior pause or play chosen through native controls',()=>{
+ for(const reduce of [false,true])for(const saveData of [false,true]){
+  const paused=setup(reduce,{saveData,nativePlayed:true,nativePaused:true});assert.equal(paused.v.paused,true);assert.equal(paused.els['rotate-toggle'].attrs['aria-pressed'],'false');
+  const playing=setup(reduce,{saveData,nativePlayed:true,nativePaused:false});assert.equal(playing.v.paused,false);assert.equal(playing.els['rotate-toggle'].attrs['aria-pressed'],'true');
+ }
+});
+test('Retiring focused native controls preserves focus without scrolling, otherwise does not move it',()=>{
+ const focused=setup(true,{nativeFocus:true});assert.equal(focused.doc.activeElement,focused.els['bear-stage']);assert.equal(focused.els['bear-stage'].focusOptions.preventScroll,true);
+ const other=setup(true);assert.equal(other.doc.activeElement,null);assert.equal(other.els['bear-stage'].focusOptions,undefined);
+});
+test('The app cache-busts the native fallback and does not falsely claim video itself failed',()=>{
+ const html=readFileSync(new URL('../dist/index.html',import.meta.url),'utf8'),app=readFileSync(new URL('../dist/app.js',import.meta.url),'utf8');
+ assert.match(html,/app\.js[^"<>]+fallback=20261106-native-bear/);
+ assert.match(app,/bear-video\.js[^'"<>]+fallback=20261106-native-bear/);
+ assert.match(app,/Используйте встроенные кнопки видео/);assert.doesNotMatch(app,/Анимация не загрузилась\. Доступен статичный постер/);
 });

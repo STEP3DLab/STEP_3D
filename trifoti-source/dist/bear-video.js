@@ -2,12 +2,16 @@ const stage=document.getElementById('bear-stage');
 const video=document.getElementById('bear-video');
 const image=document.getElementById('bear-gif');
 const toggle=document.getElementById('rotate-toggle');
+const reset=document.getElementById('bear-reset');
+const dragHint=document.querySelector('.drag-hint');
 const keyboardHelp=document.getElementById('bear-keyboard-help');
 const motionPreference=matchMedia('(prefers-reduced-motion: reduce)');
 const connection=typeof navigator==='undefined'?null:navigator.connection;
 const sources=[...video.querySelectorAll('source')];
 const failedSources=new Set();
-let wantsPlayback=!motionPreference.matches&&!connection?.saveData;
+// A slow module must not overwrite play/pause already chosen in native controls.
+const nativePlaybackStarted=(video.played?.length??0)>0||!video.paused;
+let wantsPlayback=nativePlaybackStarted?!video.paused:!motionPreference.matches&&!connection?.saveData;
 let inViewport=typeof IntersectionObserver!=='function';
 let gifMode=false,dragging=false,lastX=0,resumeAfterDrag=false,playRequest=0,exhaustionCheck=null;
 
@@ -15,7 +19,7 @@ function update(){
  toggle.textContent=wantsPlayback?'Ⅱ':'▷';
  toggle.setAttribute('aria-label',wantsPlayback?'Приостановить вращение':'Включить вращение');
  toggle.setAttribute('aria-pressed',String(wantsPlayback));
- if(gifMode)document.querySelector('.drag-hint').textContent=wantsPlayback?'Скульптура · 360°':'▷ Запустить анимацию';
+ if(gifMode)dragHint.textContent=wantsPlayback?'Скульптура · 360°':'▷ Запустить анимацию';
 }
 async function syncPlayback(){
  const request=++playRequest;
@@ -68,13 +72,13 @@ for(const source of sources)source.addEventListener('error',()=>{
 });
 video.addEventListener('loadeddata',()=>{if(!gifMode)stage.dataset.renderer='video'});
 toggle.addEventListener('click',togglePlayback);
-document.getElementById('bear-reset').addEventListener('click',()=>{
+reset.addEventListener('click',()=>{
  resumeAfterDrag=false;
  if(!gifMode)video.currentTime=0;
  pause();
 });
 stage.addEventListener('pointerdown',e=>{
- if(e.button!==0||e.isPrimary===false||gifMode||!Number.isFinite(video.duration)||video.duration<=0)return;
+ if(stage.dataset.controlsReady!=='true'||e.button!==0||e.isPrimary===false||gifMode||!Number.isFinite(video.duration)||video.duration<=0)return;
  dragging=true;lastX=e.clientX;resumeAfterDrag=wantsPlayback;pause();
  stage.setPointerCapture(e.pointerId);stage.classList.add('dragging');
 });
@@ -89,10 +93,8 @@ for(const name of ['pointerup','pointercancel','lostpointercapture'])stage.addEv
  if(resumeAfterDrag)play();
  resumeAfterDrag=false;
 });
-stage.tabIndex=0;
-stage.setAttribute('aria-keyshortcuts','Space Enter ArrowLeft ArrowRight');
 stage.addEventListener('keydown',e=>{
- if(e.altKey||e.ctrlKey||e.metaKey)return;
+ if(stage.dataset.controlsReady!=='true'||e.altKey||e.ctrlKey||e.metaKey)return;
  if(e.key===' '||e.key==='Enter'){
   e.preventDefault();if(!e.repeat)togglePlayback();return;
  }
@@ -129,3 +131,14 @@ if(video.readyState>=2)stage.dataset.renderer='video';
 if([2,3,4].includes(video.error?.code))useFallback();
 else if(video.networkState===3&&video.readyState===0)checkExhaustionSoon();
 syncPlayback();
+
+// Keep the working native controls until every custom interaction is wired.
+// The HTML fallback also covers an unavailable app or bear module.
+const restoreNativeFocus=document.activeElement===video;
+video.controls=false;
+stage.dataset.controlsReady='true';
+stage.tabIndex=0;
+stage.setAttribute('aria-keyshortcuts',gifMode?'Space Enter':'Space Enter ArrowLeft ArrowRight');
+stage.setAttribute('aria-describedby','bear-keyboard-help');
+for(const control of [toggle,reset,keyboardHelp,dragHint])control.hidden=false;
+if(restoreNativeFocus)stage.focus({preventScroll:true});

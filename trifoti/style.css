@@ -605,3 +605,7 @@ form .brief-counter[data-near-limit="true"]{color:#a91c24;font-weight:700}
 .legacy-direction-choice a{display:flex;align-items:center;min-height:44px;max-width:100%;font-size:14px;line-height:1.5;text-decoration:underline;text-underline-offset:4px;overflow-wrap:anywhere}
 .legacy-direction-choice a:hover{color:var(--red-text)}
 @media(max-width:600px){.legacy-direction-choice{padding:18px}.legacy-direction-choice nav{flex-direction:column;align-items:flex-start}}
+
+/* Native video remains usable before scripting or if its module is unavailable. */
+.bear-stage:not([data-controls-ready="true"]){cursor:default}
+.bear-stage video[controls]{mix-blend-mode:normal}
