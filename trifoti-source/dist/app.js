@@ -193,7 +193,7 @@ projectDialog.addEventListener('keydown',e=>{if(photoDetail?.key(e))return;if(!p
 projectDialog.addEventListener('close',()=>{if(projectDialog.open)return;photoDetail?.reset();slideRevision++;clearMediaWait();$$('video',projectDialog).forEach(releaseGalleryVideo);const mode=caseNavigation.closed();if(mode!=='route')restoreProjectFocus(mode)});
 caseNavigation.sync();
 optionalModule({load:()=>import('./category-stories.js?v=20261026-legacy-links&stories=20261026-story-polish&focus=20261105'),mount:({mountCategoryStories})=>{categoryStories=mountCategoryStories({document,window,beforeOpen:()=>caseNavigation.sync(),onFullCase:(key,id,tile)=>{rememberProjectOpener(tile);caseNavigation.sync()}})},onError:()=>{const help=$('.category-story-help');help.textContent='Истории не загрузились. Квадраты открывают каталог с работами или описание направления.'}})();
-import('./bear-video.js?v=20261024-ux25&fallback=20261106-native-bear').catch(()=>{const status=$('#bear-keyboard-help');if(status)status.textContent='Дополнительное управление не загрузилось. Используйте встроенные кнопки видео.';$$('#rotate-toggle, #bear-reset').forEach(button=>button.disabled=true)});
+import('./bear-video.js?v=20261024-ux25&fallback=20261106-native-bear&recovery=20261106-gif-error').catch(()=>{const status=$('#bear-keyboard-help');if(status)status.textContent='Дополнительное управление не загрузилось. Используйте встроенные кнопки видео.';$$('#rotate-toggle, #bear-reset').forEach(button=>button.disabled=true)});
 
 // Editorial tools are an explicit local mode, separate from the visitor experience.
 const reviewMode=new URLSearchParams(location.search).get('review')==='1';

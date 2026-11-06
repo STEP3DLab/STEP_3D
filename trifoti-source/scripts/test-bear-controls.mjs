@@ -153,3 +153,57 @@ test('The app cache-busts the native fallback and does not falsely claim video i
  assert.match(app,/bear-video\.js[^'"<>]+fallback=20261106-native-bear/);
  assert.match(app,/Используйте встроенные кнопки видео/);assert.doesNotMatch(app,/Анимация не загрузилась\. Доступен статичный постер/);
 });
+
+function failGif(s){
+ s.fire(s.v,'error');s.click();
+ const image=s.els['bear-gif'];image.complete=true;image.naturalWidth=0;
+ s.fire(image,'error');return image;
+}
+test('Failed GIF returns to its poster and offers a visible explicit retry',()=>{
+ const s=setup(),image=failGif(s);
+ assert.match(image.src,/poster\.webp$/);assert.equal(s.els['rotate-toggle'].attrs['aria-pressed'],'false');
+ assert.equal(s.els['rotate-toggle'].attrs['aria-label'],'Повторить загрузку анимации');
+ assert.match(s.els['drag-hint'].textContent,/Сбой анимации.*повторить/);
+ assert.match(s.els['bear-keyboard-help'].textContent,/не загрузилась.*повторить/);
+ assert.equal(s.els['drag-hint'].attrs.role,'status');assert.equal(s.els['drag-hint'].attrs['aria-atomic'],'true');
+});
+test('Failed GIF never restarts on tab or viewport changes, reset or motion preferences',()=>{
+ const s=setup(false,{observer:true});s.intersect(true);const image=failGif(s),requests=image.srcWrites.filter(src=>src.endsWith('.gif')).length;
+ s.visibility(true);s.visibility(false);s.intersect(false);s.intersect(true);s.reduce(true);s.reduce(false);s.saveData(true);s.saveData(false);s.fire(s.els['bear-reset'],'click');
+ assert.equal(image.srcWrites.filter(src=>src.endsWith('.gif')).length,requests);
+ assert.equal(s.els['rotate-toggle'].attrs['aria-pressed'],'false');assert.match(s.els['drag-hint'].textContent,/Сбой/);
+});
+test('An explicit GIF retry can succeed without moving keyboard focus',()=>{
+ const s=setup(),image=failGif(s);s.doc.activeElement=s.els['rotate-toggle'];s.click();
+ assert.match(image.src,/\.gif$/);assert.match(s.els['drag-hint'].textContent,/Загружаем/);
+ image.complete=true;image.naturalWidth=600;s.fire(image,'load');
+ assert.equal(s.els['rotate-toggle'].attrs['aria-pressed'],'true');assert.equal(s.els['drag-hint'].textContent,'Скульптура · 360°');
+ assert.doesNotMatch(s.els['bear-keyboard-help'].textContent,/не загрузилась/);assert.equal(s.doc.activeElement,s.els['rotate-toggle']);
+});
+test('A repeated GIF failure stays recoverable and retry uses the same original URL',()=>{
+ const s=setup(),image=failGif(s);s.click();s.fire(image,'error');
+ assert.match(image.src,/poster\.webp$/);assert.equal(s.els['rotate-toggle'].attrs['aria-pressed'],'false');
+ s.fire(s.els['bear-stage'],'keydown',{key:'Enter'});
+ assert.equal(image.src,'assets/animation/trifoti-bear-loop.gif');assert.equal(image.srcWrites.filter(src=>src.endsWith('.gif')).length,3);
+});
+test('Poster failure or success cannot loop requests or erase the GIF error',()=>{
+ const s=setup(),image=failGif(s),writes=image.srcWrites.length;
+ s.fire(image,'error');s.fire(image,'error');image.naturalWidth=600;s.fire(image,'load');
+ assert.equal(image.srcWrites.length,writes);assert.match(s.els['drag-hint'].textContent,/Сбой/);
+ assert.equal(s.els['rotate-toggle'].attrs['aria-pressed'],'false');
+});
+test('Hidden fallback errors leave working video playback intact',()=>{
+ const s=setup(),image=s.els['bear-gif'];image.complete=true;image.naturalWidth=0;s.fire(image,'error');
+ assert.equal(s.v.hidden,false);assert.equal(s.v.paused,false);assert.equal(image.srcWrites.length,0);
+});
+test('Obsolete image events cannot override a pending or successful current resource',()=>{
+ const s=setup(),image=failGif(s);s.click();image.complete=false;s.fire(image,'error');
+ assert.match(image.src,/\.gif$/);assert.equal(s.els['rotate-toggle'].attrs['aria-pressed'],'true');
+ image.complete=true;image.naturalWidth=600;s.fire(image,'load');s.fire(image,'error');
+ assert.match(image.src,/\.gif$/);assert.equal(s.els['drag-hint'].textContent,'Скульптура · 360°');
+ s.click();s.fire(image,'load');assert.equal(s.els['rotate-toggle'].attrs['aria-pressed'],'false');
+});
+test('GIF recovery module and entry point receive fresh cache keys',()=>{
+ const app=readFileSync(new URL('../dist/app.js',import.meta.url),'utf8'),html=readFileSync(new URL('../dist/index.html',import.meta.url),'utf8');
+ assert.match(app,/bear-video\.js\?[^']*&recovery=20261106-gif-error/);assert.match(html,/app\.js\?[^\"]*&amp;recovery=20261106-gif-error/);
+});
