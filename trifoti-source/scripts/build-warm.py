@@ -75,6 +75,8 @@ for page in target.rglob('*.html'):
     content = re.sub(r'<meta name="theme-color" content="[^"]*">', '<meta name="theme-color" content="#142039">', content)
     content = content.replace('</head>', f'<link rel="stylesheet" href="{palette}?v=20261106-spectrum">\n</head>')
     page.write_text(content)
+# Apply the editorial layer last, preserving the warm snapshot when called independently.
+runpy.run_path(str(root/'trifoti-source/warm/premium/apply.py'))['apply'](target)
 # Publish identical files for either GitHub Pages source layout.
 mirror=root/'docs/trifoti/warm'
 shutil.copytree(target,mirror,dirs_exist_ok=True)

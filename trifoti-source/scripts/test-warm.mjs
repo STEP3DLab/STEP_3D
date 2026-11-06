@@ -9,7 +9,7 @@ const read=p=>readFileSync(path.join(warm,p),'utf8');
 const files=(dir)=>readdirSync(dir).flatMap(n=>{const f=path.join(dir,n);return statSync(f).isDirectory()?files(f):[f]});
 test('Warm mirror is byte identical',()=>{for(const f of files(warm))assert.deepEqual(readFileSync(f),readFileSync(path.join(root,'docs/trifoti/warm',path.relative(warm,f))));});
 test('Original project content is preserved',()=>assert.equal(read('project-data.js').split('\n// Additional verified')[0].replaceAll('/STEP_3D/trifoti/assets/','assets/'),readFileSync(path.join(root,'trifoti/project-data.js'),'utf8')));
-test('All nine static cases are retained',()=>assert.equal(readdirSync(path.join(warm,'cases')).filter(n=>n.endsWith('.html')).length,10));
+test('All ten static cases are retained',()=>assert.equal(readdirSync(path.join(warm,'cases')).filter(n=>n.endsWith('.html')).length,10));
 test('Visual concept is disclosed and original bear remains',()=>{const h=read('index.html');assert.match(h,/Художественная визуализация/);assert.match(h,/id="bear-video"/);assert.match(h,/id="bear-reset"/);assert.match(h,/id="rotate-toggle"/);assert.match(h,/Подлинное видео/);assert.equal((h.match(/<h1\b/g)||[]).length,2);});
 test('Six current directions and honest empty categories',()=>{const h=read('index.html');assert.deepEqual([...h.matchAll(/data-story-category="([^"]+)"/g)].map(m=>m[1]),['corporate','sculpture','interiors','awards','industrial','artobjects']);assert.equal((h.match(/Пока нет проектов/g)||[]).length,2);});
 test('Brief and keyboard modules remain unchanged',()=>{for(const f of ['brief-guard.js','brief-utils.js','dialog-controls.js'])assert.equal(read(f),readFileSync(path.join(root,'trifoti',f),'utf8'));});
@@ -28,3 +28,22 @@ test('RED7 has real photos and clear attribution',async()=>{const d=await import
 test('RED7 photographs remain byte-identical to supplied published materials',async()=>{const {createHash}=await import('node:crypto');const manifest=JSON.parse(readFileSync(path.join(root,'trifoti-source/warm/red7/photo-manifest.json'),'utf8'));for(const [name,hash] of Object.entries(manifest))assert.equal(createHash('sha256').update(readFileSync(path.join(warm,'photos/red7',name))).digest('hex'),hash);});
 
 test('Warm navigation keeps its independent pre-20261105 snapshot',()=>assert.equal(createHash('sha256').update(read('header-navigation.js')).digest('hex'),'76856b1cd84199536df049d3dc3ac505e4eeda6fc27312201959d85155ea6117'));
+
+
+test('Warm mirror has no extra or missing paths',()=>{
+ const mirror=path.join(root,'docs/trifoti/warm');
+ assert.deepEqual(files(warm).map(f=>path.relative(warm,f)).sort(),files(mirror).map(f=>path.relative(mirror,f)).sort());
+});
+test('All six direction deep links reveal their details, including repeat navigation',async()=>{
+ const {revealService}=await import(path.join(warm,'section-navigation.js'));
+ for(const id of ['corporate','sculpture','design','awards','industrial','artobjects']){
+  const detail={tagName:'DETAILS',open:false};
+  const document={getElementById:key=>key===`service-${id}`?detail:null};
+  assert.equal(revealService(`#service-${id}`,document),true);
+  assert.equal(detail.open,true);
+  detail.open=false;
+  assert.equal(revealService(`#service-${id}`,document),true);
+  assert.equal(detail.open,true);
+ }
+ assert.equal(revealService('#service-modelmaking',{getElementById:()=>({tagName:'SPAN'})}),false);
+});
