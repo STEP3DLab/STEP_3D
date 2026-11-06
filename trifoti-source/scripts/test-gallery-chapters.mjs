@@ -35,7 +35,7 @@ test('Other cases mount no controls and receive a harmless updater',()=>{
 test('Integration retains gallery controls, pauses replaced video and never starts autoplay',()=>{
  assert.match(app,/onSelect:showSlide/);assert.match(app,/updateGalleryChapters\(galleryIndex\)/);
  assert.match(app,/showSlide\(routeMedia\?mediaIndex\(key,routeMedia\):frameMemory.recall\(key,p.media.length\),false,false\);if\(!projectDialog.open\)/);
- assert.match(app,/\$\$\('video',viewer\).forEach\(video=>video.pause\(\)\);viewer.replaceChildren\(\)/);
+ assert.match(app,/\$\$\('video',viewer\).forEach\(releaseGalleryVideo\);viewer.replaceChildren\(\)/);
  assert.match(app,/media.controls=true;media.muted=true;media.playsInline=true;media.preload='metadata'/);
  assert.doesNotMatch(module,/\.play\(|autoplay|setInterval|\.focus\(|scrollIntoView|keydown|tabindex/);
  assert.match(app,/keepDialogFocus\(dialog\)/);

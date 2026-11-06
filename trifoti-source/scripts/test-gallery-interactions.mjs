@@ -4,7 +4,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createFrameMemory,thumbnailKey,mountPhotoSwipe} from '../dist/gallery-interactions.js';
 import {galleryArrow} from '../dist/dialog-controls.js';
-import {watchGalleryMedia} from '../dist/media-recovery.js';
+import {watchGalleryMedia,releaseGalleryVideo} from '../dist/media-recovery.js';
 function swipe(){const handlers={},steps=[];let enabled=true;mountPhotoSwipe({viewer:{addEventListener(type,fn,options){assert.equal(options.passive,true);handlers[type]=fn}},onStep:s=>steps.push(s),isEnabled:()=>enabled});return{steps,disable(){enabled=false},fire(type,{x=0,y=0,n=1,tag='IMG',time=0,...rest}={}){const touch={clientX:x,clientY:y};handlers[type]({touches:type==='touchend'?[]:Array(n).fill(touch),changedTouches:[touch],target:{tagName:tag},timeStamp:time,...rest})}}}
 for(const [dx,step] of [[-90,1],[90,-1]])test(`Horizontal photo swipe ${dx} changes one frame`,()=>{const f=swipe();f.fire('touchstart');f.fire('touchend',{x:dx,y:10,time:300});f.fire('touchend',{x:dx,time:400});assert.deepEqual(f.steps,[step])});
 for(const kind of ['vertical','pinch','video','cancel','short','slow','disabled','remaining-touch'])test(`Swipe ignores ${kind}`,()=>{const f=swipe();f.fire('touchstart',{tag:kind==='video'?'VIDEO':'IMG'});if(kind==='vertical')f.fire('touchmove',{x:5,y:35});if(kind==='pinch')f.fire('touchmove',{n:2});if(kind==='cancel')f.fire('touchcancel');if(kind==='disabled')f.disable();f.fire('touchend',{x:kind==='short'?20:-90,y:kind==='vertical'?100:0,time:kind==='slow'?1000:300,...(kind==='remaining-touch'?{touches:[{}]}:{})});assert.deepEqual(f.steps,[])});
@@ -26,12 +26,14 @@ test('Real slide renderer remembers photo/video, sets one thumbnail Tab stop, ca
  const viewer={children:[],replaceChildren(){this.children=[]},append(media){this.children.push(media)},isConnected:true};
  for(const id of ['gallery-caption','gallery-counter','gallery-announcement','gallery-status','gallery-retry','gallery-photo-link','case-page-link','case-light-link'])nodes.set(id,{});
  nodes.set('gallery-viewer',viewer);nodes.set('gallery-thumbnails',{children:thumbs,scrollWidth:0,clientWidth:100});
- const context={photoDetail:null,modeLinks,mediaId,caseNavigation:{frame(){}},projects,galleryProject:'mascot',galleryIndex:0,slideRevision:0,projectDialog:{open:true},frameMemory:memory,
-  clearMediaWait(){cleanups++},document:{createElement(tag){return{tag,setAttribute(){},pause(){paused++}}}},
+ const context={releaseGalleryVideo,photoDetail:null,modeLinks,mediaId,caseNavigation:{frame(){}},projects,galleryProject:'mascot',galleryIndex:0,slideRevision:0,projectDialog:{open:true},frameMemory:memory,
+  clearMediaWait(){cleanups++},document:{createElement(tag){return{tag,setAttribute(){},getAttribute(name){return this[name]??null},removeAttribute(name){delete this[name]},load(){this.loads=(this.loads||0)+1},pause(){paused++}}}},
   $:selector=>nodes.get(selector.slice(1)),$$:selector=>selector==='.gallery-thumb'?thumbs:viewer.children.filter(media=>media.tag==='video'),
   watchGalleryMedia(){return()=>{cleanups++}},updateGalleryPhotoLink(){},updateGalleryChapters(){}};
  vm.createContext(context);vm.runInContext(app.slice(app.indexOf('function showSlide('),app.indexOf('function openProject(')),context);
  context.showSlide(8);assert.equal(memory.recall('mascot',10),8);assert.equal(thumbs.filter(t=>t.tabIndex===0).length,1);assert.equal(thumbs[8].tabIndex,0);
  context.showSlide(9);assert.equal(viewer.children[0].tag,'video');assert.equal(viewer.children[0].autoplay,undefined);assert.equal(memory.recall('mascot',10),9);
+ const outgoing=viewer.children[0];
  context.showSlide(0);assert.equal(paused,1);assert.equal(cleanups,3);assert.equal(thumbs[0].tabIndex,0);
+ assert.equal(outgoing.src,undefined);assert.equal(outgoing.loads,1);
 });

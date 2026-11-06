@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {watchGalleryMedia} from '../dist/media-recovery.js';
+import {watchGalleryMedia,releaseGalleryVideo} from '../dist/media-recovery.js';
+import vm from 'node:vm';
 
 function fixture(type='image'){
  const document={activeElement:null},attrs=new Map(),retryAttrs=new Map();
@@ -68,4 +69,59 @@ test('App wiring preserves original file/index and provides native focusable con
  assert.match(app,/projectDialog\.addEventListener\('close'.*slideRevision\+\+/);
  const helper=readFileSync(new URL('../dist/media-recovery.js',import.meta.url),'utf8');
  assert.doesNotMatch(helper,/setInterval|fetch\(|localStorage|sessionStorage/);
+});
+
+function videoResource(src='assets/projects/gesture/gesture-turntable.mp4'){
+ const calls=[],video=new EventTarget();video.src=src;
+ video.getAttribute=name=>video[name]??null;
+ video.pause=()=>calls.push('pause');
+ video.removeAttribute=name=>{calls.push('remove:'+name);delete video[name]};
+ video.load=()=>{assert.equal(video.src,undefined);calls.push('load');video.dispatchEvent(new Event('error'))};
+ return {video,calls};
+}
+for(const state of ['loading','playing','failed'])test(`Releasing a ${state} gallery video cancels its source, not just playback`,()=>{
+ const f=videoResource();f.video.readyState=state==='playing'?4:0;
+ releaseGalleryVideo(f.video);
+ assert.deepEqual(f.calls,['pause','remove:src','load']);assert.equal(f.video.src,undefined);
+});
+test('Repeated teardown does not reset an already released video again',()=>{
+ const f=videoResource();releaseGalleryVideo(f.video);releaseGalleryVideo(f.video);
+ assert.deepEqual(f.calls,['pause','remove:src','load','pause']);
+});
+test('An abort from releasing old media cannot expose a stale retry or loading message',()=>{
+ const f=fixture('video'),resource=videoResource();
+ const dispose=watchGalleryMedia({media:resource.video,type:'video',viewer:f.viewer,status:f.status,retry:f.retry,announcement:f.announcement,document:f.document,isCurrent:()=>true,onRetry(){throw Error('No automatic retry')},schedule:()=>0,cancel(){}});
+ dispose();releaseGalleryVideo(resource.video);
+ assert.equal(f.retry.hidden,true);assert.equal(f.status.textContent,'');
+});
+test('Actual project replacement cancels its wait and releases video before replacing content',()=>{
+ const app=readFileSync(new URL('../dist/app.js',import.meta.url),'utf8');
+ const body=app.slice(app.indexOf('function openProject(key,routeMedia){'),app.indexOf(" host.innerHTML="))+'\n}';
+ const f=videoResource(),host={contains:()=>false},events=[];
+ const context={releaseGalleryVideo,categoryStories:null,projects:{next:{title:'Next'}},galleryProject:'old',projectDialog:{open:true},document:{activeElement:null},photoDetail:{destroy(){events.push('detail')}},unbindCaseSelection(){events.push('unbind')},clearMediaWait(){events.push('wait');f.calls.push('wait')},
+  $:selector=>selector==='#project-content'?host:{},$$:(selector,root)=>{if(selector==='[data-project]')return[];assert.equal(root,context.projectDialog);return[f.video]}};
+ vm.createContext(context);vm.runInContext(body,context);context.openProject('next');
+ assert.deepEqual(events,['detail','unbind','wait']);assert.deepEqual(f.calls,['wait','pause','remove:src','load']);
+ assert.equal(context.galleryProject,'next');assert.equal(context.photoDetail,null);
+});
+function closeFixture(open=false){
+ const app=readFileSync(new URL('../dist/app.js',import.meta.url),'utf8');
+ const line=app.split('\n').find(line=>line.startsWith("projectDialog.addEventListener('close'"));
+ const f=videoResource();let close;
+ const context={releaseGalleryVideo,photoDetail:{reset(){}},slideRevision:3,clearMediaWait(){f.calls.push('wait')},caseNavigation:{closed(){return 'route'}},
+  projectDialog:{open,addEventListener(type,fn){assert.equal(type,'close');close=fn}},$$:(selector,root)=>{assert.equal(selector,'video');assert.equal(root,context.projectDialog);return[f.video]}};
+ vm.runInNewContext(line,context);return {...f,context,close};
+}
+test('Actual dialog close invalidates old events and releases video; repeated close is safe',()=>{
+ const f=closeFixture();f.close();assert.equal(f.context.slideRevision,4);
+ assert.deepEqual(f.calls,['wait','pause','remove:src','load']);f.close();
+ assert.deepEqual(f.calls,['wait','pause','remove:src','load','wait','pause']);
+});
+test('A delayed close event cannot release a gallery that was already reopened',()=>{
+ const f=closeFixture(true);f.close();assert.equal(f.context.slideRevision,3);assert.deepEqual(f.calls,[]);assert(f.video.src);
+});
+test('Entry point and changed media module both receive fresh cache keys',()=>{
+ const app=readFileSync(new URL('../dist/app.js',import.meta.url),'utf8'),html=readFileSync(new URL('../dist/index.html',import.meta.url),'utf8');
+ assert.match(app,/import \{watchGalleryMedia,releaseGalleryVideo\} from '\.\/media-recovery.js\?v=20261106-release-video'/);
+ assert.match(html,/app\.js\?[^\"]*&amp;media=20261106-release-video/);
 });

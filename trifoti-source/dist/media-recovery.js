@@ -1,3 +1,11 @@
+// Pausing alone can leave a dismissed video buffering on a slow connection.
+// Gallery videos use a direct src, not child sources. Release it before removal.
+export function releaseGalleryVideo(video){
+ video.pause();
+ if(video.getAttribute('src')===null)return;
+ video.removeAttribute('src');video.load();
+}
+
 // One attempt per explicit activation. Old slides and closed dialogs stay inert.
 export function watchGalleryMedia({media,type,viewer,status,retry,announcement,document,isCurrent,onRetry,retrying=false,caption='',schedule=setTimeout,cancel=clearTimeout}) {
  let state='loading';
