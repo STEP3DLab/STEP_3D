@@ -26,9 +26,9 @@ def apply(target):
     text = text.replace('Все проекты и подробные кейсы · ', 'Подробные кейсы · ')
     text = text.replace('<span>Работы по направлениям</span>', '<span>Избранные работы и концепты</span>')
     text = text.replace('<a href="#studio">Об объединении</a>', '<a href="#studio">Команда</a>')
-    text = re.sub(r'review-20261106\.css\?v=[^"]+', 'review-20261106.css?v=20261110-team-gallery', text)
+    text = re.sub(r'review-20261106\.css\?v=[^"]+', 'review-20261106.css?v=20261111-portfolio', text)
     if 'review-20261106.css?' not in text:
-        text = text.replace('</head>', '  <link rel="stylesheet" href="review-20261106.css?v=20261110-team-gallery">\n</head>')
+        text = text.replace('</head>', '  <link rel="stylesheet" href="review-20261106.css?v=20261111-portfolio">\n</head>')
     shutil.copyfile(source / 'review-20261106.css', target / 'review-20261106.css')
     shutil.copyfile(source / 'category-stories.js', target / 'category-stories.js')
     fedor_link = '<a class="team-sources" href="portfolio.html">Посмотреть подборку проектов <span class="direction-icon" aria-hidden="true"></span></a>'
@@ -45,6 +45,14 @@ def apply(target):
                  f'sizes="(max-width:700px) 92vw, (max-width:1200px) 45vw, 550px" width="640" height="640" alt="{name}" loading="lazy" decoding="async"></div>')
         pattern = rf'(<li class="team-card" aria-labelledby="team-{person}">\s*)<div class="team-portrait">.*?</div>'
         text = re.sub(pattern, lambda m: m[1] + photo, text, count=1, flags=re.S)
+    text = re.sub(r'\n          <div class="team-kicker">[^\n]*?</div>', '', text)
+    text = re.sub(r'(src="(?:\./)?app\.js)\?v=[^"]+', r'\1?v=20261111-portfolio', text)
+    shutil.copyfile(source / 'portfolio-brief.js', target / 'portfolio-brief.js')
+    app = target / 'app.js'
+    entry = (source / 'portfolio-brief-entry.js').read_text()
+    application = app.read_text()
+    if entry.strip() not in application:
+        app.write_text(application.rstrip() + '\n\n' + entry)
     page.write_text(text)
     shutil.copyfile(source/'interior-stage.css',target/'interior-stage.css')
 

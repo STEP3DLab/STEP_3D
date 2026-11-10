@@ -183,3 +183,13 @@ body .team-grid .team-card[aria-labelledby="team-fedor"] .team-portrait img { ma
  .albums-grid a>span { padding:10px; }
  .albums-grid img { height:auto; aspect-ratio:1.55; }
 }
+
+/* Keep the complete silhouette on covers of three-dimensional objects. */
+.albums-grid a:is([href$="#awards"],[href$="#art"],[href$="#models"]) img {
+  object-fit:contain;
+  object-position:center;
+  background:#edece9;
+}
+#portfolio-albums { scroll-margin-top:90px; }
+body .team-grid .team-person { padding:clamp(18px,2.2vw,30px); }
+body .team-grid .team-person h3, body .team-grid .team-role { min-height:0; }
