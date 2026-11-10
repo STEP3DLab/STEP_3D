@@ -23,6 +23,10 @@ def apply(target):
         text = text.replace('</head>', '  <link rel="stylesheet" href="review-20261106.css?v=20261110">\n</head>')
     shutil.copyfile(source / 'review-20261106.css', target / 'review-20261106.css')
     shutil.copyfile(source / 'category-stories.js', target / 'category-stories.js')
+    fedor_link = '<a class="team-sources" href="portfolio.html">Посмотреть подборку проектов <span class="direction-icon" aria-hidden="true"></span></a>'
+    if fedor_link not in text:
+        publications_link = '<a class="team-sources" href="#publications">'
+        text = text.replace(publications_link, fedor_link + '\n          ' + publications_link, 1)
     page.write_text(text)
     shutil.copyfile(source/'interior-stage.css',target/'interior-stage.css')
 
