@@ -42,12 +42,13 @@ export function initializeBriefTools({form,document,draftSession,draftStatus,onR
   // independently so an unfinished draft can still be selected and preserved.
   if(!validate())return;
   const revision=++copyRevision,text=formatBrief(values());preview.value=text;
-  copying=true;copy.disabled=true;copyStatus.textContent='Копируем текст…';
+  // Keep the initiating control focusable while pending; the guard above blocks repeats.
+  copying=true;copy.setAttribute('aria-disabled','true');copyStatus.textContent='Копируем текст…';
   const copied=await copyBriefText(text,clipboard);
   if(revision!==copyRevision)return;
-  copying=false;copy.disabled=false;
+  copying=false;copy.removeAttribute('aria-disabled');
   if(copied){copyStatus.textContent=formatBrief(values())===text?'Бриф скопирован. Данные никуда не отправлены.':'Скопирована версия до последних изменений. Скопируйте ещё раз, чтобы обновить текст.'}
-  else{preview.value=formatBrief(values());details.open=true;copyStatus.textContent='Автоматическое копирование недоступно. Выделите текст в открытом блоке и скопируйте его вручную.';preview.focus();preview.select()}
+  else{preview.value=formatBrief(values());details.open=true;copyStatus.textContent='Автоматическое копирование недоступно. Выделите текст в открытом блоке и скопируйте его вручную.';if(document.activeElement===copy){preview.focus();preview.select()}}
  });
  function closeConfirmation(){confirm.hidden=true;newButton.setAttribute('aria-expanded','false');newButton.focus()}
  newButton.addEventListener('click',()=>{
@@ -60,7 +61,7 @@ export function initializeBriefTools({form,document,draftSession,draftStatus,onR
   // Recheck at confirmation time; never delete another tab's newer draft.
   const state=draftSession.clear();
   if(state!=='empty'){draftStatus(state);closeConfirmation();return}
-  copyRevision++;copying=false;copy.disabled=false;copyStatus.textContent='';
+  copyRevision++;copying=false;copy.removeAttribute('aria-disabled');copyStatus.textContent='';
   for(const key of ['reference','name','idea','budget','deadline'])field(key).value='';
   field('direction').selectedIndex=0;touched.clear();
   for(const key of ['name','idea']){field(key).removeAttribute('aria-invalid');get(`brief-${key}-error`).hidden=true;get(`brief-${key}-error`).textContent=''}
