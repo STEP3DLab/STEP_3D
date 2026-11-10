@@ -311,8 +311,8 @@ function closeGallery({inPage = false, routing = false, hidden = false, reopened
       back() {historyCalls.push('back');},
       replaceState(state, title, href) {historyCalls.push(href);}
     },
-    opener: {closest() {return {hidden};}, focus(options) {focusCalls.push(options.preventScroll);}},
-    album: {id: 'awards'}, closingForNavigation: routing,
+    opener: {closest() {return {hidden};}, focus(options) {focusCalls.push(options.preventScroll);context.document.activeElement = this;}},
+    album: {id: 'awards'}, closingForNavigation: routing, pendingHistoryFocus: null,
     stopImage() {}, mediaFrame: {setAttribute() {}}, stage: {}, feedback: {}, retry: {},
     loadStatus: {}, document: {body: {style: {overflow: 'hidden'}}},
     filterAlbums(album) {filtered.push(album.id);}
@@ -330,9 +330,10 @@ test('closing a copied frame link reveals its focused card instead of leaving fo
   assert.deepEqual(s.filtered, ['awards']);
   assert.equal(s.context.document.body.style.overflow, '');
 });
-test('closing a frame opened from a card preserves the browser history scroll restoration', () => {
+test('closing a frame opened from a card waits for history before restoring focus', () => {
   const s = closeGallery({inPage: true});
-  assert.deepEqual(s.focusCalls, [true]);
+  assert.deepEqual(s.focusCalls, []);
+  assert.equal(s.context.pendingHistoryFocus, s.context.opener);
   assert.deepEqual(s.historyCalls, ['back']);
   assert.deepEqual(s.filtered, []);
 });
@@ -347,4 +348,42 @@ test('a hidden card never receives focus and a reopened viewer ignores a queued 
   assert.deepEqual(reopened.focusCalls, []);
   assert.deepEqual(reopened.historyCalls, []);
   assert.equal(reopened.context.document.body.style.overflow, 'hidden');
+});
+
+function syncHistory(s, {open = false, focused = 'body', hideCard = false} = {}) {
+  const c = s.context;
+  c.viewer.open = open;
+  c.document.activeElement = focused === 'body' ? c.document.body : focused === 'opener' ? c.opener : {};
+  c.applyFilter = () => {if (hideCard) c.opener.closest = () => ({hidden:true});};
+  const sync = script.slice(script.indexOf('function syncLocation()'), script.indexOf("window.addEventListener('hashchange'"));
+  vm.runInNewContext(sync + '\nsyncLocation();', c);
+}
+
+test('hashchange restores focus after history resets it to body, without changing scroll', () => {
+  const s = closeGallery({inPage:true});
+  syncHistory(s);
+  assert.equal(s.context.document.activeElement, s.context.opener);
+  assert.deepEqual(s.focusCalls, [true]);
+  assert.equal(s.context.pendingHistoryFocus, null);
+  syncHistory(s);
+  assert.deepEqual(s.focusCalls, [true], 'subsequent location changes must not repeat the return');
+});
+test('history return cannot override a newer focus choice, hidden card or reopened viewer', () => {
+  for (const options of [{focused:'other'}, {open:true}, {hideCard:true}]) {
+    const s = closeGallery({inPage:true});
+    syncHistory(s, options);
+    assert.deepEqual(s.focusCalls, []);
+    assert.equal(s.context.pendingHistoryFocus, null);
+  }
+});
+test('history may retain the opener focus; the final return remains scroll-free', () => {
+  const s = closeGallery({inPage:true});
+  syncHistory(s, {focused:'opener'});
+  assert.equal(s.context.document.activeElement, s.context.opener);
+  assert.deepEqual(s.focusCalls, [true]);
+});
+test('opening another frame and choosing an album cancel stale history focus', () => {
+  assert.match(script, /function openWork\(link, frame = 0\) \{\s*pendingHistoryFocus = null;/);
+  assert.match(script, /menu\.addEventListener\('click',[\s\S]*?event\.preventDefault\(\);\s*pendingHistoryFocus = null;/);
+  assert.match(script, /document\.addEventListener\('click', event => \{\s*pendingHistoryFocus = null;/);
 });

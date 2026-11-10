@@ -66,6 +66,7 @@ let position = 0;
 let opener;
 let album;
 let closingForNavigation = false;
+let pendingHistoryFocus = null;
 const copyButton = viewer.querySelector('[data-copy]');
 const addressField = viewer.querySelector('[data-address]');
 const copyStatus = viewer.querySelector('[data-copy-status]');
@@ -181,6 +182,7 @@ function move(delta) {
 }
 
 function openWork(link, frame = 0) {
+  pendingHistoryFocus = null;
   album = link.closest('section');
   sequence = [...album.querySelectorAll('[data-work]')].flatMap(card =>
     catalog[card.dataset.work].images.map((_, index) => ({work: card.dataset.work, frame:index}))
@@ -221,11 +223,13 @@ menu.addEventListener('click', event => {
   const link = event.target.closest('a');
   if (!link || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
   event.preventDefault();
+  pendingHistoryFocus = null;
   if (location.hash !== link.hash) history.pushState(null, '', link.hash);
   applyFilter();
 });
 
 document.addEventListener('click', event => {
+  pendingHistoryFocus = null;
   const link = event.target.closest('[data-work]');
   if (!link || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey || typeof viewer.showModal !== 'function') return;
   event.preventDefault();
@@ -254,11 +258,11 @@ viewer.addEventListener('close', () => {
   // A copied frame URL has no card scroll position for history to restore.
   const revealOpener = !closingForNavigation && !history.state?.trifotiAlbumFrame;
   if (!closingForNavigation) {
-    if (history.state?.trifotiAlbumFrame) history.back();
+    if (history.state?.trifotiAlbumFrame) { pendingHistoryFocus = opener; history.back(); }
     else { history.replaceState(history.state, '', '#' + album.id); filterAlbums(album); }
   }
   closingForNavigation = false;
-  if (opener?.closest('section')?.hidden === false) opener.focus({preventScroll:!revealOpener});
+  if (!pendingHistoryFocus && opener?.closest('section')?.hidden === false) opener.focus({preventScroll:!revealOpener});
 });
 viewer.addEventListener('click', event => { if (event.target === viewer) viewer.close(); });
 viewer.addEventListener('keydown', event => {
@@ -292,6 +296,16 @@ import('./gallery-interactions.js?v=20261104-red7').then(({mountPhotoSwipe}) => 
       (!window.visualViewport || window.visualViewport.scale === 1)
   });
 }).catch(() => { /* Buttons and keyboard navigation remain available. */ });
-window.addEventListener('hashchange', applyFilter);
+function syncLocation() {
+  applyFilter();
+  // History traversal can reset focus after the dialog's close event.
+  const target = pendingHistoryFocus;
+  pendingHistoryFocus = null;
+  if (!viewer.open && target?.closest('section')?.hidden === false &&
+      (document.activeElement === document.body || document.activeElement === target)) {
+    target.focus({preventScroll:true});
+  }
+}
+window.addEventListener('hashchange', syncLocation);
 applyFilter();
 </script></body></html>
