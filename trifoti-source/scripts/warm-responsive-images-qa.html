@@ -1,0 +1,39 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><title>Warm responsive images QA</title>
+<style>body{font:16px system-ui;margin:12px}iframe{border:0;display:block;height:900px;flex:none}button{padding:12px}pre{white-space:pre-wrap}.frame{overflow:auto}</style>
+<h1>Warm responsive images QA</h1>
+<p>Use real browser zoom for DPR 1, 2, 3. Each run creates fresh image URLs. CSS and other assets load from the unchanged live site. This harness is not part of the site.</p>
+<button id="run">Run width matrix</button><button id="mobile">Show 390px</button><button id="desktop">Show 1440px</button>
+<output id="status"></output><pre id="results"></pre><div class="frame"><iframe id="site" title="Site under test"></iframe></div>
+<script>
+const frame=document.querySelector('#site'), status=document.querySelector('#status'), results=document.querySelector('#results');
+const widths=[320,390,768,800,801,1150,1151,1440];
+function expectedLogo(w){return w<=380?59.5:w<=800?66.5:w<=1150?73.5:85.75}
+async function openCase(width,dpr){
+  frame.style.width=width+'px';
+  await new Promise(resolve=>{frame.onload=resolve;frame.src=`case-${width}-${dpr}.html`});
+  const doc=frame.contentDocument;
+  await doc.fonts.ready;
+  const images=[doc.querySelector('.interior-stage picture img'), ...doc.querySelectorAll('.warm-brand-mark img')];
+  await Promise.all(images.map(img=>img.decode()));
+  await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+  return {doc,images};
+}
+document.querySelector('#run').onclick=async()=>{
+  const dpr=devicePixelRatio;
+  if (![1,2,3].includes(dpr)){status.textContent=`Set browser zoom to DPR 1, 2 or 3. Current DPR ${dpr}`;return}
+  status.textContent=`Running DPR ${dpr}`;
+  const rows=[];
+  try {for (const width of widths){
+    const {doc,images}=await openCase(width,dpr);
+    const [hero,...logos]=images;
+    const box=hero.getBoundingClientRect();
+    const row={width,dpr,hero:hero.currentSrc.split('/').pop(),heroBox:[box.width,box.height],logos:logos.map(i=>({file:i.currentSrc.split('/').pop(),width:i.getBoundingClientRect().width})),overflow:doc.documentElement.scrollWidth>width};
+    row.viewport=doc.documentElement.clientWidth;
+    row.pass=Math.abs(box.width-row.viewport)<1&&Math.abs(box.height-box.width*9/16)<1&&logos.length===2&&logos.every(i=>Math.abs(i.getBoundingClientRect().width-expectedLogo(width))<1)&&!row.overflow&&images.every(i=>i.complete&&i.naturalWidth>0)&&hero.fetchPriority==='high'&&hero.loading!=='lazy';
+    rows.push(row);results.textContent=JSON.stringify(rows,null,2);
+  }status.textContent=`${rows.filter(r=>r.pass).length}/${rows.length} pass at DPR ${dpr}`;}catch(e){status.textContent=`FAIL: ${e.message}`}
+};
+document.querySelector('#mobile').onclick=()=>openCase(390,Math.round(devicePixelRatio));
+document.querySelector('#desktop').onclick=()=>openCase(1440,Math.round(devicePixelRatio));
+status.textContent=`Current DPR ${devicePixelRatio}`;
+</script></html>

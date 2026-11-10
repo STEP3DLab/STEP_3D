@@ -56,7 +56,7 @@ extra = '''<section class="warm-mood section" aria-labelledby="warm-mood-title">
 '''
 html = html.replace(marker,extra+marker)
 # Use the verified blue edition emblem without importing its palette or content.
-logo = '<span class="warm-brand-mark"><img src="brand/logo-original.jpg" width="1536" height="1258" alt="" decoding="async"></span><span class="warm-brand-type">ТРИФОТИ<small>ТВОРЧЕСКОЕ ОБЪЕДИНЕНИЕ</small></span>'
+logo = '<span class="warm-brand-mark"><img src="brand/logo-original.jpg" srcset="brand/logo-96.webp 96w, brand/logo-192.webp 192w, brand/logo-288.webp 288w" sizes="(max-width:380px) 59.5px, (max-width:800px) 66.5px, (max-width:1150px) 73.5px, 85.75px" width="1536" height="1258" alt="" decoding="async"></span><span class="warm-brand-type">ТРИФОТИ<small>ТВОРЧЕСКОЕ ОБЪЕДИНЕНИЕ</small></span>'
 html = re.sub(r'(<a class="brand brand-full brand-final"[^>]*>).*?(</a>)', lambda m: m[1].replace('brand-final', 'brand-blue-origin').replace('ТРИФОТИ — медведь и название объединения', 'ТРИФОТИ — на главную') + logo + m[2], html)
 html = re.sub(r'(<a href="#home" class="footer-wordmark footer-brand-final"[^>]*>).*?(</a>)', lambda m: m[1].replace('footer-brand-final', 'footer-brand-blue-origin') + logo + m[2], html)
 html = html.replace('<body>', '<body class="warm-edition">')
