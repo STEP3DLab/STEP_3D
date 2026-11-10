@@ -3,7 +3,7 @@ import {appendSelectionReference,mountReferenceManager} from './reference-manage
 import {mountPhotoDetail} from './gallery-photo-detail.js?v=20261104-red7';
 import {modeLinks} from './view-context.js?v=20261104-red7';
 import {optionalModule,optionalFallback} from './optional-module.js?v=20261104-red7';
-import {initializeBriefExperience,initializeBackToTop} from './experience-ux.js?v=20261104-red7';
+import {initializeBriefExperience,initializeBackToTop} from './experience-ux.js?v=20261111-print-intent';
 import {initializePortfolioFilters} from './portfolio-filters.js?v=20261104-red7';
 import {mediaId,mediaIndex} from './exploration-data.js?v=20261104-red7';
 import {mountRelated} from './related-works.js?v=20261104-red7';
