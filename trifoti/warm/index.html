@@ -24,8 +24,7 @@
   <link rel="icon" href="/STEP_3D/trifoti/warm/brand/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="style.css?v=20261104-red7">
   <link rel="stylesheet" href="category-stories.css?v=20261104-red7">
-  <script type="module" src="header-navigation.js?v=20261104-red7"></script>
-  <script type="importmap">{"imports":{"three":"/STEP_3D/trifoti/assets/vendor/three.module.js"}}</script>
+    <script type="importmap">{"imports":{"three":"/STEP_3D/trifoti/assets/vendor/three.module.js"}}</script>
   <script defer src="brief-guard.js?v=20261104-red7"></script>
   <script type="module" src="app.js?v=20261104-red7"></script>
 <link rel="stylesheet" href="warm-theme.css?v=20261104-red7">
@@ -44,6 +43,65 @@
   <nav id="navigation" aria-label="Основная навигация"><a href="#projects">Проекты</a><a href="#directions">Что создаём</a><a href="#process">Процесс</a><a href="#studio">Команда</a><a href="#journal">Новости и блог</a></nav>
   <a href="#brief-form" class="button header-cta" aria-label="Подготовить бриф для скачивания, без отправки"><span class="cta-label"><span class="desktop-label">Подготовить бриф</span><span class="mobile-label">Бриф</span></span><span><span class="direction-icon" aria-hidden="true"></span></span></a>
 </header>
+<!-- warm-header-navigation:start -->
+<script>
+(() => {
+"use strict";
+// Independent of the portfolio and form modules: links remain available until
+// this small disclosure controller has finished wiring its interactions.
+const controllers = new WeakMap();
+
+function initializeHeaderNavigation({document, window}) {
+  const header = document.querySelector('.header');
+  const menu = header?.querySelector('.menu-button');
+  const nav = header?.querySelector('#navigation');
+  if (!header || !menu || !nav || typeof window.matchMedia !== 'function') return null;
+  if (controllers.has(header)) return controllers.get(header);
+
+  const desktopNavigation = window.matchMedia('(min-width: 801px)');
+  function setMenuOpen(open) {
+    menu.setAttribute('aria-expanded', String(open));
+    menu.setAttribute('aria-label', open ? 'Закрыть меню' : 'Открыть меню');
+    nav.classList.toggle('open', open);
+  }
+  menu.addEventListener('click', () => setMenuOpen(menu.getAttribute('aria-expanded') !== 'true'));
+  header.querySelectorAll('a').forEach(link => link.addEventListener('click', () => setMenuOpen(false)));
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && menu.getAttribute('aria-expanded') === 'true') {
+      setMenuOpen(false);
+      menu.focus();
+    }
+  });
+  document.addEventListener('click', event => {
+    if (!event.target.closest?.('.header')) setMenuOpen(false);
+  });
+  // Native Tab follows the DOM; leaving the header never traps or steals focus.
+  header.addEventListener('focusout', event => {
+    if (event.relatedTarget && !header.contains(event.relatedTarget)) setMenuOpen(false);
+  });
+  desktopNavigation.addEventListener('change', () => {
+    const active = document.activeElement;
+    setMenuOpen(false);
+    if (!desktopNavigation.matches && nav.contains(active)) menu.focus({preventScroll: true});
+    else if (desktopNavigation.matches && active === menu) nav.querySelector('a[href]')?.focus({preventScroll: true});
+  });
+
+  // A visitor may already have focused a fallback link while this module loaded.
+  // Keep that link visible instead of collapsing it beneath their keyboard focus.
+  setMenuOpen(!desktopNavigation.matches && nav.contains(document.activeElement));
+  menu.hidden = false;
+  header.classList.add('nav-ready');
+  const controller = {setMenuOpen};
+  controllers.set(header, controller);
+  return controller;
+}
+
+if (typeof document !== 'undefined' && typeof window !== 'undefined') {
+  initializeHeaderNavigation({document, window});
+}
+})();
+</script>
+<!-- warm-header-navigation:end -->
 <main id="main">
 <section class="hero interior-hero section-anchor" id="home">
   <figure class="warm-hero-art interior-stage">
@@ -297,3 +355,4 @@
 <dialog id="project-dialog" class="project-dialog" aria-labelledby="case-title" aria-describedby="case-description"><div class="project-dialog-header"><p class="project-dialog-context" id="project-dialog-context"></p><button type="button" class="close-button" data-close="project-dialog" aria-label="Закрыть проект"><span>Закрыть</span><span aria-hidden="true">×</span></button></div><div id="project-content"></div></dialog>
 <div class="toast" role="status" id="toast"></div>
 </body></html>
+

@@ -1,0 +1,15 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><title>Warm navigation stability QA</title>
+<style>body{font:16px system-ui;margin:12px}button,select{padding:10px}iframe{display:block;border:0;height:800px}pre{max-height:220px;overflow:auto;white-space:pre-wrap}.frame{overflow:auto}</style>
+<h1>Warm navigation stability QA</h1><p>Local test-only delayed module and layout-shift observation.</p>
+<label>Version <select id="version"><option>current</option><option>fixed</option></select></label>
+<label>Width <select id="width"><option>320</option><option selected>390</option><option>800</option><option>801</option><option>1440</option></select></label>
+<label>Module <select id="mode"><option>delay</option><option>block</option><option>nojs</option><option>normal</option><option>inline-blocked</option><option>streamed</option></select></label>
+<button id="run" disabled>Load scenario</button><button id="cleanup">Remove test worker</button><output id="status">Preparing</output>
+<pre id="results"></pre><div class="frame"><iframe id="site" title="Site under test"></iframe></div>
+<script>
+const frame=document.querySelector('#site'),results=document.querySelector('#results'),status=document.querySelector('#status');
+addEventListener('message',e=>{if(e.origin===location.origin&&e.source===frame.contentWindow&&e.data.kind==='nav-qa'){results.textContent=JSON.stringify(e.data,null,2);if(e.data.last.time>=5000)status.textContent='Settled'}});
+document.querySelector('#run').onclick=()=>{frame.style.width=document.querySelector('#width').value+'px';frame.src=document.querySelector('#version').value+'-'+document.querySelector('#mode').value+'.html?run='+Date.now();status.textContent='Running';};
+document.querySelector('#cleanup').onclick=async()=>{frame.src='about:blank';for(const r of await navigator.serviceWorker.getRegistrations())if(r.active?.scriptURL.endsWith('/worker.js'))await r.unregister();status.textContent='Test worker removed';};
+(async()=>{await navigator.serviceWorker.register('worker.js');await navigator.serviceWorker.ready;if(!navigator.serviceWorker.controller)await new Promise(r=>navigator.serviceWorker.addEventListener('controllerchange',r,{once:true}));document.querySelector('#run').disabled=false;status.textContent='Ready';})();
+</script></html>

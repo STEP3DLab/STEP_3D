@@ -89,8 +89,11 @@ def apply(target):
     # Retain the requested interior hero during future editorial builds.
     import runpy
     runpy.run_path(str(source.parent / "interior/apply.py"))["apply"](target)
+    # Wire the critical header before main content paints, without a network race.
+    runpy.run_path(str(source.parent / "inline-navigation.py"))["apply"](target)
 
 if __name__ == '__main__':
     root = Path(__file__).resolve().parents[3]
     apply(root / 'trifoti/warm')
     shutil.copytree(root / 'trifoti/warm', root / 'docs/trifoti/warm', dirs_exist_ok=True)
+
