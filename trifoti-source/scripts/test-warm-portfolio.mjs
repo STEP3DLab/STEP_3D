@@ -151,3 +151,45 @@ test('production adds no fetch, storage, analytics or automatic retry', () => {
   assert.match(script, /if \(viewer\.open\) return;\s*stopImage\(\);/);
   assert.match(script, /viewer\.dataset\.imageState === 'error'\) showFrame\(true\)/);
 });
+
+function renderFrame({position, count = 3, focused = 'next'}) {
+  const doc = {activeElement: null, body: {}};
+  const makeControl = () => ({
+    set disabled(value) {this.unavailable = value; if (value && doc.activeElement === this) doc.activeElement = doc.body;},
+    get disabled() {return this.unavailable;},
+    focus() {doc.activeElement = this;}
+  });
+  const previous = makeControl(); const next = makeControl(); const closeButton = makeControl();
+  doc.activeElement = {previous, next, close: closeButton}[focused];
+  const text = {textContent: ''};
+  const context = {document: doc, previous, next, closeButton, position,
+    sequence: Array.from({length:count}, () => ({work:'test',frame:0})),
+    catalog:{test:{title:'Work',images:[{src:'image.webp',caption:'Caption'}]}},
+    viewer:{querySelector() {return text;}},loadImage() {}}
+  const showFrame = script.slice(script.indexOf('function showFrame('), script.indexOf('function move('));
+  vm.runInNewContext(showFrame + '\nshowFrame();', context);
+  return {...context, doc};
+}
+test('last frame transfers focus from disabled next to previous', () => {
+  const s = renderFrame({position:2});
+  assert.equal(s.next.disabled, true);
+  assert.equal(s.previous.disabled, false);
+  assert.equal(s.doc.activeElement, s.previous);
+});
+test('first frame transfers focus from disabled previous to next', () => {
+  const s = renderFrame({position:0,focused:'previous'});
+  assert.equal(s.previous.disabled, true);
+  assert.equal(s.next.disabled, false);
+  assert.equal(s.doc.activeElement, s.next);
+});
+test('interior frames and unrelated focus are not moved', () => {
+  const middle = renderFrame({position:1});
+  assert.equal(middle.doc.activeElement, middle.next);
+  const close = renderFrame({position:2,focused:'close'});
+  assert.equal(close.doc.activeElement, close.closeButton);
+});
+test('a single-frame sequence falls back to close instead of a disabled button', () => {
+  const s = renderFrame({position:0,count:1});
+  assert.equal(s.previous.disabled, true); assert.equal(s.next.disabled, true);
+  assert.equal(s.doc.activeElement, s.closeButton);
+});

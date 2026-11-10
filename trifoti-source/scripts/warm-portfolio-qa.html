@@ -142,6 +142,22 @@ async function run() {
     parts().close.click(); await waitFor(() => state() === 'idle');
     assert(parts().win.location.hash === '#models', 'wrong close route');
   });
+  await test('Last boundary retains focus and reverse ArrowLeft works immediately', async () => {
+    await load('ready'); open('work-05'); await ready();
+    parts().next.focus(); parts().next.click(); await ready();
+    assert(parts().doc.activeElement === parts().previous, 'focus lost at last boundary');
+    assert(parts().next.disabled && parts().doc.querySelector('.position').textContent === '6 / 6', 'wrong last state');
+    parts().doc.activeElement.dispatchEvent(new KeyboardEvent('keydown', {key:'ArrowLeft',bubbles:true})); await ready();
+    assert(parts().doc.querySelector('.position').textContent === '5 / 6', 'reverse arrow failed after last boundary');
+  });
+  await test('First boundary retains focus and reverse ArrowRight works immediately', async () => {
+    await load('ready'); open(); await ready(); parts().next.click(); await ready();
+    parts().previous.focus(); parts().previous.click(); await ready();
+    assert(parts().doc.activeElement === parts().next, 'focus lost at first boundary');
+    assert(parts().previous.disabled && parts().doc.querySelector('.position').textContent === '1 / 6', 'wrong first state');
+    parts().doc.activeElement.dispatchEvent(new KeyboardEvent('keydown', {key:'ArrowRight',bubbles:true})); await ready();
+    assert(parts().doc.querySelector('.position').textContent === '2 / 6', 'reverse arrow failed after first boundary');
+  });
   await test('20-second request timeout stays recoverable and ignores late completion', async () => {
     await load('timeout'); open();
     await waitFor(() => state() === 'error', 21000);

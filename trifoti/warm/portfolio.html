@@ -116,8 +116,15 @@ function showFrame(retrying = false) {
   loadImage(image, retrying);
   viewer.querySelector('.caption').textContent = image.caption;
   viewer.querySelector('.position').textContent = (position + 1) + ' / ' + sequence.length;
+  const focusedControl = document.activeElement;
   previous.disabled = position === 0;
   next.disabled = position === sequence.length - 1;
+  // Disabling a focused button can send focus to body and break dialog arrows.
+  if ((focusedControl === previous && previous.disabled) ||
+      (focusedControl === next && next.disabled)) {
+    const availableControl = focusedControl === next ? previous : next;
+    (availableControl.disabled ? closeButton : availableControl).focus({preventScroll:true});
+  }
 }
 
 function move(delta) {
