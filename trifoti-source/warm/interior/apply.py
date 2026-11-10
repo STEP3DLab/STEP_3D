@@ -16,17 +16,35 @@ def apply(target):
     text = re.sub(r'<meta name="theme-color" content="[^"]*">', '<meta name="theme-color" content="#1e4578">', text)
     text = re.sub(r'<div class="service-list">.*?</details></div>', lambda _: (source / 'service-list.html').read_text().strip(), text, count=1, flags=re.S)
     text = re.sub(r'<!-- category-stories:start -->.*?<!-- category-stories:end -->', lambda _: (source / 'category-tiles.html').read_text().strip(), text, count=1, flags=re.S)
-    if 'id="team-oksana"' not in text:
-        text = re.sub(r'(<ul class="team-grid">.*?)(    </ul>)', lambda m: m[1] + (source / 'team-profiles.html').read_text() + m[2], text, count=1, flags=re.S)
+    profiles = (source / 'team-profiles.html').read_text().rstrip()
+    # Older warm editions can already contain these two cards without their portraits.
+    if 'id="team-oksana"' in text:
+        cards = r'      <li class="team-card team-profile" aria-labelledby="team-oksana">.*?(?=\n    </ul>\n  </div>\n</section>)'
+        text = re.sub(cards, lambda _: profiles, text, count=1, flags=re.S)
+    else:
+        text = re.sub(r'(<ul class="team-grid">.*?)(    </ul>)', lambda m: m[1] + profiles + '\n' + m[2], text, count=1, flags=re.S)
+    text = text.replace('Все проекты и подробные кейсы · ', 'Подробные кейсы · ')
+    text = text.replace('<span>Работы по направлениям</span>', '<span>Избранные работы и концепты</span>')
     text = text.replace('<a href="#studio">Об объединении</a>', '<a href="#studio">Команда</a>')
+    text = re.sub(r'review-20261106\.css\?v=[^"]+', 'review-20261106.css?v=20261110-team-gallery', text)
     if 'review-20261106.css?' not in text:
-        text = text.replace('</head>', '  <link rel="stylesheet" href="review-20261106.css?v=20261110">\n</head>')
+        text = text.replace('</head>', '  <link rel="stylesheet" href="review-20261106.css?v=20261110-team-gallery">\n</head>')
     shutil.copyfile(source / 'review-20261106.css', target / 'review-20261106.css')
     shutil.copyfile(source / 'category-stories.js', target / 'category-stories.js')
     fedor_link = '<a class="team-sources" href="portfolio.html">Посмотреть подборку проектов <span class="direction-icon" aria-hidden="true"></span></a>'
     if fedor_link not in text:
         publications_link = '<a class="team-sources" href="#publications">'
         text = text.replace(publications_link, fedor_link + '\n          ' + publications_link, 1)
+    # Keep the four warm-edition portrait crops together; shared pages use their original photos.
+    for person, slug, name in [
+        ('fedor', 'fedor-parshin', 'Фёдор Геннадьевич Паршин'),
+        ('khristina', 'khristina-ponkratova', 'Христина Анатольевна Понкратова'),
+    ]:
+        base = f'photos/team/{slug}'
+        photo = (f'<div class="team-portrait"><img src="{base}-640.webp" srcset="{base}-360.webp 360w, {base}-640.webp 640w" '
+                 f'sizes="(max-width:700px) 92vw, (max-width:1200px) 45vw, 550px" width="640" height="640" alt="{name}" loading="lazy" decoding="async"></div>')
+        pattern = rf'(<li class="team-card" aria-labelledby="team-{person}">\s*)<div class="team-portrait">.*?</div>'
+        text = re.sub(pattern, lambda m: m[1] + photo, text, count=1, flags=re.S)
     page.write_text(text)
     shutil.copyfile(source/'interior-stage.css',target/'interior-stage.css')
 

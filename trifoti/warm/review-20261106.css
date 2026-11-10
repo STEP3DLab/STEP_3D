@@ -160,3 +160,26 @@ body .selected-card:last-child .selected-image img { object-fit:cover; object-po
   .service-examples { grid-template-columns:minmax(0,1fr); gap:14px; }
   .example-card>img { height:200px; }
 }
+
+/* Team portraits and direct entry to the six portfolio albums. */
+body .team-grid .team-card { border:1px solid #d7dfe7; border-radius:14px; }
+body .team-grid .team-portrait { aspect-ratio:1; background:#e7e7e6; }
+body .team-grid .team-portrait img { display:block; width:100%; height:100%; object-fit:cover; object-position:center; filter:grayscale(1); mask-image:none; }
+body .team-grid .team-card[aria-labelledby="team-fedor"] .team-portrait { background:#e7e7e6; }
+body .team-grid .team-card[aria-labelledby="team-fedor"] .team-portrait img { mask-image:none; }
+.portfolio-albums { margin:clamp(32px,5vw,68px) 0; }
+.albums-heading { display:flex; align-items:baseline; justify-content:space-between; flex-wrap:wrap; gap:12px 24px; margin-bottom:18px; }
+.albums-heading h3 { margin:0; font-size:clamp(22px,3vw,38px); line-height:1.15; }
+.albums-heading a { color:#1e4578; text-decoration:underline; text-underline-offset:.2em; }
+.albums-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:22px; }
+.albums-grid a { display:block; min-width:0; overflow:hidden; color:inherit; border:1px solid #d7dfe7; border-radius:12px; background:white; text-decoration:none; }
+.albums-grid img { display:block; width:100%; height:clamp(110px,13vw,190px); object-fit:cover; object-position:center 42%; background:#eeece9; }
+.albums-grid a>span { display:grid; gap:5px; padding:13px 15px 16px; }
+.albums-grid strong { font-size:clamp(15px,1.4vw,20px); line-height:1.25; }
+.albums-grid small { color:#53617a; font-size:13px; }
+.albums-grid a:is(:hover,:focus-visible) strong { text-decoration:underline; text-underline-offset:.16em; }
+@media (max-width:700px) {
+ .albums-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+ .albums-grid a>span { padding:10px; }
+ .albums-grid img { height:auto; aspect-ratio:1.55; }
+}
