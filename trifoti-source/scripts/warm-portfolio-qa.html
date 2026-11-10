@@ -1,0 +1,168 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><title>Warm portfolio browser regression tests</title>
+<style>body{font:16px/1.5 system-ui;margin:20px}iframe{display:block;border:1px solid #aaa;height:680px;max-width:none}li.pass{color:#176136}li.fail{color:#a62020}button{padding:10px;margin:4px}#results{max-width:1000px}</style>
+<h1>Warm portfolio browser regression tests</h1>
+<p id="status" role="status">Starting local test image worker…</p>
+<button id="run">Run tests</button><button id="mobile-error">Show mobile error</button><button id="mobile-ready">Show mobile image</button><button id="desktop-ready">Show desktop image</button>
+<ol id="results"></ol><iframe id="gallery" title="Gallery under test"></iframe>
+<script type="module">
+const frame = document.querySelector('#gallery');
+const results = document.querySelector('#results');
+const status = document.querySelector('#status');
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+let passes = 0;
+let failures = 0;
+function assert(condition, message) { if (!condition) throw new Error(message); }
+async function waitFor(predicate, timeout = 5000) {
+  const end = performance.now() + timeout;
+  while (!predicate()) {
+    if (performance.now() > end) throw new Error('Condition timed out');
+    await sleep(20);
+  }
+}
+async function test(name, fn) {
+  const item = document.createElement('li');
+  try { await fn(); item.textContent = 'PASS: ' + name; item.className = 'pass'; passes++; }
+  catch (error) { item.textContent = 'FAIL: ' + name + ': ' + error.message; item.className = 'fail'; failures++; }
+  results.append(item);
+}
+function parts() {
+  const doc = frame.contentDocument;
+  return {doc, win: frame.contentWindow, dialog: doc.querySelector('dialog'), stage: doc.querySelector('.stage'), feedback: doc.querySelector('.feedback'), retry: doc.querySelector('[data-retry]'), close: doc.querySelector('[data-close]'), next: doc.querySelector('[data-next]'), previous: doc.querySelector('[data-prev]'), status: doc.querySelector('[data-load-status]')};
+}
+async function load(scenario, width = 390, hash = '') {
+  frame.style.width = width + 'px';
+  const loaded = new Promise(resolve => frame.onload = resolve);
+  frame.src = './gallery.html?scenario=' + scenario + '&test=' + Date.now() + hash;
+  await loaded;
+}
+function open(id = 'work-02') { parts().doc.querySelector('[data-work="' + id + '"]').click(); }
+const state = () => parts().dialog.dataset.imageState;
+async function ready() { await waitFor(() => state() === 'ready'); }
+function fits() {
+  const {doc, dialog, retry} = parts();
+  const width = frame.clientWidth;
+  assert(doc.documentElement.scrollWidth <= width, 'page overflows horizontally');
+  const rect = dialog.getBoundingClientRect();
+  assert(rect.left >= 0 && rect.right <= width + 1, 'dialog overflows horizontally');
+  for (const button of dialog.querySelectorAll('button:not([hidden])')) {
+    const b = button.getBoundingClientRect();
+    assert(b.width >= 44 && b.height >= 44, 'touch target smaller than 44px');
+    assert(b.left >= rect.left && b.right <= rect.right + 1, 'button overflows dialog');
+  }
+  if (!retry.hidden) assert(retry.getBoundingClientRect().bottom <= rect.bottom + 1, 'retry outside dialog');
+}
+async function run() {
+  results.textContent = ''; passes = failures = 0; status.textContent = 'Running…';
+  await test('Delayed first image shows loading, busy state and no broken/old image', async () => {
+    await load('slow'); open();
+    const p = parts();
+    assert(state() === 'loading' && !p.feedback.hidden && p.stage.hidden, 'loading state absent');
+    assert(p.doc.querySelector('.media-frame').getAttribute('aria-busy') === 'true', 'not busy');
+    assert(p.status.textContent.includes('Загрузка') && p.retry.hidden, 'wrong loading controls');
+    assert(p.close === p.doc.activeElement, 'initial focus not on close');
+    fits(); await ready();
+    assert(!parts().stage.hidden && parts().stage.naturalWidth > 0 && parts().feedback.hidden, 'not displayed');
+    assert(parts().doc.querySelector('.media-frame').getAttribute('aria-busy') === 'false', 'busy did not clear');
+  });
+  await test('Next frame hides old image during slow load and preserves caption/position', async () => {
+    parts().next.click();
+    assert(state() === 'loading' && parts().stage.hidden, 'old image still displayed');
+    assert(parts().doc.querySelector('.position').textContent === '2 / 6', 'wrong counter');
+    assert(parts().stage.alt === parts().doc.querySelector('.caption').textContent, 'caption mismatch');
+    await ready();
+  });
+  await test('Network failure exposes a labelled retry with live status', async () => {
+    await load('failure'); open(); await waitFor(() => state() === 'error');
+    const p = parts();
+    assert(p.stage.hidden && !p.retry.hidden && !p.feedback.hidden, 'wrong error visibility');
+    assert(p.status.getAttribute('role') === 'status' && p.status.textContent.includes('Не удалось'), 'missing live error');
+    fits();
+  });
+  await test('Repeated failure remains recoverable and does not retry automatically', async () => {
+    const before = parts().stage;
+    await sleep(300); assert(parts().stage === before, 'automatic retry');
+    parts().retry.click(); await waitFor(() => state() === 'error');
+    assert(parts().stage !== before && !parts().retry.hidden, 'retry did not create new request');
+  });
+  await test('Retry makes one fresh request for same image and retains keyboard focus', async () => {
+    await load('retry'); open(); await waitFor(() => state() === 'error');
+    const p = parts(); p.retry.focus(); p.retry.click();
+    assert(state() === 'loading' && parts().retry.hidden, 'retry not loading');
+    assert(parts().doc.activeElement === parts().close, 'focus lost when retry hidden');
+    const source = new URL(parts().stage.src);
+    assert(source.pathname.endsWith('/view-02.webp') && source.searchParams.has('retry'), 'wrong retried source');
+    await ready();
+    assert(parts().doc.activeElement === parts().close, 'focus changed after completion');
+  });
+  await test('Invalid image bytes enter error state', async () => {
+    await load('broken'); open(); await waitFor(() => state() === 'error');
+    assert(!parts().retry.hidden && parts().stage.hidden, 'decode failure not recoverable');
+  });
+  await test('Rapid navigation ignores stale success, stale error and out-of-order network completion', async () => {
+    await load('race'); open();
+    const first = parts().stage; const staleLoad = first.onload; const staleError = first.onerror;
+    parts().next.click(); parts().next.click(); await ready();
+    const current = parts().stage;
+    assert(current.src.endsWith('/view-04.webp'), 'wrong selected frame');
+    staleLoad(); staleError(); first.dispatchEvent(new Event('error'));
+    await sleep(2600);
+    assert(parts().stage === current && state() === 'ready' && !current.hidden, 'stale request modified active frame');
+    assert(parts().doc.querySelector('.position').textContent === '3 / 6', 'stale counter');
+  });
+  await test('Closing during load cancels feedback and restores scroll and opener focus', async () => {
+    await load('slow'); open(); const old = parts().stage; const stale = old.onload;
+    parts().close.click(); await waitFor(() => state() === 'idle');
+    stale(); old.dispatchEvent(new Event('error')); await sleep(1900);
+    const p = parts();
+    assert(!p.dialog.open && state() === 'idle' && p.feedback.hidden, 'closed viewer updated');
+    assert(p.doc.body.style.overflow === '', 'scroll remained locked');
+    assert(p.doc.activeElement.dataset.work === 'work-02', 'opener focus not restored');
+  });
+  await test('Immediate close and reopen ignores the queued old close event', async () => {
+    await load('race'); open(); const stale = parts().stage.onerror;
+    parts().close.click(); open('work-04');
+    await ready(); stale(); await sleep(100);
+    assert(parts().dialog.open && state() === 'ready' && parts().doc.body.style.overflow === 'hidden', 'old close reset new viewer');
+    assert(parts().stage.src.endsWith('/view-04.webp'), 'wrong reopened frame');
+  });
+  await test('Previous/next boundaries and arrow navigation remain intact', async () => {
+    await load('ready'); open(); await ready();
+    assert(parts().previous.disabled, 'previous enabled at beginning');
+    parts().dialog.dispatchEvent(new KeyboardEvent('keydown', {key: 'ArrowRight', bubbles: true})); await ready();
+    assert(parts().doc.querySelector('.position').textContent === '2 / 6', 'right arrow failed');
+    for (let i = 0; i < 10; i++) parts().next.click(); await ready();
+    assert(parts().next.disabled && parts().doc.querySelector('.position').textContent === '6 / 6', 'last boundary failed');
+    parts().dialog.dispatchEvent(new KeyboardEvent('keydown', {key: 'ArrowLeft', bubbles: true})); await ready();
+    assert(parts().doc.querySelector('.position').textContent === '5 / 6', 'left arrow failed');
+  });
+  await test('Direct work hash still opens, closes to its album and clears loading', async () => {
+    await load('slow', 390, '#work-24');
+    assert(parts().dialog.open && ['loading','ready'].includes(state()), 'direct link not open');
+    assert(parts().stage.src.endsWith('/view-24.webp'), 'wrong direct-link image');
+    parts().close.click(); await waitFor(() => state() === 'idle');
+    assert(parts().win.location.hash === '#models', 'wrong close route');
+  });
+  await test('20-second request timeout stays recoverable and ignores late completion', async () => {
+    await load('timeout'); open();
+    await waitFor(() => state() === 'error', 21000);
+    assert(parts().status.textContent.includes('слишком много времени') && !parts().retry.hidden, 'missing timeout action');
+    await sleep(2300); assert(state() === 'error' && parts().stage.hidden, 'late response replaced timeout');
+  });
+  for (const width of [320,390,820,1440]) {
+    await test('Error, retry and controls fit ' + width + 'px layout', async () => {
+      await load('failure', width); open(); await waitFor(() => state() === 'error'); fits();
+      assert(parts().retry.getBoundingClientRect().height >= 44, 'retry too small');
+    });
+  }
+  status.textContent = `${passes} passed, ${failures} failed. Network responses are local test fixtures, not portfolio artwork.`;
+  document.title = `${passes} passed, ${failures} failed | Warm gallery QA`;
+}
+const registration = await navigator.serviceWorker.register('./warm-portfolio-qa-worker.js');
+await navigator.serviceWorker.ready;
+if (!navigator.serviceWorker.controller) await new Promise(resolve => navigator.serviceWorker.addEventListener('controllerchange', resolve, {once:true}));
+document.querySelector('#run').onclick = run;
+document.querySelector('#mobile-error').onclick = async () => { await load('failure', 320); open(); };
+document.querySelector('#mobile-ready').onclick = async () => { await load('ready', 320); open(); };
+document.querySelector('#desktop-ready').onclick = async () => { await load('ready', 1440); open(); };
+await run();
+</script></html>
