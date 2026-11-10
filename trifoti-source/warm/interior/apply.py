@@ -13,7 +13,16 @@ def apply(target):
         raise ValueError('Expected one existing home hero')
     if 'interior-stage.css?' not in text:
         text = text.replace('</head>', '<link rel="stylesheet" href="interior-stage.css?v=20261106-atelier">\n</head>')
-    text = re.sub(r'<meta name="theme-color" content="[^"]*">', '<meta name="theme-color" content="#1963c9">', text)
+    text = re.sub(r'<meta name="theme-color" content="[^"]*">', '<meta name="theme-color" content="#1e4578">', text)
+    text = re.sub(r'<div class="service-list">.*?</details></div>', lambda _: (source / 'service-list.html').read_text().strip(), text, count=1, flags=re.S)
+    text = re.sub(r'<!-- category-stories:start -->.*?<!-- category-stories:end -->', lambda _: (source / 'category-tiles.html').read_text().strip(), text, count=1, flags=re.S)
+    if 'id="team-oksana"' not in text:
+        text = re.sub(r'(<ul class="team-grid">.*?)(    </ul>)', lambda m: m[1] + (source / 'team-profiles.html').read_text() + m[2], text, count=1, flags=re.S)
+    text = text.replace('<a href="#studio">Об объединении</a>', '<a href="#studio">Команда</a>')
+    if 'review-20261106.css?' not in text:
+        text = text.replace('</head>', '  <link rel="stylesheet" href="review-20261106.css?v=20261110">\n</head>')
+    shutil.copyfile(source / 'review-20261106.css', target / 'review-20261106.css')
+    shutil.copyfile(source / 'category-stories.js', target / 'category-stories.js')
     page.write_text(text)
     shutil.copyfile(source/'interior-stage.css',target/'interior-stage.css')
 

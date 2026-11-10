@@ -19,7 +19,7 @@ export function mountCategoryStories({document,window,onFullCase=()=>{},beforeOp
   get('counter').textContent=frame?`${project?.concept?'Концепт':'Проект'} ${category.keys.indexOf(frame.key)+1} из ${category.keys.length} · Кадр ${frame.index+1} из ${project.media.length}`:'О направлении · 1 из 1';
   get('caption').textContent=frame?frame.item.caption:category.intro;
   get('credit').textContent=project?(project.attribution||project.type)+(project.attribution?'':' · Персональные роли участников не уточнены.'):'Пока нет опубликованных проектов';
-  get('full-case').hidden=!frame||!!project?.concept;get('full-case').href=frame?`#project/${frame.key}/media/${frame.id}`:'#projects';
+  get('full-case').hidden=!frame||!!project?.concept;get('full-case').href=project?.caseUrl||(frame?`#project/${frame.key}/media/${frame.id}`:'#projects');
   get('direction').hidden=!!frame&&!project?.concept;get('direction').href='#'+category.service;
   get('progress').replaceChildren();for(let i=0;i<(project?.media.length||1);i++){const segment=document.createElement('span');segment.className=i<=(frame?.index||0)?'is-seen':'';segment.setAttribute('aria-hidden','true');get('progress').append(segment)}
   const last=!frame||route.index===frames.length-1;get('prev').disabled=route.index===0;get('next').hidden=last;get('restart').hidden=!frame||!last;get('end').hidden=!last;get('end').textContent=project?.concept?'Это концепт, не подтверждённый изготовленный объект.':frame?'Последний кадр этого направления. Можно начать сначала или открыть полный кейс.':'Это знакомство с направлением, а не пример выполненного проекта.';
@@ -38,7 +38,7 @@ export function mountCategoryStories({document,window,onFullCase=()=>{},beforeOp
  get('close').addEventListener('click',()=>dialog.close());get('prev').addEventListener('click',()=>step(-1));get('next').addEventListener('click',()=>step(1));
  get('restart').addEventListener('click',()=>{const first=storyFrames(current.category)[0];navigation.frame(current.category,first.key,first.id)});
  get('retry').addEventListener('click',()=>{if(current)render(current)});
- get('full-case').addEventListener('click',event=>{if(event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;event.preventDefault();const tile=tiles.find(tile=>tile.dataset.storyCategory===current.category),route=navigation.fullCase();if(route)onFullCase(route.key,route.id,tile)});
+ get('full-case').addEventListener('click',event=>{if(projects[current?.key]?.caseUrl)return;if(event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;event.preventDefault();const tile=tiles.find(tile=>tile.dataset.storyCategory===current.category),route=navigation.fullCase();if(route)onFullCase(route.key,route.id,tile)});
  get('direction').addEventListener('click',event=>{if(event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;event.preventDefault();const service=document.getElementById(storyCategory(current.category).service);navigation.visit('#'+service.id);service.open=true;service.scrollIntoView({block:'start'});service.querySelector('summary').focus({preventScroll:true})});
  keepDialogFocus(dialog);
  dialog.addEventListener('keydown',event=>{const delta=galleryArrow(event);if(delta){event.preventDefault();step(delta)}});
