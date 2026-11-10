@@ -193,3 +193,98 @@ test('a single-frame sequence falls back to close instead of a disabled button',
   assert.equal(s.previous.disabled, true); assert.equal(s.next.disabled, true);
   assert.equal(s.doc.activeElement, s.closeButton);
 });
+
+function keyboardAndCopy({clipboardFails = true} = {}) {
+  const handlers = {};
+  const doc = {activeElement: null};
+  const control = {isContentEditable: false, closest: () => null};
+  const addressField = {
+    hidden: true, value: '', selected: false, isContentEditable: false,
+    closest: selector => selector.includes('input') ? addressField : null,
+    focus() {doc.activeElement = this;},
+    select() {this.selected = true;}
+  };
+  const location = {href: 'https://example.test/trifoti/warm/portfolio.html#work-02'};
+  const viewer = {open: true, addEventListener(type, handler) {handlers[type] = handler;}};
+  const copyStatus = {textContent: ''};
+  const steps = [];
+  const copied = [];
+  const context = {viewer, addressField, copyStatus, location,
+    copyButton: {addEventListener(type, handler) {handlers.copy = handler;}},
+    navigator: {clipboard: {async writeText(value) {
+      if (clipboardFails) throw new Error('Clipboard unavailable');
+      copied.push(value);
+    }}},
+    move(delta) {steps.push(delta); addressField.hidden = true;}
+  };
+  const start = script.indexOf("viewer.addEventListener('keydown'");
+  const end = script.indexOf("import('./gallery-interactions.js", start);
+  vm.runInNewContext(script.slice(start, end), context);
+  function key(key, overrides = {}) {
+    const event = {key, target: control, defaultPrevented: false,
+      preventDefault() {this.defaultPrevented = true;}, ...overrides};
+    handlers.keydown(event);
+    return event;
+  }
+  return {...context, handlers, doc, control, steps, copied, key};
+}
+
+test('clipboard fallback keeps its address and focus when either arrow is pressed', async () => {
+  const s = keyboardAndCopy();
+  await s.handlers.copy();
+  assert.equal(s.addressField.hidden, false);
+  assert.equal(s.addressField.value, s.location.href);
+  assert.equal(s.doc.activeElement, s.addressField);
+  assert.equal(s.addressField.selected, true);
+  for (const key of ['ArrowLeft', 'ArrowRight']) {
+    const event = s.key(key, {target: s.addressField});
+    assert.equal(event.defaultPrevented, false, 'native caret movement remains available');
+    assert.equal(s.addressField.hidden, false);
+    assert.equal(s.doc.activeElement, s.addressField);
+  }
+  assert.deepEqual(s.steps, []);
+});
+
+test('ordinary left and right arrows on gallery controls still navigate once', () => {
+  const s = keyboardAndCopy();
+  assert.equal(s.key('ArrowLeft').defaultPrevented, true);
+  assert.equal(s.key('ArrowRight').defaultPrevented, true);
+  assert.deepEqual(s.steps, [-1, 1]);
+});
+
+test('modified arrows, composition and handled keys retain their native behavior', () => {
+  const s = keyboardAndCopy();
+  for (const modifier of ['altKey', 'ctrlKey', 'metaKey', 'shiftKey', 'isComposing', 'defaultPrevented']) {
+    for (const key of ['ArrowLeft', 'ArrowRight']) {
+      const event = s.key(key, {[modifier]: true});
+      assert.equal(event.defaultPrevented, modifier === 'defaultPrevented');
+    }
+  }
+  assert.deepEqual(s.steps, []);
+});
+
+test('editable and native media controls do not trigger gallery navigation', () => {
+  const s = keyboardAndCopy();
+  for (const selector of ['input', 'textarea', 'select', 'video', 'audio', '[role="textbox"]', '[contenteditable]']) {
+    const target = {closest: selectors => selectors.includes(selector.replace(']', '')) ? target : null};
+    assert.equal(s.key('ArrowRight', {target}).defaultPrevented, false, selector);
+  }
+  assert.equal(s.key('ArrowLeft', {target: {isContentEditable: true, closest: () => null}}).defaultPrevented, false);
+  assert.deepEqual(s.steps, []);
+});
+
+test('Escape, Tab and copy shortcuts are left to the browser', () => {
+  const s = keyboardAndCopy();
+  for (const key of ['Escape', 'Tab', 'Home', 'End', 'c']) {
+    assert.equal(s.key(key).defaultPrevented, false);
+  }
+  assert.deepEqual(s.steps, []);
+});
+
+test('successful copying still reports success without revealing the fallback', async () => {
+  const s = keyboardAndCopy({clipboardFails: false});
+  await s.handlers.copy();
+  assert.deepEqual(s.copied, [s.location.href]);
+  assert.equal(s.copyStatus.textContent, 'Ссылка скопирована');
+  assert.equal(s.addressField.hidden, true);
+});
