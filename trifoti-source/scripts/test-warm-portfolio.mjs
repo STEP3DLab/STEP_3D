@@ -288,3 +288,14 @@ test('successful copying still reports success without revealing the fallback', 
   assert.equal(s.copyStatus.textContent, 'Ссылка скопирована');
   assert.equal(s.addressField.hidden, true);
 });
+
+
+test('short-screen gallery shrinks the media container rather than only its image', () => {
+  const rules = html.match(/@media\(max-height:580px\)\s*\{[^\n]+/)[0];
+  assert.match(rules, /\.viewport\s*\{\s*height:49dvh;\s*\}/);
+  assert.doesNotMatch(rules, /\.stage\s*\{|max-height:49dvh/);
+  assert.match(rules, /dialog\[open\]\s*\{\s*overflow:auto;/);
+  assert.match(html, /\.viewport\{[^}]*height:min\(68dvh,750px\)/);
+  assert.match(html, /@media\(max-width:540px\)[^\n]*\.viewport\{height:59dvh\}/);
+  assert.match(html, /\.stage\{object-fit:contain;display:block\}/);
+});

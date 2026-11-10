@@ -35,7 +35,8 @@ h1,h2,.section-head h2 { font-family:Unbounded,Manrope,sans-serif; font-weight:4
 .viewer-links input { min-width:0; width:min(100%,380px); font:inherit; }
 .viewport { min-height:0; }
 @media(max-width:540px) { .viewer-links { padding:0 8px 8px; } .brand-mark { width:34px; height:34px; } }
-@media(max-height:580px) { .viewport .media-frame .stage { max-height:49dvh; } dialog[open] { overflow:auto; } }
+/* Keep the short-screen frame and its controls together, without an empty stage gap. */
+@media(max-height:580px) { .viewport { height:49dvh; } dialog[open] { overflow:auto; } }
 </style></head>
 <body id="top"><header><div class="bar"><a class="brand" href="./" aria-label="ТРИФОТИ — на главную"><span class="brand-mark"><img src="brand/logo-96.webp" width="96" height="79" alt=""></span>ТРИФОТИ</a><a href="./#portfolio-albums">← К альбомам</a></div></header>
 <main id="all"><div class="intro"><h1>Галерея проектов</h1><p>Фотографии, эскизы и визуализации из подборки Фёдора Паршина.</p></div>
