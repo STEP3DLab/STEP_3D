@@ -299,3 +299,52 @@ test('short-screen gallery shrinks the media container rather than only its imag
   assert.match(html, /@media\(max-width:540px\)[^\n]*\.viewport\{height:59dvh\}/);
   assert.match(html, /\.stage\{object-fit:contain;display:block\}/);
 });
+
+function closeGallery({inPage = false, routing = false, hidden = false, reopened = false} = {}) {
+  const focusCalls = [];
+  const historyCalls = [];
+  const filtered = [];
+  const context = {
+    viewer: {open: reopened, dataset: {}},
+    history: {
+      state: inPage ? {trifotiAlbumFrame: true} : null,
+      back() {historyCalls.push('back');},
+      replaceState(state, title, href) {historyCalls.push(href);}
+    },
+    opener: {closest() {return {hidden};}, focus(options) {focusCalls.push(options.preventScroll);}},
+    album: {id: 'awards'}, closingForNavigation: routing,
+    stopImage() {}, mediaFrame: {setAttribute() {}}, stage: {}, feedback: {}, retry: {},
+    loadStatus: {}, document: {body: {style: {overflow: 'hidden'}}},
+    filterAlbums(album) {filtered.push(album.id);}
+  };
+  const start = script.indexOf("viewer.addEventListener('close', () => {") + "viewer.addEventListener('close', () => {".length;
+  const end = script.indexOf("\n});\nviewer.addEventListener('click'", start);
+  vm.runInNewContext('(() => {' + script.slice(start, end) + '\n})();', context);
+  return {focusCalls, historyCalls, filtered, context};
+}
+
+test('closing a copied frame link reveals its focused card instead of leaving focus offscreen', () => {
+  const s = closeGallery();
+  assert.deepEqual(s.focusCalls, [false]);
+  assert.deepEqual(s.historyCalls, ['#awards']);
+  assert.deepEqual(s.filtered, ['awards']);
+  assert.equal(s.context.document.body.style.overflow, '');
+});
+test('closing a frame opened from a card preserves the browser history scroll restoration', () => {
+  const s = closeGallery({inPage: true});
+  assert.deepEqual(s.focusCalls, [true]);
+  assert.deepEqual(s.historyCalls, ['back']);
+  assert.deepEqual(s.filtered, []);
+});
+test('Back navigation preserves its own scroll target and does not rewrite history', () => {
+  const s = closeGallery({routing: true});
+  assert.deepEqual(s.focusCalls, [true]);
+  assert.deepEqual(s.historyCalls, []);
+});
+test('a hidden card never receives focus and a reopened viewer ignores a queued close', () => {
+  assert.deepEqual(closeGallery({hidden: true}).focusCalls, []);
+  const reopened = closeGallery({reopened: true});
+  assert.deepEqual(reopened.focusCalls, []);
+  assert.deepEqual(reopened.historyCalls, []);
+  assert.equal(reopened.context.document.body.style.overflow, 'hidden');
+});

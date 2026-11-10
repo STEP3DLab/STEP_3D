@@ -251,12 +251,14 @@ viewer.addEventListener('close', () => {
   retry.hidden = true;
   loadStatus.textContent = '';
   document.body.style.overflow = '';
+  // A copied frame URL has no card scroll position for history to restore.
+  const revealOpener = !closingForNavigation && !history.state?.trifotiAlbumFrame;
   if (!closingForNavigation) {
     if (history.state?.trifotiAlbumFrame) history.back();
     else { history.replaceState(history.state, '', '#' + album.id); filterAlbums(album); }
   }
   closingForNavigation = false;
-  if (opener?.closest('section')?.hidden === false) opener.focus({preventScroll:true});
+  if (opener?.closest('section')?.hidden === false) opener.focus({preventScroll:!revealOpener});
 });
 viewer.addEventListener('click', event => { if (event.target === viewer) viewer.close(); });
 viewer.addEventListener('keydown', event => {
