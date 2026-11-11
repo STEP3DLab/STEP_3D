@@ -147,3 +147,41 @@ test('Exploration keyboard focus remains offset and visible without replacing se
  assert.equal(declarations('button,input,textarea,select,a')['outline-offset'],'5px');
  assert(ratio('var(--red)',paper)>=3,'focus ring against surrounding paper');
 });
+
+// Model the actual nested project Close and the separate review Close. The old
+// direct-child selector no longer matches the project header. This is a focused
+// ordinary-color cascade regression, not a substitute for browser rendering.
+const closeRules=[...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)].flatMap(([,selectors,body])=>
+ selectors.split(',').map(selector=>selector.trim()).filter(selector=>/^(?:\.project-dialog(?:-header)?[> ]+)?\.close-button(?::[\w-]+)*$/.test(selector)).map(selector=>({
+  selector,
+  specificity:(selector.match(/[.:][\w-]+/g)||[]).length,
+  values:Object.fromEntries(body.split(';').filter(Boolean).map(value=>{const i=value.indexOf(':');return [value.slice(0,i).trim(),value.slice(i+1).trim()];}))
+ })));
+function closeColors({project=false,hover=false,focus=false}={}){
+ const values={color:'var(--ink)',background:paper},weights={color:-1,background:-1};
+ for(const rule of closeRules){
+  if(rule.selector.startsWith('.project-dialog>'))continue;
+  if(rule.selector.startsWith('.project-dialog-header')&&!project)continue;
+  const states=rule.selector.match(/:[\w-]+/g)||[];
+  if(!states.every(state=>{if(state===':hover')return hover;if(state===':focus-visible')return focus;assert.fail('Unmodelled Close state: '+state)}))continue;
+  for(const property of ['color','background'])if(property in rule.values&&rule.specificity>=weights[property]){
+   values[property]=rule.values[property];weights[property]=rule.specificity;
+  }
+ }
+ if(values.background==='transparent')values.background=paper;
+ if(values.color==='white')values.color='#fff';
+ return values;
+}
+for(const project of [false,true])for(const [state,extra] of [['default',{}],['hover',{hover:true}],['focus-visible',{focus:true}],['hover + focus-visible',{hover:true,focus:true}]]){
+ test(`${project?'Project header':'Review dialog'} Close stays readable on ${state}`,()=>{
+  const colors=closeColors({project,...extra});
+  ordinary(colors.color,colors.background,`Close ${state}`);
+  assert.equal(colors.color,extra.hover?'#fff':'var(--ink)');
+  assert.equal(colors.background,extra.hover?'var(--ink)':paper);
+ });
+}
+test('Project Close contrast fix preserves native system colors and refreshes the stylesheet URL',()=>{
+ assert.equal(declarations('.project-dialog-header>.close-button:hover').background,'var(--ink)');
+ assert.doesNotMatch(css,/forced-color-adjust\s*:\s*none/);
+ assert.match(html,/style\.css\?[^\"]*&amp;close=20261111-contrast/);
+});

@@ -326,6 +326,7 @@ footer.site-footer{display:block;margin:0;padding:48px 4.5% 88px;background:#ebe
 .project-dialog[open]{display:flex;flex-direction:column}
 .project-dialog-header{flex:0 0 60px;display:flex;justify-content:flex-end;align-items:flex-start;padding:8px 16px}
 .project-dialog-header>.close-button{position:static;background:var(--paper)}
+.project-dialog-header>.close-button:hover{background:var(--ink);color:white}
 #project-content{min-height:0;min-width:0;overflow:auto;overscroll-behavior:contain;padding:6px 30px 30px;scroll-padding-block:6px}
 @media(max-width:800px){#project-content{padding:6px 20px 25px}}
 
