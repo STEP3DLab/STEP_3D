@@ -1,5 +1,5 @@
 import {initializePortfolioDisclosure,visiblePortfolioTarget} from './portfolio-disclosure.js?v=20261104-red7';
-import {appendSelectionReference,mountReferenceManager} from './reference-manager.js?v=20261104-red7';
+import {appendSelectionReference,mountReferenceManager} from './reference-manager.js?v=20261111-sales';
 import {mountPhotoDetail} from './gallery-photo-detail.js?v=20261104-red7';
 import {modeLinks} from './view-context.js?v=20261104-red7';
 import {optionalModule,optionalFallback} from './optional-module.js?v=20261104-red7';
@@ -12,7 +12,7 @@ import {createFrameMemory,thumbnailKey,mountPhotoSwipe} from './gallery-interact
 import {initializeSectionNavigation} from './section-navigation.js?v=20261104-red7';
 import {initializeBriefTools} from './brief-tools.js?v=20261111-copy-focus';
 import {updateGalleryPhotoLink} from './gallery-photo-link.js?v=20261104-red7';
-import {updateBriefGuidance} from './brief-guidance.js?v=20261104-red7';
+import {updateBriefGuidance} from './brief-guidance.js?v=20261111-sales';
 import {mountCaseSections} from './case-sections.js?v=20261104-red7';
 import {mountGalleryChapters} from './gallery-chapters.js?v=20261104-red7';
 import {watchGalleryMedia} from './media-recovery.js?v=20261104-red7';
@@ -65,7 +65,7 @@ briefExperience=initializeBriefExperience({form,document,window,validate:()=>bri
 // Keep the native submit button disabled until local-only handling is ready.
 draftStatus(recovered.state);
 $('#brief-save').disabled=false;
-optionalModule({load:()=>import('./brief-preparation.js?v=20261104-red7'),mount:({mountBriefPreparation})=>{briefPreparation=mountBriefPreparation({form,document,window})},onError:()=>{const note=document.createElement('p');note.className='form-note';note.textContent='Подсказки не загрузились. Бриф можно заполнить, скачать и скопировать без них.';form.querySelector('.brief-intro').after(note)}})();
+optionalModule({load:()=>import('./brief-preparation.js?v=20261111-sales'),mount:({mountBriefPreparation})=>{briefPreparation=mountBriefPreparation({form,document,window})},onError:()=>{const note=document.createElement('p');note.className='form-note';note.textContent='Подсказки не загрузились. Бриф можно заполнить, скачать и скопировать без них.';form.querySelector('.brief-intro').after(note)}})();
 
 $$('[data-close]').forEach(b=>b.addEventListener('click',()=>document.getElementById(b.dataset.close).close()));
 $$('dialog').forEach(dialog=>{if(dialog.id!=='category-story-dialog')keepDialogFocus(dialog);let backdropPressed=false;dialog.addEventListener('pointerdown',e=>{const r=dialog.getBoundingClientRect();backdropPressed=e.target===dialog&&(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)});dialog.addEventListener('click',e=>{if(backdropPressed&&e.target===dialog)dialog.close();backdropPressed=false})});
@@ -172,7 +172,20 @@ import('./publication-filters.js?v=20261104-red7').then(({initializePublicationF
 });
 
 if (new URLSearchParams(location.search).has('portfolio')) {
-  import('./portfolio-brief.js?v=20261111').then(({addPortfolioReference}) =>
+  import('./portfolio-brief.js?v=20261111-sales').then(({addPortfolioReference}) =>
     addPortfolioReference({form, selectReference, status:document.getElementById('brief-status')})
   ).catch(() => { document.getElementById('brief-status').textContent = 'Пример не удалось открыть. Обновите страницу, чтобы повторить.'; });
+}
+
+// Enhance the local brief only after its normal validation and save actions are ready.
+import('./brief-handoff.js?v=20261111-sales').then(({mountBriefHandoff}) => {
+  mountBriefHandoff({form, document, window, formatBrief, validate: () => briefTools.validate()});
+}).catch(() => { /* The static manager contacts and local export remain accessible. */ });
+
+if (new URLSearchParams(location.search).has('case')) {
+  import('./case-enquiry.js?v=20261111-sales').then(({addCaseReference}) => {
+    addCaseReference({form, selectReference, status: document.getElementById('brief-status')});
+  }).catch(() => {
+    document.getElementById('brief-status').textContent = 'Не удалось добавить проект. Обновите страницу, чтобы повторить.';
+  });
 }

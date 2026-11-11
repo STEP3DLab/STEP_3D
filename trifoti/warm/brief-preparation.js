@@ -8,12 +8,13 @@ export const preparationDirections=Object.freeze([
  {name:'Дизайн интерьеров',question:'Хотите изменить пространство?',note:'Планировка, образ и детали интерьера.',materials:['Фото пространства или места установки','Примерные размеры или план, если есть','Примеры атмосферы, цвета и материалов']},
  {name:'Награды',question:'Нужен памятный предмет?',note:'Сувенир, приз или награда для события.',materials:['Повод, получатели и примерный тираж','Символика, логотип или эскиз, если есть','Пожелания к размеру, упаковке и сроку']},
  {name:'Промышленный дизайн',question:'Нужно спроектировать изделие?',note:'Функция, эргономика, форма и конструкция.',materials:['Назначение изделия и условия использования','Размеры и функциональные требования','Чертежи, эскизы и ограничения изготовления']},
- {name:'Арт-объекты',question:'Нужен художественный акцент?',note:'Идея, образ и взаимодействие с пространством.',materials:['Описание художественной идеи','Место размещения и примерные размеры','Материалы и примеры настроения']}
+ {name:'Арт-объекты',question:'Нужен художественный акцент?',note:'Идея, образ и взаимодействие с пространством.',materials:['Описание художественной идеи','Место размещения и примерные размеры','Материалы и примеры настроения']},
+ {name:'Макетирование',question:'Нужен макет здания или изделия?',note:'Масштаб, габариты и детализация.',materials:['Фотографии, планы или чертежи','Масштаб или желаемый размер макета','Детали, которые важно показать']}
 ]);
 const commonMaterials=['Короткое описание задумки','Примеры того, что нравится','Известные размеры или ограничения'];
 export function preparationMaterials(direction){return preparationDirections.find(item=>item.name===direction)?.materials||commonMaterials}
 export const ideaQuestions=Object.freeze(['Понятно ли, для кого и зачем нужен объект?','Указано ли, где и как им будут пользоваться?','Есть ли ориентир по размеру или важные ограничения?','Понятно ли, что нравится в выбранных примерах?']);
-export {appendSelectionReference} from './reference-manager.js?v=20261104-red7';
+export {appendSelectionReference} from './reference-manager.js?v=20261111-sales';
 export function mountBriefPreparation({form,document,window}){
  const el=(tag,text)=>{const node=document.createElement(tag);if(text)node.textContent=text;return node};
  const details=el('details');details.className='brief-preparation';details.id='brief-preparation';

@@ -1,4 +1,13 @@
 // Resolve gallery references from the same published catalogue that visitors browse.
+const albumDirections = Object.freeze({
+  art: 'Арт-объекты',
+  interiors: 'Дизайн интерьеров',
+  models: 'Макетирование',
+  awards: 'Награды',
+  sculpture: 'Парковая и монументальная скульптура',
+  industrial: 'Промышленный дизайн'
+});
+
 export async function addPortfolioReference({form, selectReference, status}) {
   const url = new URL(location.href);
   const route = url.searchParams.get('portfolio') || '';
@@ -26,12 +35,18 @@ export async function addPortfolioReference({form, selectReference, status}) {
     const current = new URL(location.href);
     if (current.hash !== '#brief-form' || current.searchParams.get('portfolio') !== route) return;
     const field = form.elements.namedItem('reference');
+    let updated = field.value;
     if (!field.value.split('\n').includes(canonical)) {
       const reference = [entry.title, image.caption, canonical].join('\n');
-      const updated = [field.value, reference].filter(Boolean).join('\n\n');
+      updated = [field.value, reference].filter(Boolean).join('\n\n');
       if (updated.length > 6000) { status.textContent = 'В поле примеров достигнут лимит. Уберите один пример и откройте ссылку снова.'; return; }
-      selectReference(updated);
     }
+    // Resolve the selection after the fetch: the visitor may have edited the draft meanwhile.
+    const direction = form.elements.namedItem('direction');
+    const suggested = albumDirections[entry.album];
+    const useSuggestion = direction?.selectedIndex === 0 && [...direction.options].some(option => option.value === suggested);
+    if (useSuggestion) direction.value = suggested;
+    if (updated !== field.value || useSuggestion) selectReference(updated);
     status.textContent = 'В брифе выбран пример «' + entry.title + '».';
     cleanUrl();
   } catch {

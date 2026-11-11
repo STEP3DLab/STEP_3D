@@ -64,6 +64,8 @@ def apply(target):
         shutil.copyfile(source / name, target / name)
     shutil.copyfile(source / 'favicon.svg', target / 'brand/favicon.svg')
     for page in target.rglob('*.html'):
+        if page == target / 'portfolio.html':
+            continue  # The standalone album viewer has its own responsive stylesheet.
         text = page.read_text()
         if page.parent.name == 'cases' and 'premium-case-heading' not in text:
             image = re.search(r'<figure id="([^"]+)"[^>]*>.*?(<img\b[^>]*>)', text, re.S)
@@ -89,6 +91,8 @@ def apply(target):
     # Retain the requested interior hero during future editorial builds.
     import runpy
     runpy.run_path(str(source.parent / "interior/apply.py"))["apply"](target)
+    runpy.run_path(str(source.parent / "case-enquiry/apply.py"))["apply"](target)
+    runpy.run_path(str(source.parent / "sales/apply.py"))["apply"](target)
     # Wire the critical header before main content paints, without a network race.
     runpy.run_path(str(source.parent / "inline-navigation.py"))["apply"](target)
 

@@ -51,8 +51,9 @@ def apply(target):
     app = target / 'app.js'
     entry = (source / 'portfolio-brief-entry.js').read_text()
     application = app.read_text()
-    if entry.strip() not in application:
+    if "new URLSearchParams(location.search).has('portfolio')" not in application:
         app.write_text(application.rstrip() + '\n\n' + entry)
+    shutil.copyfile(source / 'reference-manager.js', target / 'reference-manager.js')
     page.write_text(text)
     shutil.copyfile(source/'interior-stage.css',target/'interior-stage.css')
 
