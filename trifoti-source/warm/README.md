@@ -23,3 +23,7 @@
 Итоги пяти отдельных ИИ-аудитов и принятые изменения: [PREMIUM-AUDIT-2026-11-06.md](PREMIUM-AUDIT-2026-11-06.md).
 
 Визуальная проверка проведена в облачном браузере на широкой и узких раскладках. Проверки на физических iOS/Android не проводились. Бриф хранится только в браузере посетителя: его можно скачать, скопировать или распечатать. Сайт не передаёт содержимое брифа в Telegram, почту или другие сервисы. Общие контактные ссылки не содержат данных формы. Главная, портфолио, каталог и подробные кейсы доступны для поисковой индексации.
+
+### Gallery critical typography
+
+`portfolio-critical-fonts.py` embeds exact, scoped variable-font subsets in the standalone gallery to avoid font-loading layout jumps. Run it after editing the header, intro, album names/counters or section headings, then run its `--check` mode and `scripts/test-warm-portfolio-fonts.py`. Details: `PORTFOLIO-FONT-STABILITY-QA.md`. The separate gallery viewer and all original fonts remain intact.

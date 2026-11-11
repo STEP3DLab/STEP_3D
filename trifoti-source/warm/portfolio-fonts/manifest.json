@@ -1,0 +1,19 @@
+{
+  "characters": " ,-.134568АВГДИКМНОПРТФабвгдежзийклмнопрстуфцшъыьэяё←",
+  "fonts": {
+    "manrope": {
+      "source": "manrope",
+      "weight": "200 800",
+      "bytes": 11008,
+      "sha256": "e9cd7a090426c9301bcb80f152f827d2aa0ae6b30338a31c06c0b890e334004d",
+      "source_sha256": "3ae11c49db0455a3cc33e37d380f20fdb8c7f8b41dc07625c177e3d87a9d6ae6"
+    },
+    "unbounded": {
+      "source": "unbounded",
+      "weight": "200 900",
+      "bytes": 26788,
+      "sha256": "04ad06730b019ae5de66074d6d697734a83d912aa2398d27ee2b6bb08a4b7523",
+      "source_sha256": "323b511be380c8d474ef030686b71aedde501f8d9cd46da558b7c40454372c3f"
+    }
+  }
+}
