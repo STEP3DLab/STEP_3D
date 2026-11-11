@@ -152,7 +152,7 @@ footer.site-footer{display:block;margin:0;padding:48px 4.5% 88px;background:#ebe
    The square mask follows the same cover crop and 14% position as the photo. */
 @supports (mask-mode:luminance){
   .team-card[aria-labelledby="team-fedor"] .team-portrait{background:radial-gradient(ellipse 65% 120% at 115% 2%,#a649c8 0%,#6e16c8 58%,transparent 59%),linear-gradient(155deg,#8829bd 15%,#a03bad 68%,#a649c8 100%)}
-  .team-card[aria-labelledby="team-fedor"] .team-portrait img{mask-image:url('assets/team/fedor-background-mask-20261026.svg');mask-mode:luminance;mask-size:cover;mask-position:center 14%;mask-repeat:no-repeat}
+  .team-card[aria-labelledby="team-fedor"] .team-portrait img{mask-image:url('assets/team/fedor-background-mask-lossless-20261111.svg');mask-mode:luminance;mask-size:cover;mask-position:center 14%;mask-repeat:no-repeat}
 }
 .team-person{display:flex;flex-direction:column;flex:1;padding:24px 0 0;min-width:0}
 .team-kicker{display:flex;justify-content:space-between;gap:18px;font-size:10px;line-height:1.6;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:16px}

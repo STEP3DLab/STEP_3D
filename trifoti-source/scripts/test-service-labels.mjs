@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {readFileSync} from 'node:fs';
+import {gzipSync} from 'node:zlib';
 import {projects} from '../dist/project-data.js';
 const html=readFileSync(new URL('../dist/index.html',import.meta.url),'utf8');
 const links=[...html.matchAll(/<a\b([^>]*\bdata-service="([^"]+)"[^>]*)>([\s\S]*?)<\/a>/g)];
@@ -138,4 +139,18 @@ test('Mask normalizes near-white to opaque without altering portrait pixels',()=
  assert.equal((svg.match(/type="linear" slope="1.1" intercept="-0.05"/g)||[]).length,3);
  assert(svg.includes('color-interpolation-filters="sRGB"'));
  assert(svg.includes('href="data:image/png;base64,'));
+});
+
+
+test('The served portrait mask keeps the original SVG geometry with a smaller PNG payload',()=>{
+ const original=readFileSync(new URL('../dist/assets/team/fedor-background-mask-20261026.svg',import.meta.url),'utf8');
+ const optimized=readFileSync(new URL('../dist/assets/team/fedor-background-mask-lossless-20261111.svg',import.meta.url),'utf8');
+ const payload=/data:image\/png;base64,[A-Za-z0-9+/=]+/;
+ assert.equal(optimized.replace(payload,'PNG'),original.replace(payload,'PNG'));
+ assert(gzipSync(optimized,{level:9}).length<430000,'The optimized mask must stay below its measured compressed budget');
+ assert(gzipSync(optimized,{level:9}).length<gzipSync(original,{level:9}).length*.8);
+ const css=readFileSync(new URL('../dist/style.css',import.meta.url),'utf8');
+ assert(css.includes('assets/team/fedor-background-mask-lossless-20261111.svg'));
+ assert(!css.includes('assets/team/fedor-background-mask-20261026.svg'));
+ assert(html.includes('portrait=20261111-lossless-mask'));
 });
