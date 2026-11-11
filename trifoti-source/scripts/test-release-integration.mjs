@@ -4,7 +4,8 @@ import {readFileSync} from 'node:fs';
 const read=name=>readFileSync(new URL('../dist/'+name,import.meta.url),'utf8');
 const app=read('app.js'),html=read('index.html');
 test('Integrated exploration retains a single progressive menu and portfolio controller',()=>{
- assert.equal((html.match(/src="header-navigation\.js/g)||[]).length,1);
+ assert.equal((html.match(/<!-- header-navigation:inline:start -->/g)||[]).length,1);
+ assert.doesNotMatch(html, /src="header-navigation\.js/);
  assert.equal((app.match(/initializePortfolioFilters\(\{document,window\}\)/g)||[]).length,1);
  assert.doesNotMatch(app,/function setMenuOpen|function selectProjectFilter/);
  assert.match(app,/initializeBriefExperience\(\{form,document,window/);

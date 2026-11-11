@@ -22,9 +22,9 @@
   <meta name="twitter:description" content="Искусство, дизайн и инженерия. От идеи до реального объекта.">
   <meta name="twitter:image" content="https://step3dlab.github.io/STEP_3D/trifoti/assets/brand/trifoti-logo-transparent.png">
   <link rel="icon" href="assets/brand/trifoti-favicon-transparent-64.png" type="image/png" sizes="64x64">
-  <link rel="stylesheet" href="style.css?v=20261026-legacy-links&amp;portrait=20261111-lossless-mask&amp;audit=20261026-design-r1&amp;fallback=20261106-native-bear&amp;gallery=20261106-fixed-shell&amp;copy=20261106-brief-focus&amp;close=20261111-contrast&amp;labels=20261111-clear&amp;type=20261111-wrap">
+  <link rel="stylesheet" href="style.css?v=20261026-legacy-links&amp;portrait=20261111-lossless-mask&amp;audit=20261026-design-r1&amp;fallback=20261106-native-bear&amp;gallery=20261106-fixed-shell&amp;copy=20261106-brief-focus&amp;close=20261111-contrast&amp;labels=20261111-clear&amp;type=20261111-wrap&amp;load=20261111-stable">
   <link rel="stylesheet" href="category-stories.css?v=20261026-story-polish&amp;audit=20261026-design-r1&amp;contrast=20261105">
-  <script type="module" src="header-navigation.js?v=20261105-native-links"></script>
+
   <script type="importmap">{"imports":{"three":"./assets/vendor/three.module.js"}}</script>
   <script defer src="brief-guard.js?v=20261026-seven"></script>
   <script type="module" src="app.js?v=20261026-legacy-links&amp;stories=20261026-story-polish&amp;audit=20261026-design-r1&amp;focus=20261105&amp;brief=20261106-optional-choice&amp;photo=20261106-resize&amp;media=20261106-release-video&amp;return=20261106-resized-return&amp;storyreturn=20261106&amp;playback=20261106-background-pause&amp;fallback=20261106-native-bear&amp;filters=20261106-ready&amp;recovery=20261106-gif-error&amp;copy=20261106-case-focus&amp;review=20261106-conflict&amp;publications=20261106-init-focus&amp;selection=20261106-summary-return&amp;comparison=20261106-history&amp;thumbfocus=20261111-native-scroll"></script>
@@ -37,6 +37,70 @@
   <nav id="navigation" aria-label="Основная навигация"><a href="#projects">Проекты</a><a href="#directions">Что создаём</a><a href="#process">Процесс</a><a href="#studio">Об объединении</a><a href="#journal">Новости и блог</a></nav>
   <a href="#brief-form" class="button header-cta" aria-label="Подготовить бриф для скачивания, без отправки"><span class="cta-label"><span class="desktop-label">Подготовить бриф</span><span class="mobile-label">Бриф</span></span><span><span class="direction-icon" aria-hidden="true"></span></span></a>
 </header>
+<!-- header-navigation:inline:start -->
+<script>
+(() => {
+"use strict";
+// Independent of the portfolio and form modules: links remain available until
+// this small disclosure controller has finished wiring its interactions.
+const controllers = new WeakMap();
+
+function initializeHeaderNavigation({document, window}) {
+  const header = document.querySelector('.header');
+  const menu = header?.querySelector('.menu-button');
+  const nav = header?.querySelector('#navigation');
+  if (!header || !menu || !nav || typeof window.matchMedia !== 'function') return null;
+  if (controllers.has(header)) return controllers.get(header);
+
+  const desktopNavigation = window.matchMedia('(min-width: 801px)');
+  function setMenuOpen(open) {
+    menu.setAttribute('aria-expanded', String(open));
+    menu.setAttribute('aria-label', open ? 'Закрыть меню' : 'Открыть меню');
+    nav.classList.toggle('open', open);
+  }
+  menu.addEventListener('click', () => setMenuOpen(menu.getAttribute('aria-expanded') !== 'true'));
+  header.querySelectorAll('a').forEach(link => link.addEventListener('click', event => {
+    // Keep the current page and its focused link intact when the browser opens
+    // another tab/window or an earlier handler has already handled the action.
+    if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    setMenuOpen(false);
+  }));
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && menu.getAttribute('aria-expanded') === 'true') {
+      setMenuOpen(false);
+      menu.focus();
+    }
+  });
+  document.addEventListener('click', event => {
+    if (!event.target.closest?.('.header')) setMenuOpen(false);
+  });
+  // Native Tab follows the DOM; leaving the header never traps or steals focus.
+  header.addEventListener('focusout', event => {
+    if (event.relatedTarget && !header.contains(event.relatedTarget)) setMenuOpen(false);
+  });
+  desktopNavigation.addEventListener('change', () => {
+    const active = document.activeElement;
+    setMenuOpen(false);
+    if (!desktopNavigation.matches && nav.contains(active)) menu.focus({preventScroll: true});
+    else if (desktopNavigation.matches && active === menu) nav.querySelector('a[href]')?.focus({preventScroll: true});
+  });
+
+  // A visitor may already have focused a fallback link while this module loaded.
+  // Keep that link visible instead of collapsing it beneath their keyboard focus.
+  setMenuOpen(!desktopNavigation.matches && nav.contains(document.activeElement));
+  menu.hidden = false;
+  header.classList.add('nav-ready');
+  const controller = {setMenuOpen};
+  controllers.set(header, controller);
+  return controller;
+}
+
+if (typeof document !== 'undefined' && typeof window !== 'undefined') {
+  initializeHeaderNavigation({document, window});
+}
+})();
+</script>
+<!-- header-navigation:inline:end -->
 <main id="main">
 <section class="hero section-anchor" id="home">
   <div class="hero-copy">

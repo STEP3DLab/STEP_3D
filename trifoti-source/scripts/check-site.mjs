@@ -16,7 +16,7 @@ for(const [,url] of html.matchAll(/\b(?:src|href|poster)="([^"]+)"/g)){
  else if(url.startsWith('#'))assert(ids.includes(url.slice(1)),`Missing anchor ${url}`);
  else if(!/^(?:https?:|data:)/.test(url))assert(existsSync(resolve(dist,url.split(/[?#]/)[0])),`Missing file ${url}`);
 }
-for(const [,url] of css.matchAll(/url\(['"]?([^)'"\s]+)['"]?\)/g))assert(existsSync(resolve(dist,url)),`Missing style asset ${url}`);
+for(const [,url] of css.matchAll(/url\(['"]?([^)'"\s]+)['"]?\)/g)){if(url.startsWith('data:')){assert(/^data:font\/woff2;base64,[A-Za-z0-9+/]+=*$/.test(url),'Only embedded WOFF2 font URLs are allowed');assert.equal(Buffer.from(url.split(',')[1],'base64').toString('ascii',0,4),'wOF2');}else assert(existsSync(resolve(dist,url)),`Missing style asset ${url}`);}
 let photos=0,videos=0;
 for(const [key,project] of Object.entries(projects)){
  assert(project.title&&project.description&&project.media.length,`Incomplete case ${key}`);

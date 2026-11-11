@@ -30,8 +30,8 @@ for(const font of report.fonts){
   assert(css.includes(`assets/fonts/${name}-OFL.txt`));
  });
 }
-test('All three complete fonts are smaller without adding faces or subsetting',()=>{
- assert.equal(faces.length,3);assert.equal(report.fonts.reduce((n,f)=>n+f.glyphs,0),3044);
+test('All three original fonts remain complete beside the critical heading subset',()=>{
+ assert.equal(faces.length,4);assert.equal(report.fonts.reduce((n,f)=>n+f.glyphs,0),3044);
  assert.equal(report.fonts.reduce((n,f)=>n+read(f.family+'.ttf').length,0),1115060);
  assert.equal(report.fonts.reduce((n,f)=>n+read(f.family+'.woff2').length,0),386100);
  assert(!faces.some(face=>/\.ttf|format\('truetype'\)/.test(face)));
@@ -53,7 +53,7 @@ test('The single-column hero wraps when fallback fonts need more space',()=>{
 });
 test('The full slogan and its three designed lines remain unchanged',()=>{
  assert.match(html,/<h1 aria-label="Пределов в творчестве не существует!"><span>Пределов<\/span><span class="red">в творчестве<\/span><span>не существует!<\/span><\/h1>/);
- assert.match(css,/\.hero h1\{font-family:Oswald,Manrope,sans-serif;font-size:clamp\(76px,7\.8vw,122px\);font-weight:600;/);
+ assert.match(css,/\.hero h1\{font-family:TrifotiHeadline,Oswald,Manrope,sans-serif;font-size:clamp\(76px,7\.8vw,122px\);font-weight:600;/);
 });
 test('The fallback reflow reaches both public mirrors with a fresh CSS URL',()=>{
  assert.match(html,/style\.css\?[^\"]*&amp;type=20261111-wrap/);
