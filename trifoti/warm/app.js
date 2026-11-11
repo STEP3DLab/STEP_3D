@@ -1,3 +1,4 @@
+import {fillCaseDirection} from './case-enquiry.js?v=20261111-brief-links';
 import {initializePortfolioDisclosure,visiblePortfolioTarget} from './portfolio-disclosure.js?v=20261104-red7';
 import {appendSelectionReference,mountReferenceManager} from './reference-manager.js?v=20261111-sales';
 import {mountPhotoDetail} from './gallery-photo-detail.js?v=20261104-red7';
@@ -31,8 +32,10 @@ function download(text,name){const blob=new Blob(['\ufeff'+text],{type:'text/pla
 initializePortfolioFilters({document,window});
 initializePortfolioDisclosure({document,window});
 initializeBackToTop({document,window});
-$('#empty-category-brief').addEventListener('click',()=>{const direction=$('[data-filter][aria-pressed="true"]').dataset.direction;if(direction){$('#brief-direction').value=direction;saveDraft()}});
-$$('[data-service]').forEach(a=>a.addEventListener('click',()=>{$('#brief-direction').value=a.dataset.service;saveDraft()}));
+$('#empty-category-brief').addEventListener('click',event=>{if(!followsBriefHere(event))return;const direction=$('[data-filter][aria-pressed="true"]').dataset.direction;if(direction){$('#brief-direction').value=direction;saveDraft()}});
+$$('[data-service]').forEach(a=>a.addEventListener('click',event=>{if(!followsBriefHere(event))return;$('#brief-direction').value=a.dataset.service;saveDraft()}));
+
+function followsBriefHere(event){return !event.defaultPrevented&&event.button===0&&!event.metaKey&&!event.ctrlKey&&!event.shiftKey&&!event.altKey}
 
 const form=$('#brief-form'),draftSession=createBriefDraftSession(),recovered=draftSession.recovered;
 const draftMessages={empty:'Черновик сохраняется в этом браузере.',restored:'Черновик восстановлен из этого браузера.',saved:'Черновик сохранён в этом браузере.',unavailable:'Автосохранение недоступно. Не закрывайте страницу, пока не скачаете или не скопируете бриф.',invalid:'Сохранённый черновик не удалось прочитать. Заполните бриф заново.',partial:'Часть черновика восстановлена. Проверьте поля перед скачиванием.',failed:'Черновик не удалось сохранить в браузере. Не закрывайте страницу: скачайте или скопируйте бриф.',conflict:'Черновик изменён в другой вкладке. Автосохранение здесь остановлено, чтобы не перезаписать другую версию. Ваши текущие поля не изменены: скачайте бриф или скопируйте текст ниже до обновления страницы. После обновления откроется сохранённая версия.'};
@@ -113,7 +116,7 @@ function openProject(key,routeMedia){
  if(p.attribution){const provenance=$('#case-provenance');provenance.hidden=false;const credit=document.createElement('p');credit.textContent=p.attribution;provenance.append(credit);for(const source of p.sources||[]){const link=document.createElement('a');link.href=source.url;link.textContent=source.label;link.target='_blank';link.rel='noopener noreferrer';provenance.append(link)}}
  p.tags.forEach(tag=>{const span=document.createElement('span');span.textContent=tag;$('#case-tags').append(span)});
  if(p.media.length>1)p.media.forEach((item,i)=>{const b=document.createElement('button');b.className='gallery-thumb';b.setAttribute('aria-label',`Показать: ${item.caption}`);const img=document.createElement('img');img.src=thumbnailSource(item);img.width=180;img.height=200;img.alt='';img.loading='lazy';img.decoding='async';b.append(img);const number=document.createElement('span');number.className='thumb-number';number.textContent=String(i+1).padStart(2,'0');number.setAttribute('aria-hidden','true');b.append(number);if(item.type==='video'){const label=document.createElement('span');label.textContent='▷';b.append(label)}b.addEventListener('click',()=>showSlide(i));b.addEventListener('keydown',event=>{const next=thumbnailKey(event,i,p.media.length);if(next===null)return;event.preventDefault();showSlide(next);$('#gallery-thumbnails').children[next].focus({preventScroll:true})});$('#gallery-thumbnails').append(b)});
- $('#gallery-prev').addEventListener('click',()=>showSlide(galleryIndex-1));$('#gallery-next').addEventListener('click',()=>showSlide(galleryIndex+1));$('#case-contact').addEventListener('click',e=>{e.preventDefault();const result=appendSelectionReference(form.elements.namedItem('reference').value,[key]);if(result.tooLong){$('#case-selection-status').textContent='Референс не добавлен: достигнут лимит 6000 символов. Уберите ненужный референс в брифе.';return}const direction=form.elements.namedItem('direction');if(p.direction&&direction.selectedIndex===0)direction.value=({'Скульптура':'Парковая и монументальная скульптура','Сувениры и призы':'Награды'}[p.direction]||p.direction);selectReference(result.value);caseNavigation.visit('#brief-form');form.scrollIntoView({block:'start'});requestAnimationFrame(()=>form.elements.namedItem('name').focus({preventScroll:true}))});
+ $('#gallery-prev').addEventListener('click',()=>showSlide(galleryIndex-1));$('#gallery-next').addEventListener('click',()=>showSlide(galleryIndex+1));$('#case-contact').addEventListener('click',e=>{if(!followsBriefHere(e))return;e.preventDefault();const result=appendSelectionReference(form.elements.namedItem('reference').value,[key]);if(result.tooLong){$('#case-selection-status').textContent='Референс не добавлен: достигнут лимит 6000 символов. Уберите ненужный референс в брифе.';return}const direction=form.elements.namedItem('direction');fillCaseDirection(key,direction);selectReference(result.value);caseNavigation.visit('#brief-form');form.scrollIntoView({block:'start'});requestAnimationFrame(()=>form.elements.namedItem('name').focus({preventScroll:true}))});
  const shareButton=$('#case-share'),shareStatus=$('#case-share-status'),shareFallback=$('#case-share-fallback'),shareURL=$('#case-share-url');shareURL.value=projectLink(location.href,key);
  shareButton.addEventListener('click',async()=>{const value=shareURL.value;const copied=await copyProjectLink(value,navigator.clipboard);if(!shareButton.isConnected)return;if(!projectDialog.open||shareURL.value!==value)return;shareStatus.textContent=copied?'Ссылка скопирована.':'Не удалось скопировать автоматически. Выделите ссылку ниже и скопируйте её.';shareFallback.hidden=copied;if(!copied){shareURL.focus();shareURL.select()}});
  const caseIndex=caseKeys.indexOf(key);
@@ -179,7 +182,7 @@ if (new URLSearchParams(location.search).has('portfolio')) {
 
 // Enhance the local brief only after its normal validation and save actions are ready.
 if (new URLSearchParams(location.search).has('case')) {
-  import('./case-enquiry.js?v=20261111-sales').then(({addCaseReference}) => {
+  import('./case-enquiry.js?v=20261111-brief-links').then(({addCaseReference}) => {
     addCaseReference({form, selectReference, status: document.getElementById('brief-status')});
   }).catch(() => {
     document.getElementById('brief-status').textContent = 'Не удалось добавить проект. Обновите страницу, чтобы повторить.';

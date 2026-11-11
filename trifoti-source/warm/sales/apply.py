@@ -34,7 +34,7 @@ def apply(target):
         html = html.replace(previous, 'Скопируйте текст в свои заметки. Данные остаются в вашем браузере.')
     html = html.replace('Чтобы обсудить проект, воспользуйтесь прямой ссылкой на Telegram или почту менеджера выше.', 'Для скачивания брифа нужен JavaScript. Без него доступны описания направлений, публикации и полные страницы проектов.')
     html = html.replace('<option>Арт-объекты</option></select>', '<option>Арт-объекты</option><option>Макетирование</option></select>')
-    html = re.sub(r'(src="(?:\./)?app\.js\?v=)[^"]+', r'\g<1>20261111-print-intent&amp;copy-focus=20261111&amp;enquiry=' + VERSION + '&amp;local-brief=20261111', html)
+    html = re.sub(r'(src="(?:\./)?app\.js\?v=)[^"]+', r'\g<1>20261111-print-intent&amp;copy-focus=20261111&amp;enquiry=' + VERSION + '&amp;local-brief=20261111&amp;brief-links=20261111', html)
     if 'href="sales.css?' not in html:
         html = html.replace('</head>', f'<link rel="stylesheet" href="sales.css?v={VERSION}">\n</head>')
     html = re.sub(r'(href="sales\.css\?v=)[^"]+', r'\g<1>20261111-local-brief', html)

@@ -9,6 +9,16 @@ const briefDirections = new Map([
   ['Арт-объекты', 'Арт-объекты']
 ]);
 
+// Both the full gallery and standalone case pages suggest the same service.
+// An explicitly chosen service always takes precedence.
+export function fillCaseDirection(key, direction) {
+  if (!Object.hasOwn(projects, key) || direction.selectedIndex !== 0) return false;
+  const proposed = objectCases.has(key) ? 'Арт-объекты' : briefDirections.get(projects[key].direction);
+  if (![...direction.options].some(option => option.value === proposed)) return false;
+  direction.value = proposed;
+  return true;
+}
+
 export function addCaseReference({form, selectReference, status, location = window.location, history = window.history}) {
   const url = new URL(location.href);
   const key = url.searchParams.get('case');
@@ -27,9 +37,7 @@ export function addCaseReference({form, selectReference, status, location = wind
   }
 
   const direction = form.elements.namedItem('direction');
-  const proposed = objectCases.has(key) ? 'Арт-объекты' : briefDirections.get(project.direction);
-  const fillDirection = direction.selectedIndex === 0 && [...direction.options].some(option => option.value === proposed);
-  if (fillDirection) direction.value = proposed;
+  const fillDirection = fillCaseDirection(key, direction);
   if (selection.added || fillDirection) selectReference(selection.value);
   status.textContent = 'В брифе выбран проект «' + project.title + '».';
 

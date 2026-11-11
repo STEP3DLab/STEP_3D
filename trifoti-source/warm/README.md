@@ -27,3 +27,7 @@
 ### Gallery critical typography
 
 `portfolio-critical-fonts.py` embeds exact, scoped variable-font subsets in the standalone gallery to avoid font-loading layout jumps. Run it after editing the header, intro, album names/counters or section headings, then run its `--check` mode and `scripts/test-warm-portfolio-fonts.py`. Details: `PORTFOLIO-FONT-STABILITY-QA.md`. The separate gallery viewer and all original fonts remain intact.
+
+### Переходы к брифу
+
+Открытие ссылки брифа в отдельной вкладке не меняет поля исходной вкладки. Полная галерея и отдельная страница кейса предлагают одно и то же направление, сохраняя ручной выбор посетителя. Проверки: [BRIEF-LINKS-QA.md](BRIEF-LINKS-QA.md).
