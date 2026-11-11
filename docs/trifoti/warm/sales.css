@@ -1,17 +1,9 @@
 .enquiry-contact { margin-top: 1.7rem; border-left: 3px solid #1e4578; padding-left: 1rem; }
-.enquiry-contact h3, .enquiry-handoff h4 { margin: 0 0 .45rem; font: 750 1.05rem/1.4 Manrope, sans-serif; }
+.enquiry-contact h3 { margin: 0 0 .45rem; font: 750 1.05rem/1.4 Manrope, sans-serif; }
 .enquiry-contact a { display: table; padding: .5rem 0; font-weight: 700; color: #1e4578; text-underline-offset: .2em; }
-.enquiry-handoff { margin: 1.25rem 0 .75rem; padding: 1.15rem; background: #edf3fa; border: 1px solid #becddd; border-radius: 14px; }
-.enquiry-handoff p { margin: .35rem 0 .8rem; line-height: 1.5; }
-.enquiry-actions { display: flex; flex-wrap: wrap; gap: .6rem; }
-.enquiry-actions .button { min-height: 46px; }
-.enquiry-handoff .form-note:empty { display: none; }
-#brief-form .enquiry-handoff [hidden], #enquiry-handoff[hidden] { display: none; }
 #brief-form .brief-actions { gap: .7rem; flex-wrap: wrap; }
 #brief-form .brief-actions .button { font-size: .86rem; }
 .reference-item a { display: inline-flex; align-items: center; min-height: 44px; text-decoration: underline; text-underline-offset: .16em; }
 @media (max-width: 560px) {
   .enquiry-contact a { min-height: 44px; }
-  .enquiry-actions { flex-direction: column; }
-  .enquiry-actions .button { width: 100%; }
 }

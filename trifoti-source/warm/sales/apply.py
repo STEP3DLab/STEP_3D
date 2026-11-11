@@ -24,19 +24,20 @@ def apply(target):
     html = replace_section(html, '<div id="project-questions"', '</section>', (SOURCE / 'faq.html').read_text())
     if 'id="enquiry-handoff"' in html:
         html = replace_section(html, '<div class="enquiry-handoff"', '<div class="brief-actions">', '')
-    html = html.replace('<div class="brief-actions">', (SOURCE / 'handoff.html').read_text() + '<div class="brief-actions">', 1)
     html = html.replace('Подготовить бриф для скачивания, без отправки', 'Обсудить проект с менеджером')
     html = html.replace('href="#brief-form" class="button header-cta"', 'href="#contact" class="button header-cta"')
     html = html.replace('<span class="desktop-label">Подготовить бриф</span><span class="mobile-label">Бриф</span>', '<span class="desktop-label">Обсудить проект</span><span class="mobile-label">Связь</span>')
     html = html.replace('Соберите свой бриф', 'Бриф на проект').replace('Для начала достаточно имени и пары предложений об идее. Остальное — по желанию.', 'Для первого обсуждения достаточно имени и короткого описания задачи. Бюджет, срок и примеры можно добавить по желанию.')
-    html = html.replace('class="button button-dark" type="submit" id="brief-save"', 'class="button button-outline" type="submit" id="brief-save"')
-    html = html.replace('Бриф скачивается файлом, а не отправляется объединению.', 'Копию брифа можно сохранить для себя или коллег.')
-    html = html.replace('Скопируйте текст и передайте объединению удобным способом. Данные никуда не отправляются автоматически.', 'Вставьте текст в письмо или сообщение менеджеру.')
-    html = html.replace('Для скачивания брифа нужен JavaScript. Без него доступны описания направлений, публикации и полные страницы проектов.', 'Чтобы обсудить проект, воспользуйтесь прямой ссылкой на Telegram или почту менеджера выше.')
+    html = html.replace('class="button button-outline" type="submit" id="brief-save"', 'class="button button-dark" type="submit" id="brief-save"')
+    html = html.replace('Копию брифа можно сохранить для себя или коллег.', 'Бриф скачивается файлом, а не отправляется объединению.')
+    for previous in ['Скопируйте текст и передайте объединению удобным способом. Данные никуда не отправляются автоматически.', 'Вставьте текст в письмо или сообщение менеджеру.']:
+        html = html.replace(previous, 'Скопируйте текст в свои заметки. Данные остаются в вашем браузере.')
+    html = html.replace('Чтобы обсудить проект, воспользуйтесь прямой ссылкой на Telegram или почту менеджера выше.', 'Для скачивания брифа нужен JavaScript. Без него доступны описания направлений, публикации и полные страницы проектов.')
     html = html.replace('<option>Арт-объекты</option></select>', '<option>Арт-объекты</option><option>Макетирование</option></select>')
-    html = re.sub(r'(src="(?:\./)?app\.js\?v=)[^"]+', r'\g<1>20261111-print-intent&amp;copy-focus=20261111&amp;enquiry=' + VERSION, html)
+    html = re.sub(r'(src="(?:\./)?app\.js\?v=)[^"]+', r'\g<1>20261111-print-intent&amp;copy-focus=20261111&amp;enquiry=' + VERSION + '&amp;local-brief=20261111', html)
     if 'href="sales.css?' not in html:
         html = html.replace('</head>', f'<link rel="stylesheet" href="sales.css?v={VERSION}">\n</head>')
+    html = re.sub(r'(href="sales\.css\?v=)[^"]+', r'\g<1>20261111-local-brief', html)
     studio_title = 'ТРИФОТИ — дизайн интерьеров, скульптура и награды на заказ в Москве'
     html = re.sub(r'<title>[^<]*</title>', f'<title>{studio_title}</title>', html, count=1)
     html = re.sub(r'<meta property="og:title" content="[^"]*">', f'<meta property="og:title" content="{studio_title}">', html, count=1)
@@ -51,7 +52,9 @@ def apply(target):
         if public_page == portfolio and 'rel="canonical"' not in content:
             content = content.replace('</head>', '<link rel="canonical" href="https://step3dlab.github.io/STEP_3D/trifoti/warm/portfolio.html"></head>', 1)
         public_page.write_text(content)
-    for filename in ['sales.css', 'brief-handoff.js', 'brief-guidance.js']:
+    # Remove the retired transmission module from upgraded snapshots as well.
+    (target / 'brief-handoff.js').unlink(missing_ok=True)
+    for filename in ['sales.css', 'brief-guidance.js']:
         shutil.copyfile(SOURCE / filename, target / filename)
 
     app = target / 'app.js'
