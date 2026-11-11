@@ -468,7 +468,7 @@ form .brief-counter[data-near-limit="true"]{color:#a91c24;font-weight:700}
 .project-card:focus-visible{outline:3px solid var(--red-text);outline-offset:7px;border-radius:2px}
 .project-card:focus-visible .project-arrow{background:var(--red);color:white;border-color:var(--red)}
 .project-card:focus-visible h3,.project-card:hover h3{text-decoration:underline;text-underline-offset:5px}
-.project-tag{max-width:calc(100% - 150px)}
+.project-tag,.project-grid .project-tag{max-width:calc(100% - 150px)}
 .project-dialog-header{align-items:center;justify-content:space-between;gap:16px;flex-basis:auto;min-height:68px;border-bottom:1px solid var(--line);padding:10px 22px}
 .project-dialog-context{font-size:12px;line-height:1.5;min-width:0;max-width:75%;overflow-wrap:anywhere}
 .project-dialog-header .close-button{display:flex;align-items:center;justify-content:center;gap:12px;width:auto;min-width:110px;height:44px;padding:8px 13px;border-radius:24px}
@@ -518,13 +518,13 @@ form .brief-counter[data-near-limit="true"]{color:#a91c24;font-weight:700}
 :is(summary,input,textarea,select):focus-visible{outline:2px solid var(--red-text);outline-offset:4px}
 @media(pointer:coarse){.gallery-help-keyboard{display:none}.gallery-help-touch{display:inline}}
 @media(max-width:800px){
- .project-teaser{font-size:14px}.project-open-label{right:11px;top:11px;font-size:9px;padding:6px 8px}.project-tag{max-width:calc(100% - 135px)}
+ .project-teaser{font-size:14px}.project-open-label{right:11px;top:11px;font-size:9px;padding:6px 8px}.project-tag,.project-grid .project-tag{max-width:calc(100% - 135px)}
  .project-dialog-header{padding:10px 14px;gap:10px}.project-dialog-context{font-size:11px;max-width:65%}.project-dialog-header .close-button{min-width:100px;gap:8px}
  .hero-directions{gap:2px 14px;margin-top:12px}.hero-directions a{font-size:12px}
  .back-to-top{right:14px;bottom:max(14px,env(safe-area-inset-bottom));padding:8px 14px}
  .back-to-top span{display:none}.brief-intro{margin-bottom:20px}.case-navigation{gap:8px}.case-navigation button{padding:12px}
 }
-@media(max-width:360px){.portfolio-toolbar{flex-wrap:wrap}.portfolio-toolbar>.text-link{text-align:left}.project-open-label{top:auto;bottom:54px;right:11px}.project-tag{max-width:calc(100% - 22px)}.project-dialog-context{max-width:58%}}
+@media(max-width:360px){.portfolio-toolbar{flex-wrap:wrap}.portfolio-toolbar>.text-link{text-align:left}.project-open-label{top:auto;bottom:54px;right:11px}.project-tag,.project-grid .project-tag{max-width:calc(100% - 22px)}.project-dialog-context{max-width:58%}}
 @media(forced-colors:active){
  :is(summary,input,textarea,select,.project-card):focus-visible{outline:3px solid Highlight}
  .brief-progress-track,.brief-progress-track>span,.team-expertise li,.project-open-label,.thumb-number,.back-to-top{border:1px solid CanvasText}
