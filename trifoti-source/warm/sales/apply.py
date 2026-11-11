@@ -37,7 +37,20 @@ def apply(target):
     html = re.sub(r'(src="(?:\./)?app\.js\?v=)[^"]+', r'\g<1>20261111-print-intent&amp;copy-focus=20261111&amp;enquiry=' + VERSION, html)
     if 'href="sales.css?' not in html:
         html = html.replace('</head>', f'<link rel="stylesheet" href="sales.css?v={VERSION}">\n</head>')
+    studio_title = 'ТРИФОТИ — дизайн интерьеров, скульптура и награды на заказ в Москве'
+    html = re.sub(r'<title>[^<]*</title>', f'<title>{studio_title}</title>', html, count=1)
+    html = re.sub(r'<meta property="og:title" content="[^"]*">', f'<meta property="og:title" content="{studio_title}">', html, count=1)
     page.write_text(html)
+    # The independent public brochure is ready for search. Presentation tools retain their own settings.
+    portfolio = target / 'portfolio.html'
+    pages = [page, target / 'catalog.html', *sorted((target / 'cases').glob('*.html'))]
+    if portfolio.exists():
+        pages.append(portfolio)
+    for public_page in pages:
+        content = public_page.read_text().replace('<meta name="robots" content="noindex,nofollow">', '<meta name="robots" content="index,follow">')
+        if public_page == portfolio and 'rel="canonical"' not in content:
+            content = content.replace('</head>', '<link rel="canonical" href="https://step3dlab.github.io/STEP_3D/trifoti/warm/portfolio.html"></head>', 1)
+        public_page.write_text(content)
     for filename in ['sales.css', 'brief-handoff.js', 'brief-guidance.js']:
         shutil.copyfile(SOURCE / filename, target / filename)
 

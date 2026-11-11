@@ -34,3 +34,12 @@ test('Static contacts work independently of the enhanced form', () => {
   assert.doesNotMatch(page, /Отправка объединению пока недоступна|Публичные контакты пока не опубликованы/);
   assert.match(page, /id="enquiry-handoff" hidden/);
 });
+
+test('Public commercial pages are indexable and have their own canonical destinations', () => {
+  for (const path of ['index.html', 'portfolio.html', 'catalog.html', 'cases/red7-panels.html']) {
+    const html = readFileSync(new URL('../../trifoti/warm/' + path, import.meta.url), 'utf8');
+    assert.doesNotMatch(html, /<meta name="robots"[^>]*noindex/i);
+    const base = 'https://step3dlab.github.io/STEP_3D/trifoti/warm/';
+    assert.ok(html.includes('rel="canonical" href="' + base + (path === 'index.html' ? '' : path) + '"'));
+  }
+});
