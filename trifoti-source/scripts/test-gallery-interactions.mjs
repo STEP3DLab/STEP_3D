@@ -20,6 +20,27 @@ import vm from 'node:vm';
 import {readFileSync} from 'node:fs';
 import {projects} from '../dist/project-data.js';
 const app=readFileSync(new URL('../dist/app.js',import.meta.url),'utf8');
+test('Thumbnail keyboard focus can reveal wrapped rows in the inner gallery scroller',()=>{
+ const initializer=app.split('\n').find(line=>line.startsWith(' if(p.media.length>1)p.media.forEach('));
+ const buttons=[],events=[];
+ const document={createElement(tag){return{tag,handlers:{},setAttribute(){},append(){},addEventListener(type,handler){this.handlers[type]=handler},focus(options){events.push(['focus',buttons.indexOf(this),options])}}}};
+ vm.runInNewContext(initializer,{p:projects.mascot,document,thumbnailKey,thumbnailSource:()=>'',showSlide:index=>events.push(['slide',index]),$:()=>({children:buttons,append:button=>buttons.push(button)})});
+ for(const [key,from,to] of [['End',0,9],['ArrowLeft',9,8],['Home',8,0],['ArrowRight',9,0]]){
+  events.length=0;
+  buttons[from].handlers.keydown({key,preventDefault(){events.push(['prevent'])}});
+  assert.deepEqual(events,[['prevent'],['slide',to],['focus',to,undefined]],`${key} must allow native focus scrolling after the frame layout changes`);
+ }
+ for(const event of [{key:'Tab'},{key:'ArrowRight',ctrlKey:true},{key:'ArrowLeft',defaultPrevented:true}]){
+  events.length=0;buttons[0].handlers.keydown({...event,preventDefault(){throw new Error('unhandled key was consumed')}});assert.deepEqual(events,[]);
+ }
+});
+test('The thumbnail focus correction is served with a fresh entry URL and identical public mirrors',()=>{
+ const html=readFileSync(new URL('../dist/index.html',import.meta.url),'utf8');
+ assert.match(html,/<script type="module" src="app\.js\?[^\"]*&amp;thumbfocus=20261111-native-scroll/);
+ for(const mirror of ['../../trifoti/','../../docs/trifoti/'])for(const file of ['index.html','app.js']){
+  assert.equal(readFileSync(new URL(mirror+file,import.meta.url),'utf8'),readFileSync(new URL('../dist/'+file,import.meta.url),'utf8'));
+ }
+});
 test('Real slide renderer remembers photo/video, sets one thumbnail Tab stop, cancels old media and never autoplays',()=>{
  const memory=createFrameMemory(),nodes=new Map();let cleanups=0,paused=0;
  const thumbs=projects.mascot.media.map(()=>({classList:{toggle(){}},setAttribute(){}}));
