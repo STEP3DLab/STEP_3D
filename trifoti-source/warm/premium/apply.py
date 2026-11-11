@@ -93,6 +93,7 @@ def apply(target):
     runpy.run_path(str(source.parent / "interior/apply.py"))["apply"](target)
     runpy.run_path(str(source.parent / "case-enquiry/apply.py"))["apply"](target)
     runpy.run_path(str(source.parent / "sales/apply.py"))["apply"](target)
+    runpy.run_path(str(source.parent / "interior/atelier.py"))["apply"](target)
     # Wire the critical header before main content paints, without a network race.
     runpy.run_path(str(source.parent / "inline-navigation.py"))["apply"](target)
 
