@@ -37,3 +37,28 @@ test('All three complete fonts are smaller without adding faces or subsetting',(
  assert(!faces.some(face=>/\.ttf|format\('truetype'\)/.test(face)));
  assert.match(html,/style\.css\?v=[^\"]+/);
 });
+
+test('The single-column hero wraps when fallback fonts need more space',()=>{
+ const rules=[...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)]
+  .filter(match=>match[1].trim()==='.hero h1 span');
+ assert.equal(rules.length,2,'Keep the desktop intrinsic sizing rule and one narrow override');
+ assert.equal(rules[0][2],'display:block;white-space:nowrap');
+ const narrow=css.match(/@media\(max-width:800px\)\{\s*\.hero\{display:flex;flex-direction:column\}(?:\s*[^{}]+\{[^{}]*\})*\s*\}/)?.[0];
+ assert(narrow,'The override belongs to the existing single-column media block');
+ assert(narrow.includes('.hero h1 span{white-space:normal;overflow-wrap:break-word}'));
+ const declarations=Object.fromEntries(rules[1][2].split(';').filter(Boolean).map(item=>item.split(':')));
+ assert.equal(declarations['white-space'],'normal');
+ assert.equal(declarations['overflow-wrap'],'break-word');
+ for(const key of ['font-size','font-family','font-weight','width','height','max-height','overflow','text-overflow','line-clamp','transform'])assert.equal(declarations[key],undefined);
+});
+test('The full slogan and its three designed lines remain unchanged',()=>{
+ assert.match(html,/<h1 aria-label="Пределов в творчестве не существует!"><span>Пределов<\/span><span class="red">в творчестве<\/span><span>не существует!<\/span><\/h1>/);
+ assert.match(css,/\.hero h1\{font-family:Oswald,Manrope,sans-serif;font-size:clamp\(76px,7\.8vw,122px\);font-weight:600;/);
+});
+test('The fallback reflow reaches both public mirrors with a fresh CSS URL',()=>{
+ assert.match(html,/style\.css\?[^\"]*&amp;type=20261111-wrap/);
+ for(const prefix of ['../../trifoti/','../../docs/trifoti/']){
+  assert.equal(readFileSync(new URL(prefix+'style.css',import.meta.url),'utf8'),css);
+  assert.equal(readFileSync(new URL(prefix+'index.html',import.meta.url),'utf8'),html);
+ }
+});
