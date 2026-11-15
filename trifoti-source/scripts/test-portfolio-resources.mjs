@@ -319,3 +319,54 @@ test('Light invalid routes leave loaded media and focus intact',()=>{
  const f=lightFixture('#project/mascot/media/clay-turntable'),frame=f.frame('mascot');frame.children[4].emit('click');const video=frame.children[1].children[0];video.focus();
  f.window.location.hash='#unknown';f.emit('popstate');f.emit('hashchange');assert.equal(frame.children[1].children[0],video);assert.equal(f.document.activeElement,video);assert.equal(video.paused,undefined);
 });
+
+// A failed small poster must never turn a retry into an original-file request.
+for(const [key,id] of [['mascot','white-front'],['gesture','gesture-turntable'],['vmeste-prize','vmeste-prize']])test(`Light failed preview keeps an explicit original action: ${key}`,()=>{
+ const f=lightFixture('#project/'+key+'/media/'+id),frame=f.frame(key),host=frame.children[1],load=frame.children[4],item=projects[key].media.find(item=>item.src.includes('/'+id+'.'));
+ f.nodes['light-posters'].checked=true;f.nodes['light-posters'].emit('change');
+ const first=host.children[0];first.emit('error');
+ assert.equal(load.textContent,item.type==='video'?'Показать управление видео':'Загрузить оригинал фото');
+ const retry=frame.children[5];assert(retry);assert.equal(retry.hidden,false);assert.equal(retry.textContent,'Повторить загрузку превью');
+ retry.focus();retry.emit('click');const second=host.children[0];assert.notEqual(second,first);
+ assert.equal(second.tagName,'IMG');assert.equal(second.src,lightPreview(projects[key],item));assert.notEqual(second.src,item.src);
+ assert.equal(f.document.activeElement,retry);assert.equal(retry.hidden,false);assert.equal(retry.attrs['aria-disabled'],'true');
+ retry.emit('click');assert.equal(host.children[0],second,'Pending retry cannot create a duplicate request');
+ second.emit('error');assert.equal(retry.attrs['aria-disabled'],'false');assert.equal(retry.hidden,false);
+ retry.emit('click');const third=host.children[0];assert.notEqual(third,second);assert.equal(third.src,first.src);
+ third.emit('load');assert.equal(retry.hidden,true);assert.equal(f.document.activeElement,frame);assert.deepEqual(frame.focusOptions,{preventScroll:true});
+ assert.equal(load.textContent,item.type==='video'?'Показать управление видео':'Загрузить оригинал фото');
+ load.focus();load.emit('click');const original=host.children[0];assert.equal(original.src,item.src);assert.equal(original.tagName,item.type==='video'?'VIDEO':'IMG');
+ assert.equal(f.document.activeElement,load);if(item.type==='video'){assert.equal(original.preload,'none');assert.equal(original.autoplay,undefined)}
+ original.emit('error');assert.equal(load.textContent,'Повторить загрузку');assert.equal(retry.hidden,true);
+ load.emit('click');assert.equal(host.children[0].src,item.src);
+});
+for(const phase of ['failed','pending'])for(const action of ['next','popstate','posters-off','original'])test(`Light ${action} clears a ${phase} preview retry and ignores obsolete events`,()=>{
+ const f=lightFixture(),frame=f.frame('mascot'),host=frame.children[1],load=frame.children[4];
+ f.nodes['light-posters'].checked=true;f.nodes['light-posters'].emit('change');let old=host.children[0];old.emit('error');
+ const retry=frame.children[5];assert(retry);retry.focus();if(phase==='pending'){retry.emit('click');old=host.children[0]}
+ if(action==='next')frame.children[0].children[2].emit('click');
+ else if(action==='popstate'){f.window.location.hash='#project/mascot/media/white-side';f.emit('popstate')}
+ else if(action==='posters-off'){f.nodes['light-posters'].checked=false;f.nodes['light-posters'].emit('change')}
+ else load.emit('click');
+ assert(retry.hidden);assert.equal(f.document.activeElement,frame);
+ const current=host.children[0],message=frame.children[3].textContent,button=load.textContent;
+ old.emit('error');old.emit('load');retry.emit('click');
+ assert.equal(host.children[0],current);assert.equal(frame.children[3].textContent,message);assert.equal(load.textContent,button);assert(retry.hidden);
+});
+test('Light successful preview retry never takes focus from another gallery',()=>{
+ const f=lightFixture(),frame=f.frame('mascot'),host=frame.children[1];f.nodes['light-posters'].checked=true;f.nodes['light-posters'].emit('change');
+ host.children[0].emit('error');const retry=frame.children[5];assert(retry);retry.emit('click');
+ const elsewhere=f.frame('pink').children[4];elsewhere.focus();host.children[0].emit('load');
+ assert(retry.hidden);assert.equal(f.document.activeElement,elsewhere);
+});
+test('Light preview recovery refreshes its generated entry module URL',()=>{
+ assert.match(read('light.html'),/light-view\.js[^"<>]*preview=20261115-retry/);
+});
+
+test('Light duplicate history events preserve an in-flight preview retry and focus',()=>{
+ const f=lightFixture(),frame=f.frame('mascot'),host=frame.children[1];f.nodes['light-posters'].checked=true;f.nodes['light-posters'].emit('change');
+ host.children[0].emit('error');const retry=frame.children[5];retry.focus();retry.emit('click');const current=host.children[0];
+ f.emit('popstate');f.emit('hashchange');f.controller.sync(false);
+ assert.equal(host.children[0],current);assert.equal(f.document.activeElement,retry);assert.equal(retry.hidden,false);assert.equal(retry.attrs['aria-disabled'],'true');
+ current.emit('error');assert.equal(retry.attrs['aria-disabled'],'false');
+});
