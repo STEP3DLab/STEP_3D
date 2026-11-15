@@ -78,11 +78,6 @@ def apply(target):
         style = '../premium.css' if page.parent.name == 'cases' else 'premium.css'
         if 'premium.css?' not in text:
             text = text.replace('</head>', f'<link rel="stylesheet" href="{style}?v={VERSION}">\n</head>')
-        # Share the same verified emblem in the header and Telegram link preview.
-        text = text.replace('https://step3dlab.github.io/STEP_3D/trifoti/assets/brand/trifoti-logo-transparent.png', 'https://step3dlab.github.io/STEP_3D/trifoti/warm/brand/logo-original.jpg')
-        text = text.replace('property="og:image:type" content="image/png"', 'property="og:image:type" content="image/jpeg"')
-        text = text.replace('property="og:image:width" content="1254"', 'property="og:image:width" content="1536"').replace('property="og:image:height" content="1254"', 'property="og:image:height" content="1258"')
-        text = text.replace('Логотип ТРИФОТИ: красно-белый медведь в чёрном контуре дома', 'ТРИФОТИ — знак творческого объединения')
         text = re.sub(r'<link rel="icon"[^>]*>', '<link rel="icon" href="/STEP_3D/trifoti/warm/brand/favicon.svg" type="image/svg+xml">', text)
         page.write_text(text)
     nav = target / 'section-navigation.js'
@@ -94,6 +89,7 @@ def apply(target):
     runpy.run_path(str(source.parent / "case-enquiry/apply.py"))["apply"](target)
     runpy.run_path(str(source.parent / "sales/apply.py"))["apply"](target)
     runpy.run_path(str(source.parent / "interior/atelier.py"))["apply"](target)
+    runpy.run_path(str(source / "share_preview.py"))["apply"](target)
     # Wire the critical header before main content paints, without a network race.
     runpy.run_path(str(source.parent / "inline-navigation.py"))["apply"](target)
 

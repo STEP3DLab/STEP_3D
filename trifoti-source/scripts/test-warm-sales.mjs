@@ -26,7 +26,9 @@ for (const edition of ['trifoti/warm/', 'docs/trifoti/warm/']) {
     const page = read(edition + 'index.html');
     const contact = page.slice(page.indexOf('<div class="contact-intro">'), page.indexOf('<form id="brief-form"'));
     assert.match(contact, /href="https:\/\/t\.me\/step_3d_mngr"/);
-    assert.match(contact, /href="mailto:info@step3d.tech/);
+    assert.match(contact, /3ft@trifoti\.ru/);
+    assert.match(contact, /Почта пока не подключена/);
+    assert.doesNotMatch(contact, /mailto:|info@step3d\.tech/);
     for (const [, href] of contact.matchAll(/href="([^"]+)"/g)) {
       const url = new URL(href);
       assert.equal(url.searchParams.has('text'), false);
