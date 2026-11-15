@@ -18,7 +18,7 @@ def apply(target):
         head, body = page.read_text().split('</head>', 1)
         title = ('ТРИФОТИ — скульптура, интерьеры и арт-объекты' if home else
                  unescape(re.search(r'<title>(.*?)</title>', head).group(1)))
-        description = ('Портфолио творческого объединения. Объёмные панно RED7, театральные награды и скульптуры из мастерской Фёдора Паршина.' if home else
+        description = ('Портфолио творческого объединения. Объёмные панно RED7, театральные награды и скульптуры.' if home else
                        unescape(re.search(r'<meta name="description" content="([^"]*)"', head).group(1)))
         page_url = BASE_URL if home else BASE_URL + page.name
         image_url = BASE_URL + 'brand/' + COVER
