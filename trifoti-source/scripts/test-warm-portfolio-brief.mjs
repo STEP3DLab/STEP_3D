@@ -10,7 +10,7 @@ const script = readFileSync(new URL('portfolio-brief.js', root), 'utf8').replace
 
 const choices = ['Пока не знаю — давайте обсудим', 'Арт-объекты', 'Дизайн интерьеров', 'Макетирование', 'Награды', 'Парковая и монументальная скульптура', 'Промышленный дизайн'];
 
-function browser(route, initialReference = '', initialDirection = choices[0]) {
+function browser(route, initialReference = '', initialDirection = choices[0], fetchCatalogue = async () => ({ok:true, text:async () => html})) {
   const location = new URL('https://example.org/STEP_3D/trifoti/warm/?portfolio=' + encodeURIComponent(route) + '#brief-form');
   const field = {value:initialReference};
   const status = {textContent:''};
@@ -21,7 +21,7 @@ function browser(route, initialReference = '', initialDirection = choices[0]) {
   const form = {elements:{namedItem(name) {return {reference:field, direction}[name];}}};
   const context = vm.createContext({
     URL, location, history:{state:null, replaceState(_, __, url) {location.href = url;}},
-    fetch:async () => ({ok:true, text:async () => html}),
+    fetch:fetchCatalogue,
     options:{form, status, selectReference(value) {field.value = value;}}
   });
   return {field, direction, status, location, add:() => vm.runInContext(script + '\naddPortfolioReference(options)', context)};
@@ -125,4 +125,28 @@ test('portfolio reference UI opens the precise frame and removes only that frame
   rows[1].children.find(node => node.tag === 'button').handlers.click();
   assert.equal(withModel.field.value, draft.field.value);
   assert.equal(saves, 1);
+});
+
+for (const result of ['network failure', 'missing frame', 'valid frame']) {
+  test(`a stale ${result} does not overwrite the newer route status or draft`, async () => {
+    let resolve, reject;
+    const request = new Promise((yes, no) => {resolve = yes; reject = no;});
+    const draft = browser(result === 'missing frame' ? 'work-99' : 'work-09', 'Мой текст', choices[0], () => request);
+    const pending = draft.add();
+    draft.location.search = '?portfolio=work-24';
+    draft.status.textContent = 'Новый пример выбран';
+    if (result === 'network failure') reject(new Error('offline'));
+    else resolve({ok:true, text:async () => html});
+    await pending;
+    assert.equal(draft.status.textContent, 'Новый пример выбран');
+    assert.equal(draft.field.value, 'Мой текст');
+    assert.equal(draft.direction.value, choices[0]);
+    assert.equal(draft.location.search, '?portfolio=work-24');
+  });
+}
+test('an active network failure still explains how to retry', async () => {
+  const draft = browser('work-09', '', choices[0], async () => {throw new Error('offline');});
+  await draft.add();
+  assert.match(draft.status.textContent, /Обновите страницу/);
+  assert.match(draft.location.search, /portfolio/);
 });

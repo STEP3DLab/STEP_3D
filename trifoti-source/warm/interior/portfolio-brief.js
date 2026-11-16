@@ -16,6 +16,10 @@ export async function addPortfolioReference({form, selectReference, status}) {
   const frame = Number(match[2] || 1) - 1;
   const fragment = match[1] + (frame > 0 ? '/' + (frame + 1) : '');
   const canonical = 'https://step3dlab.github.io/STEP_3D/trifoti/warm/portfolio.html#' + fragment;
+  const isCurrentRoute = () => {
+    const current = new URL(location.href);
+    return current.hash === '#brief-form' && current.searchParams.get('portfolio') === route;
+  };
   const cleanUrl = () => {
     const current = new URL(location.href);
     if (current.searchParams.get('portfolio') !== route) return;
@@ -27,13 +31,12 @@ export async function addPortfolioReference({form, selectReference, status}) {
     if (!response.ok) throw new Error('catalogue unavailable');
     // Parse the inert JSON block without instantiating the gallery or loading photos.
     const html = await response.text();
+    if (!isCurrentRoute()) return;
     const block = /<script id="images" type="application\/json">([\s\S]*?)<\/script>/.exec(html);
     if (!block) throw new Error('missing catalogue');
     const entry = JSON.parse(block[1])[match[1]];
     const image = entry?.images[frame];
     if (!image) { status.textContent = 'Такого кадра в галерее нет.'; return; }
-    const current = new URL(location.href);
-    if (current.hash !== '#brief-form' || current.searchParams.get('portfolio') !== route) return;
     const field = form.elements.namedItem('reference');
     let updated = field.value;
     if (!field.value.split('\n').includes(canonical)) {
@@ -50,6 +53,7 @@ export async function addPortfolioReference({form, selectReference, status}) {
     status.textContent = 'В брифе выбран пример «' + entry.title + '».';
     cleanUrl();
   } catch {
+    if (!isCurrentRoute()) return;
     status.textContent = 'Пример не удалось загрузить. Обновите страницу, чтобы повторить.';
   }
 }

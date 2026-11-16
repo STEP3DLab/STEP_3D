@@ -175,7 +175,7 @@ import('./publication-filters.js?v=20261104-red7').then(({initializePublicationF
 });
 
 if (new URLSearchParams(location.search).has('portfolio')) {
-  import('./portfolio-brief.js?v=20261111-sales').then(({addPortfolioReference}) =>
+  import('./portfolio-brief.js?v=20261116-route-guard').then(({addPortfolioReference}) =>
     addPortfolioReference({form, selectReference, status:document.getElementById('brief-status')})
   ).catch(() => { document.getElementById('brief-status').textContent = 'Пример не удалось открыть. Обновите страницу, чтобы повторить.'; });
 }
