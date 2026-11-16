@@ -26,8 +26,11 @@ export async function addPortfolioReference({form, selectReference, status}) {
     current.searchParams.delete('portfolio');
     history.replaceState(history.state, '', current.href);
   };
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 15000);
+  status.textContent = 'Загружаем выбранный пример… Текст брифа не меняется.';
   try {
-    const response = await fetch(new URL('portfolio.html', url), {credentials:'same-origin'});
+    const response = await fetch(new URL('portfolio.html', url), {credentials:'same-origin', signal:controller.signal});
     if (!response.ok) throw new Error('catalogue unavailable');
     // Parse the inert JSON block without instantiating the gallery or loading photos.
     const html = await response.text();
@@ -54,6 +57,10 @@ export async function addPortfolioReference({form, selectReference, status}) {
     cleanUrl();
   } catch {
     if (!isCurrentRoute()) return;
-    status.textContent = 'Пример не удалось загрузить. Обновите страницу, чтобы повторить.';
+    status.textContent = controller.signal.aborted
+      ? 'Загрузка примера заняла слишком много времени. Ваш текст не изменён. Обновите страницу, чтобы повторить.'
+      : 'Пример не удалось загрузить. Обновите страницу, чтобы повторить.';
+  } finally {
+    clearTimeout(timeout);
   }
 }

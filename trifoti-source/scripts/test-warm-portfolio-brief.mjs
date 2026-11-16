@@ -10,7 +10,7 @@ const script = readFileSync(new URL('portfolio-brief.js', root), 'utf8').replace
 
 const choices = ['Пока не знаю — давайте обсудим', 'Арт-объекты', 'Дизайн интерьеров', 'Макетирование', 'Награды', 'Парковая и монументальная скульптура', 'Промышленный дизайн'];
 
-function browser(route, initialReference = '', initialDirection = choices[0], fetchCatalogue = async () => ({ok:true, text:async () => html})) {
+function browser(route, initialReference = '', initialDirection = choices[0], fetchCatalogue = async () => ({ok:true, text:async () => html}), clock = {setTimeout, clearTimeout}) {
   const location = new URL('https://example.org/STEP_3D/trifoti/warm/?portfolio=' + encodeURIComponent(route) + '#brief-form');
   const field = {value:initialReference};
   const status = {textContent:''};
@@ -20,7 +20,7 @@ function browser(route, initialReference = '', initialDirection = choices[0], fe
   };
   const form = {elements:{namedItem(name) {return {reference:field, direction}[name];}}};
   const context = vm.createContext({
-    URL, location, history:{state:null, replaceState(_, __, url) {location.href = url;}},
+    URL, AbortController, ...clock, location, history:{state:null, replaceState(_, __, url) {location.href = url;}},
     fetch:fetchCatalogue,
     options:{form, status, selectReference(value) {field.value = value;}}
   });
@@ -149,4 +149,35 @@ test('an active network failure still explains how to retry', async () => {
   await draft.add();
   assert.match(draft.status.textContent, /Обновите страницу/);
   assert.match(draft.location.search, /portfolio/);
+});
+
+test('loading a portfolio reference reports progress without changing the draft', async () => {
+  let resolve;
+  const pendingResponse = new Promise(yes => {resolve = yes;});
+  const draft = browser('work-09', 'Мой текст', choices[0], () => pendingResponse);
+  const pending = draft.add();
+  assert.match(draft.status.textContent, /Загружаем/);
+  assert.equal(draft.field.value, 'Мой текст');
+  resolve({ok:true, text:async () => html});
+  await pending;
+  assert.match(draft.status.textContent, /выбран пример/);
+});
+
+test('a stalled catalogue is aborted with a retry message and preserves the draft and route', async () => {
+  let expire, delay, cleared = false, signal;
+  const clock = {setTimeout(callback, milliseconds) {expire = callback; delay = milliseconds; return 42;}, clearTimeout(id) {assert.equal(id, 42); cleared = true;}};
+  const draft = browser('work-09', 'Мой текст', choices[0], (_, options) => {
+    signal = options.signal;
+    return new Promise((_, reject) => signal.addEventListener('abort', () => reject(new Error('aborted'))));
+  }, clock);
+  const pending = draft.add();
+  assert.equal(delay, 15000);
+  expire();
+  await pending;
+  assert.equal(signal.aborted, true);
+  assert.equal(cleared, true);
+  assert.match(draft.status.textContent, /слишком много времени/);
+  assert.equal(draft.field.value, 'Мой текст');
+  assert.equal(draft.direction.value, choices[0]);
+  assert.equal(draft.location.search, '?portfolio=work-09');
 });
