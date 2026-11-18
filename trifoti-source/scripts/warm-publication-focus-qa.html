@@ -1,0 +1,22 @@
+<!doctype html><html lang="ru"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Проверка фокуса каталога публикаций</title>
+<style>body{font:16px/1.5 system-ui;margin:20px}button,input,select{min-height:44px;max-width:100%}textarea{width:95%}a{overflow-wrap:anywhere}li{margin:12px 0}.pass{color:#176136}.fail{color:#a62020}[hidden]{display:none!important}</style>
+<h1>Каталог публикаций: браузерная регрессия</h1><button id="run">Проверить</button><p id="result" role="status">Готово к проверке</p><ol id="results"></ol><div id="fixture"></div>
+<script type="module">
+import {initializePublicationFilters} from '../../trifoti/warm/publication-filters.js';
+const source=await fetch('../../trifoti/warm/index.html').then(r=>r.text());
+const template=new DOMParser().parseFromString(source,'text/html').querySelector('#publication-catalog');
+const mount=document.querySelector('#fixture'), results=document.querySelector('#results'), status=document.querySelector('#result');
+const tick=()=>new Promise(resolve=>setTimeout(resolve,0));
+let failures=0;
+function assert(value,message){if(!value)throw Error(message)}
+function setup(){mount.replaceChildren(template.cloneNode(true));const root=mount.querySelector('#publication-catalog');root.open=true;return root}
+async function test(name,fn){const li=document.createElement('li');try{await fn();li.className='pass';li.textContent='PASS: '+name}catch(e){failures++;li.className='fail';li.textContent='FAIL: '+name+' · '+e.message}results.append(li)}
+document.querySelector('#run').onclick=async()=>{
+ results.replaceChildren();failures=0;
+ await test('Поздняя инициализация не сбрасывает фокус ссылки',async()=>{const root=setup(),link=root.querySelector('[data-publication-category] a');link.focus();await tick();initializePublicationFilters({document});await tick();assert(document.activeElement===link,'Фокус потерян')});
+ await test('Поздний отказ копирования не перехватывает новый фокус',async()=>{const root=setup();let reject;initializePublicationFilters({document,clipboard:{writeText:()=>new Promise((_,r)=>reject=r)}});const trigger=root.querySelector('[data-publication-copy]'),search=root.querySelector('#publication-search');trigger.focus();trigger.click();search.focus();reject(Error('Controlled denial'));await tick();assert(document.activeElement===search,'Фокус поиска потерян');assert(!root.querySelector('#publication-copy-label').hidden,'Нет ручного копирования')});
+ await test('Отказ на текущей кнопке выделяет текст для ручного копирования',async()=>{const root=setup();initializePublicationFilters({document,clipboard:{writeText:async()=>{throw Error('Controlled denial')}}});const trigger=root.querySelector('[data-publication-copy]');trigger.focus();trigger.click();await tick();const text=root.querySelector('#publication-copy-text');assert(document.activeElement===text,'Нет фокуса поля');assert(text.selectionEnd===text.value.length&&text.selectionStart===0,'Текст не выделен')});
+ await test('Сортировка и сброс сохраняют все источники',async()=>{const root=setup();initializePublicationFilters({document});const list=root.querySelector('#publication-list'),original=[...list.children];const sort=root.querySelector('#publication-sort');sort.value='newest';sort.dispatchEvent(new Event('change'));assert(list.children.length===original.length,'Источники потеряны');root.querySelector('#publication-reset').click();assert([...list.children].every((x,i)=>x===original[i]),'Исходный порядок не восстановлен')});
+ status.textContent=failures?`${failures} ошибок`:`PASS: ${results.children.length} браузерные проверки`;
+};
+</script></html>

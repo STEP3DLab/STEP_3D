@@ -57,7 +57,12 @@ export function initializePublicationFilters({document, clipboard = globalThis.n
     });
     if (list) {
       const ordered = sortPublications(entries.map((element, index) => ({element, date: records.get(element.dataset.publicationId)?.date, index})), order);
-      ordered.forEach(item => list.append(item.element));
+      // Re-inserting an unchanged entry drops focus from its source link if this
+      // optional enhancement finishes after the visitor has started reading.
+      const current = [...list.children];
+      if (current.length !== ordered.length || ordered.some((item, index) => item.element !== current[index])) {
+        ordered.forEach(item => list.append(item.element));
+      }
     }
     const message = `Показано: ${visible} из ${entries.length}.`;
     if (status.textContent !== message) status.textContent = message;
@@ -107,8 +112,11 @@ export function initializePublicationFilters({document, clipboard = globalThis.n
       if (generation !== copyGeneration) return;
       copyStatus.textContent = 'Автоматическое копирование недоступно. Выделите и скопируйте текст ниже вручную.';
       copyLabel.hidden = false;
-      copyText.focus();
-      copyText.select();
+      // A delayed denial must not override the visitor's next keyboard action.
+      if (document.activeElement === trigger) {
+        copyText.focus();
+        copyText.select();
+      }
     }
   });
   apply('all');
