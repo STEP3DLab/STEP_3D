@@ -1,0 +1,12 @@
+/* A clear, local-only next step from inspiration to a project brief. */
+.gallery-guide{margin-top:24px;padding:12px 18px;background:#eaf0f6;border-left:3px solid #1e4578;max-width:760px}
+.gallery-guide-label{display:block;color:#1e4578;font-weight:700;font-size:15px}
+.intro .gallery-guide p{margin:0;font-size:14px;line-height:1.6;color:#263b52}
+.gallery-guide-note{display:block;font-size:12px;line-height:1.5;color:#52606d}
+.viewer-next-step{display:flex;align-items:center;gap:20px;padding:12px 16px;border-top:1px solid #ffffff30;flex-shrink:0}
+.viewer-next-step>a{display:flex;align-items:center;justify-content:space-between;gap:22px;min-height:48px;padding:12px 18px;background:#f7f6f1;color:#1e4578;border-radius:2px;font-size:14px;font-weight:700;text-decoration:none;white-space:nowrap}
+.viewer-next-step>a:hover{text-decoration:underline;background:#e2ecff}
+.viewer-next-step p{font-size:12px;line-height:1.6;color:#d7e1ed}
+dialog .viewport{height:min(57dvh,650px)}
+@media(max-width:540px){.gallery-guide{padding:12px 14px;margin-top:16px}.viewer-next-step{padding:12px;gap:8px;align-items:stretch;flex-direction:column}.viewer-next-step>a{min-height:44px;padding:10px 14px}.viewer-next-step p{font-size:11px}dialog .viewport{height:43dvh}}
+@media(max-height:580px){dialog .viewport{height:36dvh}dialog[open]{overflow:auto}}
