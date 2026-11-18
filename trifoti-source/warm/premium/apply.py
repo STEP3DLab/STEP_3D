@@ -93,6 +93,9 @@ def apply(target):
     # Wire the critical header before main content paints, without a network race.
     runpy.run_path(str(source.parent / "inline-navigation.py"))["apply"](target)
 
+    # Standalone concept pages own their styles and retain original concept images.
+    runpy.run_path(str(source.parent / "concepts/apply.py"))["apply"](target)
+
 if __name__ == '__main__':
     root = Path(__file__).resolve().parents[3]
     apply(root / 'trifoti/warm')
