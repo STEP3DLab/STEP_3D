@@ -26,6 +26,9 @@ export function initializePortfolioFilters({document,window}){
  function select(key,persist=true){
   const selected=buttons.find(button=>button.dataset.filter===key);
   if(!selected)return false;
+  // Capture focus before hiding a card: the browser can blur it immediately.
+  const focused=document.activeElement;
+  const hidesFocus=focused&&cards.some(card=>!matches(card,key)&&(card.closest?.('.project-item')||card).contains?.(focused));
   for(const button of buttons){
    const active=button===selected;
    button.classList.toggle('active',active);
@@ -42,6 +45,8 @@ export function initializePortfolioFilters({document,window}){
   if(persist&&window){
    try{const url=new URL(window.location.href);if(key==='all')url.searchParams.delete('filter');else url.searchParams.set('filter',key);window.history.replaceState(window.history.state,'',url.href)}catch{}
   }
+  // Warm filter buttons are already visible; do not move unrelated focus.
+  if(hidesFocus)selected.focus({preventScroll:true});
   return true;
  }
  for(const [index,button] of buttons.entries()){
