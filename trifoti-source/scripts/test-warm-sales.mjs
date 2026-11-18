@@ -30,7 +30,7 @@ for (const edition of ['trifoti/warm/', 'docs/trifoti/warm/']) {
     assert.match(contact, /Почта пока не подключена/);
     assert.doesNotMatch(contact, /mailto:|info@step3d\.tech/);
     for (const [, href] of contact.matchAll(/href="([^"]+)"/g)) {
-      const url = new URL(href);
+      const url = new URL(href, 'https://step3dlab.github.io/STEP_3D/trifoti/warm/');
       assert.equal(url.searchParams.has('text'), false);
       assert.equal(url.searchParams.has('body'), false);
     }
