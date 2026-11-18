@@ -205,11 +205,12 @@ function keyboardAndCopy({clipboardFails = true} = {}) {
     select() {this.selected = true;}
   };
   const location = {href: 'https://example.test/trifoti/warm/portfolio.html#work-02'};
-  const viewer = {open: true, addEventListener(type, handler) {handlers[type] = handler;}};
+  const controls = [];
+  const viewer = {open: true, querySelectorAll() {return controls;}, addEventListener(type, handler) {handlers[type] = handler;}};
   const copyStatus = {textContent: ''};
   const steps = [];
   const copied = [];
-  const context = {viewer, addressField, copyStatus, location,
+  const context = {viewer, document:doc, controls, addressField, copyStatus, location,
     copyButton: {addEventListener(type, handler) {handlers.copy = handler;}},
     navigator: {clipboard: {async writeText(value) {
       if (clipboardFails) throw new Error('Clipboard unavailable');
@@ -386,4 +387,25 @@ test('opening another frame and choosing an album cancel stale history focus', (
   assert.match(script, /function openWork\(link, frame = 0\) \{\s*pendingHistoryFocus = null;/);
   assert.match(script, /menu\.addEventListener\('click',[\s\S]*?event\.preventDefault\(\);\s*pendingHistoryFocus = null;/);
   assert.match(script, /document\.addEventListener\('click', event => \{\s*pendingHistoryFocus = null;/);
+});
+
+
+test('Tab wraps at both visible dialog boundaries, skipping hidden and disabled controls', () => {
+  const s = keyboardAndCopy();
+  const control = (name, visible = true, disabled = false) => ({name, tabIndex:0, disabled, getClientRects:() => visible ? [{}] : [], focus() {s.doc.activeElement = this;}});
+  const first = control('close'), hidden = control('retry', false), middle = control('next'), last = control('brief'), disabled = control('disabled', true, true);
+  s.controls.push(first, hidden, middle, last, disabled);
+  s.doc.activeElement = first;
+  assert.equal(s.key('Tab', {shiftKey:true}).defaultPrevented, true);
+  assert.equal(s.doc.activeElement, last);
+  assert.equal(s.key('Tab').defaultPrevented, true);
+  assert.equal(s.doc.activeElement, first);
+  s.doc.activeElement = middle;
+  assert.equal(s.key('Tab').defaultPrevented, false);
+  assert.equal(s.doc.activeElement, middle);
+  for (const modifier of ['ctrlKey','metaKey','altKey','isComposing']) {
+    s.doc.activeElement = last;
+    assert.equal(s.key('Tab', {[modifier]:true}).defaultPrevented, false);
+    assert.equal(s.doc.activeElement, last);
+  }
 });
