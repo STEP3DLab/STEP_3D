@@ -90,6 +90,9 @@ def apply(target):
     runpy.run_path(str(source.parent / "sales/apply.py"))["apply"](target)
     runpy.run_path(str(source.parent / "interior/atelier.py"))["apply"](target)
     runpy.run_path(str(source / "share_preview.py"))["apply"](target)
+    runpy.run_path(str(source.parent / "customer-preservation/apply.py"))["apply"](target)
+    # Restore independent warm runtime sources after legacy template rewrites.
+    runpy.run_path(str(source.parent / "runtime/apply.py"))["apply"](target)
     # Wire the critical header before main content paints, without a network race.
     runpy.run_path(str(source.parent / "inline-navigation.py"))["apply"](target)
 

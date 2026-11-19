@@ -19,7 +19,9 @@ def apply(target):
  s=s.replace('<div class="project-grid">','<div class="project-grid">'+card)
  s=s.replace('Все проекты и подробные кейсы · 9','Все проекты и подробные кейсы · 10').replace('Все <span class="filter-count">9</span>','Все <span class="filter-count">10</span>').replace('9 проектов','10 проектов')
  marker='</div></div>\n'
- i=s.index('<div class="catalog-filters-row">');end=s.index('</div></div>',i)
+ row=re.search(r'<div\b[^>]*class="catalog-filters-row"[^>]*>',s)
+ if not row: raise ValueError('Portfolio filter row is missing')
+ i=row.start();end=s.index('</div></div>',i)
  s=s[:end]+'<button data-filter="artobjects" data-direction="Арт-объекты" aria-pressed="false">Арт-объекты <span class="filter-count">1</span></button>'+s[end:]
  p.write_text(s)
  # Reuse established resource renderer with this edition's project data.
@@ -27,6 +29,11 @@ def apply(target):
  gen=gen.replace("'../dist/project-data.js'","'../../trifoti/warm/project-data.js'").replace("'../dist/exploration-data.js'","'../../trifoti/warm/exploration-data.js'")
  gen=gen.replace("https://step3dlab.github.io/STEP_3D/trifoti/","https://step3dlab.github.io/STEP_3D/trifoti/warm/")
  gen=gen.replace("const d=dimensions[src];","const d=dimensions[src]||(src.includes('/photos/red7/')?{width:src.includes('workshop')||src.includes('finishing')?1536:1152,height:src.includes('workshop')||src.includes('finishing')?1152:1536}:null);")
+ # The warm meeting runtime has no loading/selection wrapper contract.
+ gen=gen.replace('href="#meeting-stage" hidden','href="#meeting-stage"')
+ gen=re.sub(r'<div id="meeting-loading">.*?</nav></div><div id="meeting-selection" hidden>', '', gen, flags=re.S)
+ fallback="""<noscript><p>Для ручного переключения нужен JavaScript. Статические страницы работают и без него:</p><ul>${keys.map(key=>`<li><a href="${casePath(key)}">${e(projects[key].title)}</a></li>`).join('')}</ul></noscript>"""
+ gen=gen.replace('<a href="index.html#explore/">Выбрать работы</a></div>', '<a href="index.html#explore/">Выбрать работы</a>'+fallback)
  temp=root/'trifoti-source/scripts/.warm-render.tmp.mjs';temp.write_text(gen)
  try:
   code="import {renderCase,renderCatalog,renderLight,renderMeeting} from './trifoti-source/scripts/.warm-render.tmp.mjs'; console.log(JSON.stringify({'cases/red7-panels.html':renderCase('red7-panels'),'catalog.html':renderCatalog(),'light.html':renderLight(),'meeting.html':renderMeeting()}));"

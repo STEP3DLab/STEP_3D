@@ -70,6 +70,8 @@ runpy.run_path(str(root/'trifoti-source/warm/red7/apply.py'))['apply'](target)
 # Keep the independent studio palette after all generated styles and direction updates.
 shutil.copyfile(root/'trifoti-source/warm/studio-palette.css', target/'studio-palette.css')
 for page in target.rglob('*.html'):
+    if page.name == 'portfolio.html':
+        continue  # Standalone gallery owns its styles; do not append palette on every build.
     palette = '../studio-palette.css' if page.parent.name == 'cases' else 'studio-palette.css'
     content = page.read_text()
     content = re.sub(r'<meta name="theme-color" content="[^"]*">', '<meta name="theme-color" content="#142039">', content)
@@ -77,7 +79,9 @@ for page in target.rglob('*.html'):
     page.write_text(content)
 # Apply the editorial layer last, preserving the warm snapshot when called independently.
 runpy.run_path(str(root/'trifoti-source/warm/premium/apply.py'))['apply'](target)
+runpy.run_path(str(root/'trifoti-source/warm/case-media-index/apply.py'))['apply'](target)
 # Publish identical files for either GitHub Pages source layout.
 mirror=root/'docs/trifoti/warm'
+(mirror/'gallery-return-focus.js').unlink(missing_ok=True)
 shutil.copytree(target,mirror,dirs_exist_ok=True)
 print('Built warm edition and docs mirror')

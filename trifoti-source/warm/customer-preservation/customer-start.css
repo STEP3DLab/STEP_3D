@@ -1,0 +1,21 @@
+/* Two honest ways to begin: direct conversation or a local, unsent brief. */
+#contact .contact-intro .customer-start{margin-top:28px;padding:28px;background:#203f68;color:#fff;border:0;border-radius:3px}
+#contact .contact-intro .customer-start .eyebrow{display:block;color:#dce7f5;font-size:10px;letter-spacing:.1em;line-height:1.6}
+#contact .contact-intro .customer-start h3{font-size:28px;line-height:1.2;margin:12px 0 16px;color:#fff}
+#contact .contact-intro .customer-start p{color:#edf2f8;font-size:14px;line-height:1.65;margin:0;max-width:none}
+.customer-start-checklist{list-style:none;padding:0;margin:24px 0;display:grid;gap:16px}
+.customer-start-checklist li{display:grid;gap:4px;padding-top:14px;border-top:1px solid #6b83a2;font-size:14px;line-height:1.5}
+.customer-start-checklist strong{color:#fff}.customer-start-checklist span{color:#edf2f8}
+#contact .contact-intro .customer-start>a{display:flex;justify-content:space-between;gap:16px;align-items:center;background:#fff;color:#203f68;min-height:48px;padding:12px 16px;font-weight:600;text-decoration:none;line-height:1.4}
+#contact .contact-intro .customer-start .customer-start-note{font-size:12px;margin-top:12px}
+.customer-brief-link{display:flex;justify-content:space-between;align-items:center;min-height:48px;padding:12px 0;gap:16px;text-decoration:underline;text-underline-offset:4px;font-size:14px}
+#contact .contact-intro>.studio-email{margin-top:18px;font-size:13px;line-height:1.6}
+#brief-form .brief-local-explainer{padding:14px 16px;border-left:3px solid #203f68;background:#eff3f8;color:#203f68;font-size:13px;line-height:1.6;margin-top:18px}
+.brief-next-step{padding:20px;margin:20px 0;background:#eff3f8;border:1px solid #bdc9d8}
+.brief-next-step h4{margin:0 0 10px;font-size:18px;line-height:1.35;color:#203f68}
+.brief-next-step p{font-size:13px;line-height:1.6;margin:0;color:#34445a}
+.brief-next-step a{display:flex;align-items:center;gap:10px;min-height:44px;margin-top:12px;color:#203f68;text-decoration:underline;text-underline-offset:4px;font-size:14px;font-weight:600}
+.customer-start a:focus-visible,.customer-brief-link:focus-visible,.brief-next-step a:focus-visible{outline:3px solid #b26d16;outline-offset:4px}
+@media(max-width:600px){#contact .contact-intro .customer-start{padding:22px}#contact .contact-intro .customer-start h3{font-size:25px}.brief-next-step{padding:16px}.customer-start-checklist{gap:12px}}
+
+#customer-start-title{scroll-margin-top:120px}
