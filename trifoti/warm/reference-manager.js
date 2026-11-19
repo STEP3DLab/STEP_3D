@@ -1,3 +1,4 @@
+import {concepts,conceptBlock,conceptURL} from './concept-data.js?v=20261119-context';
 import {projects} from './project-data.js?v=20261104-red7';
 import {caseKeys, exactLink, PUBLIC_SITE} from './exploration-data.js?v=20261104-red7';
 
@@ -5,6 +6,8 @@ export const referenceBlock = key => [projects[key].title, projects[key].attribu
 const portfolioPrefix = PUBLIC_SITE + 'portfolio.html#';
 
 function readPart(text) {
+  const conceptKey=Object.keys(concepts).find(key=>text===conceptBlock(key));
+  if(conceptKey)return {text,key:conceptURL(conceptKey),title:concepts[conceptKey].title,caption:concepts[conceptKey].caption};
   const caseKey = caseKeys.find(key => text === referenceBlock(key));
   if (caseKey) return {text, key:caseKey};
 

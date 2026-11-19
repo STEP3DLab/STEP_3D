@@ -1,5 +1,5 @@
 import {projects} from './project-data.js?v=20261104-red7';
-import {appendSelectionReference} from './reference-manager.js?v=20261111-sales';
+import {appendSelectionReference} from './reference-manager.js?v=20261119-context';
 
 // These three cases show standalone sculptural objects rather than park installations.
 const objectCases = new Set(['mascot', 'pink', 'gesture']);

@@ -14,7 +14,7 @@ export const preparationDirections=Object.freeze([
 const commonMaterials=['Короткое описание задумки','Примеры того, что нравится','Известные размеры или ограничения'];
 export function preparationMaterials(direction){return preparationDirections.find(item=>item.name===direction)?.materials||commonMaterials}
 export const ideaQuestions=Object.freeze(['Понятно ли, для кого и зачем нужен объект?','Указано ли, где и как им будут пользоваться?','Есть ли ориентир по размеру или важные ограничения?','Понятно ли, что нравится в выбранных примерах?']);
-export {appendSelectionReference} from './reference-manager.js?v=20261111-sales';
+export {appendSelectionReference} from './reference-manager.js?v=20261119-context';
 export function mountBriefPreparation({form,document,window}){
  const el=(tag,text)=>{const node=document.createElement(tag);if(text)node.textContent=text;return node};
  const details=el('details');details.className='brief-preparation';details.id='brief-preparation';

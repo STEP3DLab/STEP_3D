@@ -1,6 +1,6 @@
 import {fillCaseDirection} from './case-enquiry.js?v=20261111-brief-links';
 import {initializePortfolioDisclosure,visiblePortfolioTarget} from './portfolio-disclosure.js?v=20261104-red7';
-import {appendSelectionReference,mountReferenceManager} from './reference-manager.js?v=20261111-sales';
+import {appendSelectionReference,mountReferenceManager} from './reference-manager.js?v=20261119-context';
 import {mountPhotoDetail} from './gallery-photo-detail.js?v=20261104-red7';
 import {modeLinks} from './view-context.js?v=20261104-red7';
 import {optionalModule,optionalFallback} from './optional-module.js?v=20261104-red7';
@@ -187,4 +187,8 @@ if (new URLSearchParams(location.search).has('case')) {
   }).catch(() => {
     document.getElementById('brief-status').textContent = 'Не удалось добавить проект. Обновите страницу, чтобы повторить.';
   });
+}
+
+if(new URLSearchParams(location.search).has('concept')) {
+ import('./concept-brief.js?v=20261119-context').then(({addConceptReference})=>addConceptReference({form,selectReference,status:document.getElementById('brief-status')})).catch(()=>{document.getElementById('brief-status').textContent='Не удалось добавить концепт. Обновите страницу, чтобы повторить.';});
 }

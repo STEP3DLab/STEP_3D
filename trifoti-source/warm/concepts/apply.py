@@ -13,10 +13,31 @@ def apply(target):
 <body><header><a class="brand" href="../index.html">ТРИФОТИ<span>Дизайн-студия</span></a><a class="back" href="../index.html#service-{direction}">← {label}</a></header>
 <main><div class="intro"><span class="eyebrow">Исследование формы · концепт</span><h1>{title}</h1><p class="subtitle">{subtitle}</p></div>
 <div class="layout"><figure><a href="{key}.webp" aria-label="Открыть оригинальное изображение: {title.replace('«','').replace('»','')}"><img src="{key}.webp" alt="{title}" width="{width}" height="{height}"></a><figcaption>{subtitle} · изображение <a href="{key}.webp">Открыть оригинал →</a></figcaption></figure>
-<aside><h2>Замысел, не готовое изделие</h2><p>Предоставленное изображение показывает замысел. Оно не подтверждает изготовление или заказ со стороны указанной на медали команды. Интерактивной 3D-модели этого концепта пока нет.</p><div class="next"><h2>Обсудим вашу задачу</h2><p>На главной можно подготовить описание заказа и выбрать удобный способ связи со студией.</p><a class="button" href="../index.html#contact">Перейти к обсуждению <span aria-hidden="true">→</span></a><a class="return" href="../index.html#service-{direction}">Вернуться к направлению →</a></div></aside></div></main><footer>ТРИФОТИ · Концепты и исследования формы</footer></body></html>'''
+<aside><h2>Замысел, не готовое изделие</h2><p>Предоставленное изображение показывает замысел. Оно не подтверждает изготовление или заказ со стороны указанной на медали команды. Интерактивной 3D-модели этого концепта пока нет.</p><div class="next"><h2>Обсудим вашу задачу</h2><p>Добавьте это изображение как отправную точку в локальный бриф. Ваш текст и выбранное направление сохранятся. Ничего не отправляется.</p><a class="button" href="../index.html?concept={key}#brief-form">Добавить концепт в бриф <span aria-hidden="true">→</span></a><a class="return" href="../index.html#service-{direction}">Вернуться к направлению →</a></div></aside></div></main><footer>ТРИФОТИ · Концепты и исследования формы</footer></body></html>'''
         if key=='atlas': text=text.replace(' или заказ со стороны указанной на медали команды','')
         (dest/f'{key}.html').write_text(text)
     p=target/'index.html'
     h=p.read_text()
     for key in ['wolves','atlas']: h=h.replace(f'href="concepts/{key}.webp"',f'href="concepts/{key}.html"')
     p.write_text(h)
+
+    source=Path(__file__).parent
+    for name in ['concept-data.js','concept-brief.js']: shutil.copyfile(source/name,target/name)
+    manager=target/'reference-manager.js'
+    text=manager.read_text()
+    imp="import {concepts,conceptBlock,conceptURL} from './concept-data.js?v=20261119-context';\n"
+    if imp not in text: text=imp+text
+    marker='function readPart(text) {'
+    hook="\n  const conceptKey=Object.keys(concepts).find(key=>text===conceptBlock(key));\n  if(conceptKey)return {text,key:conceptURL(conceptKey),title:concepts[conceptKey].title,caption:concepts[conceptKey].caption};"
+    if 'const conceptKey=' not in text:text=text.replace(marker,marker+hook)
+    manager.write_text(text)
+    app=target/'app.js';text=app.read_text()
+    if "has('concept')" not in text:
+        text+="\nif(new URLSearchParams(location.search).has('concept')) {\n import('./concept-brief.js?v=20261119-context').then(({addConceptReference})=>addConceptReference({form,selectReference,status:document.getElementById('brief-status')})).catch(()=>{document.getElementById('brief-status').textContent='Не удалось добавить концепт. Обновите страницу, чтобы повторить.';});\n}\n"
+    app.write_text(text)
+
+    # Invalidate all consumers of the extended reference parser together.
+    import re
+    for name in ['app.js','brief-preparation.js','case-enquiry.js']:
+        file=target/name
+        if file.exists():file.write_text(re.sub(r"(reference-manager\.js\?v=)[^'\"]+",r"\g<1>20261119-context",file.read_text()))
