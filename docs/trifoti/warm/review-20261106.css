@@ -185,7 +185,7 @@ body .team-grid .team-card[aria-labelledby="team-fedor"] .team-portrait img { ma
 }
 
 /* Keep the complete silhouette on covers of three-dimensional objects. */
-.albums-grid a:is([href$="#awards"],[href$="#art"],[href$="#models"]) img {
+.albums-grid a:is([href$="#awards"],[href$="#art"],[href$="#models"],[href$="#sculpture"]) img {
   object-fit:contain;
   object-position:center;
   background:#edece9;
