@@ -245,21 +245,39 @@ function applyFilter() {
   if (viewer.open) { closingForNavigation = true; viewer.close(); }
 }
 
+// Preserve the album's reading position before changing a filter or jumping to its menu.
+function saveAlbumPosition() {
+  const visible = albums.filter(section => !section.hidden);
+  history.replaceState({...history.state, trifotiAlbumReturn:{
+    y:window.scrollY, category:visible.length === 1 ? visible[0].id : 'all'
+  }}, '', location.href);
+}
 menu.addEventListener('click', event => {
   const link = event.target.closest('a');
   if (!link || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
   event.preventDefault();
   pendingHistoryFocus = null;
+  saveAlbumPosition();
   if (location.hash !== link.hash) history.pushState(null, '', link.hash);
   applyFilter();
 });
 
 document.addEventListener('click', event => {
   pendingHistoryFocus = null;
+  const jump = event.target.closest('a[href="#album-menu"],a[href="#top"]');
+  if (jump && !event.ctrlKey && !event.metaKey && !event.shiftKey && !event.altKey) {
+    event.preventDefault();
+    saveAlbumPosition();
+    const category = history.state.trifotiAlbumReturn.category;
+    if (location.hash !== jump.hash) history.pushState({trifotiAlbumCategory:category}, '', jump.hash);
+    document.querySelector(jump.hash)?.scrollIntoView();
+    return;
+  }
   const link = event.target.closest('[data-work]');
   if (!link || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey || typeof viewer.showModal !== 'function') return;
   event.preventDefault();
   opener = link;
+  saveAlbumPosition();
   history.pushState({...history.state, trifotiAlbumFrame:true, trifotiAlbumOpener:link.dataset.work}, '', frameHash(link.dataset.work, 0));
   openWork(link);
 });
@@ -334,7 +352,18 @@ import('./gallery-interactions.js?v=20261104-red7').then(({mountPhotoSwipe}) => 
   });
 }).catch(() => { /* Buttons and keyboard navigation remain available. */ });
 function syncLocation() {
+  const saved = history.state?.trifotiAlbumReturn;
+  const category = saved?.category || history.state?.trifotiAlbumCategory;
+  if ((location.hash === '#album-menu' || location.hash === '#top') && category) {
+    filterAlbums(albums.find(section => section.id === category));
+  }
   applyFilter();
+  if (!viewer.open && saved && Number.isFinite(saved.y)) {
+    const destination = location.href;
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      if (!viewer.open && location.href === destination) window.scrollTo({top:saved.y,behavior:'instant'});
+    }));
+  }
   // History traversal can reset focus after the dialog's close event.
   const target = pendingHistoryFocus;
   pendingHistoryFocus = null;

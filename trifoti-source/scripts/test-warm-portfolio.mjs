@@ -353,6 +353,7 @@ test('a hidden card never receives focus and a reopened viewer ignores a queued 
 
 function syncHistory(s, {open = false, focused = 'body', hideCard = false} = {}) {
   const c = s.context;
+  c.location = {hash:'#sculpture',href:'https://example.test/#sculpture'};
   c.viewer.open = open;
   c.document.activeElement = focused === 'body' ? c.document.body : focused === 'opener' ? c.opener : {};
   c.applyFilter = () => {if (hideCard) c.opener.closest = () => ({hidden:true});};
@@ -408,4 +409,31 @@ test('Tab wraps at both visible dialog boundaries, skipping hidden and disabled 
     assert.equal(s.key('Tab', {[modifier]:true}).defaultPrevented, false);
     assert.equal(s.doc.activeElement, last);
   }
+});
+
+
+test('album history restores saved scroll only after filtering and on the same destination', () => {
+  const sync = script.slice(script.indexOf('function syncLocation()'), script.indexOf("window.addEventListener('hashchange'"));
+  const tasks=[], scrolls=[], filters=[];
+  const context={history:{state:{trifotiAlbumReturn:{y:1849.6,category:'sculpture'}}},
+    location:{hash:'#album-menu',href:'https://example.test/#album-menu'},
+    albums:[{id:'sculpture'}], filterAlbums:a=>filters.push(a.id), applyFilter(){},
+    viewer:{open:false},pendingHistoryFocus:null,document:{body:{}},
+    requestAnimationFrame:fn=>tasks.push(fn),window:{scrollTo:options=>scrolls.push(options.top)}};
+  vm.runInNewContext(sync+';syncLocation();',context);
+  assert.deepEqual(filters,['sculpture']);
+  while(tasks.length) tasks.shift()();
+  assert.deepEqual(scrolls,[1849.6]);
+  vm.runInNewContext('syncLocation();',context);
+  context.location.href='https://example.test/#awards';
+  while(tasks.length) tasks.shift()();
+  assert.deepEqual(scrolls,[1849.6], 'stale return cannot override a newer navigation');
+});
+test('saving album position preserves unrelated history state', () => {
+  const save=script.slice(script.indexOf('function saveAlbumPosition()'),script.indexOf("menu.addEventListener('click'"));
+  const context={albums:[{id:'sculpture',hidden:false},{id:'awards',hidden:true}],window:{scrollY:1849.6},location:{href:'https://example.test/#sculpture'},history:{state:{other:1},replaceState(s){this.state=s;}}};
+  vm.runInNewContext(save+';saveAlbumPosition();',context);
+  assert.equal(context.history.state.other,1);
+  assert.equal(context.history.state.trifotiAlbumReturn.y,1849.6);
+  assert.equal(context.history.state.trifotiAlbumReturn.category,'sculpture');
 });
