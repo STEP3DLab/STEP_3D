@@ -210,3 +210,10 @@ h1, h2, h3, h4, button, input, textarea, select { font-family: inherit; }
 @media(prefers-reduced-motion:reduce) { .selected-image img, .selected-arrow { transition: none; } .selected-card:hover img { transform: none; } }
 @media(forced-colors:active) { .process, .contact, .selected-category, .selected-arrow { background: Canvas; color: CanvasText; } .selected-image { border: 1px solid CanvasText; } }
 @media print { .hero { display: block; padding: 20px 0; } .hero h1 { font-size: 42px; } .selected-work { display: grid; grid-template-columns: repeat(3,1fr); } .selected-image img { height: 160px; } .selected-arrow, .premium-extras { display: none; } .section, .process { padding: 28px 0; } .process, .contact { background: white; color: black; } #brief-form { box-shadow: none; } }
+
+/* RED7 provenance belongs with the title, before the mobile cover. */
+.premium-case-heading .case-credit { font-size: 14px; line-height: 1.6; margin: -12px 0 20px; color: var(--ink); }
+@media screen and (max-width: 800px) {
+  .case-page .premium-case-heading:has(.case-credit) .case-credit { grid-row: 3; }
+  .case-page .premium-case-heading:has(.case-credit) .premium-case-cover { grid-row: 4; }
+}

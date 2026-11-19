@@ -75,6 +75,13 @@ def apply(target):
                 cover = '<a class="premium-case-cover" href="#' + image[1] + '">' + cover_image + '<span>Смотреть фотографии проекта <span aria-hidden="true">↘</span></span></a>'
                 replacement = heading[0].replace('class="resource-heading"', 'class="resource-heading premium-case-heading"').replace('</header>', cover + '</header>')
                 text = text.replace(heading[0], replacement, 1)
+        # Keep RED7 provenance visible beside the title, without duplicating it.
+        if page.name == 'red7-panels.html' and 'class="case-credit"' not in text:
+            credit = 'Из портфолио Step3D / X.Lab.'
+            old = '<p class="attribution">' + credit + ' '
+            if old in text:
+                text = text.replace(old, '<p class="attribution">', 1)
+                text = text.replace('</h1>', '</h1><p class="case-credit">' + credit + '</p>', 1)
         style = '../premium.css' if page.parent.name == 'cases' else 'premium.css'
         if 'premium.css?' not in text:
             text = text.replace('</head>', f'<link rel="stylesheet" href="{style}?v={VERSION}">\n</head>')
