@@ -17,6 +17,7 @@ def section(source, marker):
 def apply(target):
     target = Path(target)
     source = Path(__file__).parent
+    shutil.copyfile(source / "catalog.js", target / "catalog.js")
     page = target / 'index.html'
     text = page.read_text()
     if 'data-premium-edition="20261106"' not in text:
