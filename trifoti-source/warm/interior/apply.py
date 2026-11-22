@@ -24,7 +24,7 @@ def apply(target):
     else:
         text = re.sub(r'(<ul class="team-grid">.*?)(    </ul>)', lambda m: m[1] + profiles + '\n' + m[2], text, count=1, flags=re.S)
     text = text.replace('Все проекты и подробные кейсы · ', 'Подробные кейсы · ')
-    text = text.replace('<span>Работы по направлениям</span>', '<span>Избранные работы и концепты</span>')
+    text = text.replace('<span>Работы по направлениям</span>', '<span>Подборки работ и концептов</span>')
     text = text.replace('<a href="#studio">Об объединении</a>', '<a href="#studio">Команда</a>')
     text = re.sub(r'review-20261106\.css\?v=[^"]+', 'review-20261106.css?v=20261111-portfolio', text)
     if 'review-20261106.css?' not in text:
