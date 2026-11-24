@@ -2,20 +2,25 @@ const stage=document.getElementById('bear-stage');
 const video=document.getElementById('bear-video');
 const image=document.getElementById('bear-gif');
 const toggle=document.getElementById('rotate-toggle');
+const dragHint=document.querySelector('.drag-hint');
 const keyboardHelp=document.getElementById('bear-keyboard-help');
 const motionPreference=matchMedia('(prefers-reduced-motion: reduce)');
 const connection=typeof navigator==='undefined'?null:navigator.connection;
 const sources=[...video.querySelectorAll('source')];
 const failedSources=new Set();
+const gifSource='/STEP_3D/trifoti/assets/animation/trifoti-bear-loop.gif',posterSource='/STEP_3D/trifoti/assets/animation/bear-loop-poster.webp';
 let wantsPlayback=!motionPreference.matches&&!connection?.saveData;
 let inViewport=typeof IntersectionObserver!=='function';
-let gifMode=false,dragging=false,lastX=0,resumeAfterDrag=false,playRequest=0,exhaustionCheck=null;
+let gifMode=false,gifFailed=false,dragging=false,lastX=0,resumeAfterDrag=false,playRequest=0,exhaustionCheck=null;
 
 function update(){
  toggle.textContent=wantsPlayback?'Ⅱ':'▷';
- toggle.setAttribute('aria-label',wantsPlayback?'Приостановить вращение':'Включить вращение');
+ toggle.setAttribute('aria-label',wantsPlayback?'Приостановить вращение':gifFailed?'Повторить загрузку анимации':'Включить вращение');
  toggle.setAttribute('aria-pressed',String(wantsPlayback));
- if(gifMode)document.querySelector('.drag-hint').textContent=wantsPlayback?'Скульптура · 360°':'▷ Запустить анимацию';
+ if(gifMode){
+  const hint=gifFailed?(wantsPlayback?'Загружаем анимацию…':'Сбой анимации · повторить ▶'):wantsPlayback?'Скульптура · 360°':'▷ Запустить анимацию';
+  if(dragHint.textContent!==hint)dragHint.textContent=hint;
+ }
 }
 async function syncPlayback(){
  const request=++playRequest;
@@ -23,7 +28,7 @@ async function syncPlayback(){
  update();
  if(gifMode){
   video.pause();
-  const source=canPlay?'/STEP_3D/trifoti/assets/animation/trifoti-bear-loop.gif':'/STEP_3D/trifoti/assets/animation/bear-loop-poster.webp';
+  const source=canPlay?gifSource:posterSource;
   if(image.getAttribute('src')!==source)image.setAttribute('src',source);
   return;
  }
@@ -55,6 +60,19 @@ function checkExhaustionSoon(){
   if(video.networkState===3&&video.readyState===0)useFallback();
  },0);
 }
+// An event can arrive after a source change. Read the current image's state,
+// not just the event type; never retry a failed poster or request GIF implicitly.
+image.addEventListener('error',()=>{
+ if(!gifMode||image.getAttribute('src')!==gifSource||!image.complete||image.naturalWidth!==0)return;
+ gifFailed=true;wantsPlayback=false;resumeAfterDrag=false;
+ keyboardHelp.textContent='Анимация не загрузилась. Пробел или Enter — повторить загрузку.';
+ syncPlayback();
+});
+image.addEventListener('load',()=>{
+ if(!gifMode||image.getAttribute('src')!==gifSource||!image.complete||!image.naturalWidth)return;
+ gifFailed=false;keyboardHelp.textContent='Видео недоступно. Пробел или Enter — включить или приостановить анимацию.';
+ update();
+});
 video.muted=true;
 video.addEventListener('error',useFallback);
 video.addEventListener('loadstart',()=>failedSources.clear());

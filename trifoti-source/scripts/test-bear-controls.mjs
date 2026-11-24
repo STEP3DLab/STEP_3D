@@ -20,7 +20,7 @@ function setup(reduce=false,options={}){
  const timers=new Map();let timerId=0;
  const connection=new EventTarget();connection.saveData=options.saveData??false;let observerCallback,observed;
  const Observer=options.observer?class{constructor(callback,config){if(options.observerThrows)throw Error('unavailable');observerCallback=callback;assert.equal(config.threshold,0)}observe(target){observed=target}}:undefined;
- let initializationError;try{vm.runInNewContext(code,{document:doc,navigator:{connection},IntersectionObserver:Observer,matchMedia:()=>pref,setTimeout:fn=>{timers.set(++timerId,fn);return timerId},clearTimeout:id=>timers.delete(id)})}catch(error){if(!options.failInitialization)throw error;initializationError=error}
+ let initializationError;try{vm.runInNewContext(options.code??code,{document:doc,navigator:{connection},IntersectionObserver:Observer,matchMedia:()=>pref,setTimeout:fn=>{timers.set(++timerId,fn);return timerId},clearTimeout:id=>timers.delete(id)})}catch(error){if(!options.failInitialization)throw error;initializationError=error}
  const fire=(el,type,props={})=>{const e=new Event(type,{cancelable:true});for(const [k,value]of Object.entries(props))Object.defineProperty(e,k,{value});el.dispatchEvent(e);return e};
  return {els,doc,v,fire,pref,initializationError,sources,timers,intersect:value=>{assert.equal(observed,els['bear-stage']);observerCallback([{target:observed,isIntersecting:value}])},saveData:value=>{connection.saveData=value;fire(connection,'change')},flush:()=>{const pending=[...timers.values()];timers.clear();pending.forEach(fn=>fn())},click:()=>fire(els['rotate-toggle'],'click'),reduce:value=>{pref.matches=value;fire(pref,'change',{matches:value})},visibility:hidden=>{doc.hidden=hidden;fire(doc,'visibilitychange')}};
 }
@@ -206,4 +206,25 @@ test('Obsolete image events cannot override a pending or successful current reso
 test('GIF recovery module and entry point receive fresh cache keys',()=>{
  const app=readFileSync(new URL('../dist/app.js',import.meta.url),'utf8'),html=readFileSync(new URL('../dist/index.html',import.meta.url),'utf8');
  assert.match(app,/bear-video\.js\?[^']*&recovery=20261106-gif-error/);assert.match(html,/app\.js\?[^\"]*&amp;recovery=20261106-gif-error/);
+});
+
+
+test('warm bear returns to its poster after a failed GIF and only retries explicitly',()=>{
+ const warm=readFileSync(new URL('../../trifoti/warm/bear-video.js',import.meta.url),'utf8');
+ const s=setup(false,{observer:true,code:warm});
+ s.intersect(true);s.fire(s.v,'error');
+ const image=s.els['bear-gif'],toggle=s.els['rotate-toggle'];
+ assert.match(image.src,/poster[.]webp$/);
+ s.click();assert.match(image.src,/[.]gif$/);
+ image.complete=true;image.naturalWidth=0;s.fire(image,'error');
+ assert.match(image.src,/poster[.]webp$/);
+ assert.equal(toggle.attrs['aria-pressed'],'false');
+ assert.match(toggle.attrs['aria-label'],/Повторить загрузку/);
+ s.intersect(false);s.intersect(true);s.visibility(true);s.visibility(false);
+ assert.equal(image.srcWrites.filter(src=>src.endsWith('.gif')).length,1);
+ const stage=s.els['bear-stage'];s.fire(stage,'keydown',{key:'Enter'});
+ image.naturalWidth=480;s.fire(image,'load');
+ assert.match(image.src,/[.]gif$/);
+ assert.equal(toggle.attrs['aria-pressed'],'true');
+ assert.match(s.els['drag-hint'].textContent,/360°/);
 });
