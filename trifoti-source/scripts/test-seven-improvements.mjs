@@ -119,6 +119,16 @@ test('First Escape fits the photo and keeps dialog open; second is left to nativ
 test('Zoom keyboard pans only inside inspection; browser shortcuts and unrelated controls are untouched',()=>{
  const f=zoom();f.find('Рассмотреть +').emit('click');for(const extra of [{ctrlKey:true},{metaKey:true},{altKey:true},{shiftKey:true},{target:f.el('input')}])assert.equal(f.controller.key({key:'ArrowRight',target:f.viewer,...extra}),false);let prevented=false;assert.equal(f.controller.key({key:'ArrowRight',target:f.viewer,preventDefault(){prevented=true}}),true);assert(prevented);
 });
+for(const label of ['Уменьшить фото','Вписать','Сдвинуть просмотр вправо'])test('Changing photos preserves focus when '+label+' becomes unavailable',()=>{
+ const f=zoom(),plus=f.find('Рассмотреть +');plus.emit('click');
+ const control=f.host.querySelectorAll('button').find(n=>n.attrs['aria-label']===label||n.textContent===label);control.focus();
+ const second=f.el('img');second.naturalWidth=800;second.naturalHeight=1200;f.viewer.replaceChildren(second);f.controller.setItem(second,projects.pink.media[1]);
+ assert.equal(f.document.activeElement,plus);assert.equal(f.controller.isZoomed(),false);assert.equal(second.style.width,'');
+});
+test('Changing photos keeps focus on unrelated frame navigation',()=>{
+ const f=zoom();f.find('Рассмотреть +').emit('click');const next=f.el('button');f.host.append(next);next.focus();
+ const second=f.el('img');f.viewer.replaceChildren(second);f.controller.setItem(second,projects.pink.media[1]);assert.equal(f.document.activeElement,next);
+});
 test('Changing frame or switching to video clears zoom, hides photo controls and never autoplays',()=>{
  const f=zoom();f.find('Рассмотреть +').emit('click');const second=f.el('img');second.naturalWidth=800;second.naturalHeight=1200;f.viewer.replaceChildren(second);f.controller.setItem(second,projects.pink.media[1]);assert.equal(f.controller.isZoomed(),false);assert.equal(second.style.width,'');f.find('Рассмотреть +').focus();const video=f.el('video');f.controller.setItem(video,{type:'video'});assert.equal(f.host.querySelector('.photo-detail').hidden,true);assert.equal(f.document.activeElement,f.viewer);assert.equal(video.autoplay,undefined);
 });
