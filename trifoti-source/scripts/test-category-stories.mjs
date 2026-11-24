@@ -129,7 +129,9 @@ test('Service selection, filter query and exploration routes reveal the collapse
 });
 test('Primary DOM is four native square links followed by one collapsed catalogue; close stays sticky',()=>{
  const html=read('index.html'),css=read('category-stories.css');assert.equal((html.match(/data-story-category=/g)||[]).length,4);assert(html.indexOf('category-stories:start')<html.indexOf('id="all-projects"'));assert.match(html,/<details class="all-projects" id="all-projects">/);assert.match(html,/Все проекты и подробные кейсы · 9/);assert.match(html,/id="portfolio-exploration"/);assert.match(css,/aspect-ratio:1/);assert.match(css,/grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);assert.match(css,/grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);assert.match(css,/\.story-top\{position:sticky;top:0/);assert.match(css,/object-fit:contain/);assert.match(css,/min-height:44px/);
- const catalog=read('catalog.html');for(const [,target] of html.matchAll(/data-story-category="[^"]+" href="catalog.html#([^"]+)"/g))assert(catalog.includes('id="'+target+'"'));
+ const links=[...html.matchAll(/data-story-category="([^"]+)" href="([^"]+)"/g)].map(([,id,href])=>[id,href]);
+ assert.deepEqual(links,storyCategories.map(c=>[c.id,c.cover?'cases/'+c.cover+'.html':'#'+c.service]));
+ for(const [,href] of links)if(href.startsWith('cases/'))assert.match(read(href),/class="static-gallery"/);else assert(html.includes('id="'+href.slice(1)+'"'));
 });
 test('No new persistence, data collection, networking, automatic timing or media playback is introduced',()=>{
  for(const file of ['category-stories.js','category-stories-data.js','category-stories-navigation.js','portfolio-disclosure.js'])assert.doesNotMatch(read(file),/localStorage|sessionStorage|fetch\(|XMLHttpRequest|sendBeacon|\.play\(|setTimeout|setInterval|requestAnimationFrame/);
