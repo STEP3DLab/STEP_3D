@@ -41,9 +41,11 @@ test('Packet preserves all source project descriptions and attribution without f
  assert.doesNotMatch(packet,/имплант|образовани|основатель|директор ТРИФОТИ|художественный руководитель/i);
 });
 test('Packet preserves approved achievements and specific role-source labels without internal audit prose',()=>{
- assert.equal(packetPeople.length,2);for(const person of packetPeople)assert(packet.includes(person.ownerClaim));
+ assert.equal(packetPeople.length,4);for(const person of packetPeople)if(person.ownerClaim)assert(packet.includes(person.ownerClaim));
+ assert.doesNotMatch(packet,/undefined/);
+ for(const person of packetPeople.slice(2)){assert(read('index.html').includes(`id="${person.profile}"`));assert(packet.includes(`trifoti/#${person.profile}"`));}
  assert.doesNotMatch(packet,/По сведениям владельца|отдельная внешняя проверка|переданы владельцем|клиентских логотипов/);
- assert.equal((packet.match(/Профессиональный контекст/g)||[]).length,2);assert.match(packet,/Заслуженный художник Крыма/);assert.match(packet,/Чемпион БРИКС и чемпион Хайтек/);assert.match(packet,/Подготовила нескольких чемпионов России/);
+ assert.equal((packet.match(/Профессиональный контекст/g)||[]).length,4);assert.match(packet,/Заслуженный художник Крыма/);assert.match(packet,/Чемпион БРИКС и чемпион Хайтек/);assert.match(packet,/Подготовила нескольких чемпионов России/);
  for(const person of packetPeople)assert(packet.includes(person.name));
 });
 test('Packet preserves noindex, safe external links and local-only controls',()=>{
