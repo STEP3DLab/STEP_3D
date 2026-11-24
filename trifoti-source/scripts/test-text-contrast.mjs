@@ -79,7 +79,7 @@ test('Brand colors and white button text retain contrast; profile numerals remai
  assert.equal(declarations('.button').color,'white');
  ordinary('#fff','var(--red)','white button text');
  assert.equal(declarations('.team-index').opacity,'.65');
- assert.equal((html.match(/class="team-index" aria-hidden="true"/g)||[]).length,2);
+ assert.equal((html.match(/class="team-index" aria-hidden="true"/g)||[]).length,4);
 });
 test('Stylesheet and application retain explicit cache version URLs',()=>{
  assert.match(html,/style\.css\?v=[^\"]+/);
@@ -94,12 +94,12 @@ test('Original photo action passes in normal, visited, hover, focus and active s
  ordinary(declarations('.gallery-photo-link span').color,paper,'new tab hint');
 });
 
-test('Both profile roles, biography text and evidence links are readable on paper',()=>{
+test('All four profile roles, biography text and evidence links are readable on paper',()=>{
  const background=declarations('.team-card').background;
  ordinary(declarations('.team-role').color,background,'profile role');
  ordinary(declarations('.team-bio p').color,background,'profile biography');
  ordinary(declarations('.team-evidence a').color,background,'profile evidence links');
- assert.equal((html.match(/class="team-role"/g)||[]).length,2);
+ assert.equal((html.match(/class="team-role"/g)||[]).length,4);
 });
 
 // Focused cascade model for ordinary-color task buttons, not a browser CSS engine.

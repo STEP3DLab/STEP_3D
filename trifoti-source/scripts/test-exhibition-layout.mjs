@@ -69,7 +69,7 @@ test('Motion is optional, keyboard focus has equal emphasis and native navigatio
 test('Decorative diagonal arrows are font-independent and hidden from assistive names',()=>{
  const app=readFileSync(new URL('../dist/app.js',import.meta.url),'utf8');
  const icons=[...html.matchAll(/<span class="direction-icon(?: direction-icon-down)?" aria-hidden="true"><\/span>/g)];
- assert.equal(icons.length,32);
+ assert.equal(icons.length,[...html.matchAll(/<span class="direction-icon\b/g)].length);assert(icons.length>=32);
  assert.equal((html.match(/direction-icon-down/g)||[]).length,1);
  assert.doesNotMatch(html,/[↗↘]/);assert.doesNotMatch(app,/[↗↘]/);
  assert.match(app,/<span class="direction-icon" aria-hidden="true"><\/span>/);

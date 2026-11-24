@@ -85,10 +85,10 @@ test('Portfolio offers only populated filters while all four service directions 
  assert(html.includes('data-show-projects="sculpture"'));assert(html.includes('data-show-projects="awards"'));
 });
 
-test('Team presents the two researched profiles with portraits, attribution and source links',()=>{
+test('Team presents four profiles while preserving the previously researched roles, attribution and sources',()=>{
  const team=html.slice(html.indexOf('<div class="team-block"'),html.indexOf('</section>',html.indexOf('<div class="team-block"')));
- assert.deepEqual([...team.matchAll(/<h3 id="team-[^"]+">([^<]+)<\/h3>/g)].map(m=>m[1]),['Фёдор Геннадьевич Паршин','Христина Анатольевна Понкратова']);
- assert.equal((team.match(/<img\b/g)||[]).length,2);assert.doesNotMatch(team,/team-monogram|Оксана|Владимир/);
+ assert.deepEqual([...team.matchAll(/<h3 id="team-[^"]+">([^<]+)<\/h3>/g)].map(m=>m[1]),['Фёдор Геннадьевич Паршин','Христина Анатольевна Понкратова','Оксана Ветрова','Владимир Константинович Ганьшин']);
+ assert.equal((team.match(/<img\b/g)||[]).length,4);assert.doesNotMatch(team,/team-monogram/);
  assert.match(team,/alt="Фёдор Геннадьевич Паршин"/);assert.match(team,/alt="Христина Анатольевна Понкратова"/);
  assert.match(team,/dobrotorium\.ru\/people\/12/);assert.match(team,/technopark-rgsu\.ru\/skb\/laboratories\/industrial-design-engineering\//);
  assert.match(team,/cttit\.ru\/news\/2024\/04\/reversivnyij-inzhiniring-itogi\.html/);assert.doesNotMatch(team,/имплант|Окончил|мастерскую|образование|medcollege\.medsi\.ru/i);

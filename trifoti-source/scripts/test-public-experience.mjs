@@ -29,3 +29,20 @@ test('Forced colors is bounded, preserves user palette and covers focus, selecti
  const rules=css.slice(css.indexOf('@media(forced-colors:active)'));assert(rules);
  assert.match(rules,/:focus-visible\{outline:3px solid Highlight/);assert.match(rules,/aria-pressed="true"/);assert.match(rules,/gallery-thumb.active/);assert.match(rules,/aria-current="location"/);assert.match(rules,/form \[aria-invalid="true"\]\{border:2px dashed CanvasText/);assert.match(rules,/form \.brief-field-error\{color:CanvasText/);assert.match(rules,/button,\.button,select,input,textarea\{border:1px solid ButtonText/);assert.doesNotMatch(css,/forced-color-adjust\s*:\s*none/);
 });
+
+test('The public homepage has all four team members and reuses the two previously published portraits',()=>{
+ const cardIds=[...html.matchAll(/<li class="team-card[^"]*" aria-labelledby="(team-[a-z]+)">/g)].map(m=>m[1]);
+ assert.deepEqual(cardIds,['team-fedor','team-khristina','team-oksana','team-vladimir']);
+ for(const [id,slug,name,role] of [['oksana','oksana-vetrova','Оксана Ветрова','Дизайнер интерьеров'],['vladimir','vladimir-ganshin','Владимир Константинович Ганьшин','Инженер · 3D-технологии и прототипирование']]){
+  const head=html.indexOf('aria-labelledby="team-'+id+'"'),card=html.slice(head,html.indexOf('</div>\n      </li>',head));
+  assert(card.includes('<h3 id="team-'+id+'">'+name+'</h3>'));
+  assert(card.includes('alt="'+name+'" loading="lazy" decoding="async"'));
+  assert(card.includes('<p class="team-role">'+role+'</p>'));
+  for(const size of [360,640]){
+   const file=slug+'-'+size+'.webp',source=readFileSync(new URL('../../trifoti/warm/photos/team/'+file,import.meta.url));
+   assert.deepEqual(readFileSync(new URL('../dist/assets/team/'+file,import.meta.url)),source);
+   assert.deepEqual(readFileSync(new URL('../../trifoti/assets/team/'+file,import.meta.url)),source);
+   assert.deepEqual(readFileSync(new URL('../../docs/trifoti/assets/team/'+file,import.meta.url)),source);
+  }
+ }
+});
