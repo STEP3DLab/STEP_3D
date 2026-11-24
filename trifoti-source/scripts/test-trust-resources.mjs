@@ -36,7 +36,7 @@ test('Generated resources match final HTML and packet is readable with no JavaSc
  for(const html of [trust,packet]){const ids=[...html.matchAll(/\bid="([^"]+)"/g)].map(match=>match[1]);assert.equal(new Set(ids).size,ids.length);}
 });
 test('Packet preserves all source project descriptions and attribution without fabricated roles',()=>{
- for(const [key,p] of Object.entries(projects)){assert(packet.includes(p.description));assert(packet.includes(p.attribution||p.type));assert(packet.includes('#project/'+key));for(const source of p.sources||[])assert(packet.includes(source.url));}
+ for(const [key,p] of Object.entries(projects)){assert(packet.includes(p.description));assert(packet.includes(p.attribution||p.type));assert(packet.includes('/trifoti/cases/'+key+'.html'));assert(existsSync(new URL('../dist/cases/'+key+'.html',import.meta.url)));for(const source of p.sources||[])assert(packet.includes(source.url));}
  assert.equal((packet.match(/Персональные роли участников в этом кейсе не уточнены/g)||[]).length,Object.values(projects).filter(p=>!p.attribution).length);
  assert.doesNotMatch(packet,/имплант|образовани|основатель|директор ТРИФОТИ|художественный руководитель/i);
 });
