@@ -33,7 +33,8 @@ def apply(target):
     # Synchronous, after its DOM exists and before main content is parsed.
     start = html.index('<header class="header">')
     end = html.index('</header>', start) + len('</header>')
-    if html.count('<main id="main">') != 1 or html.index('<main id="main">') < end:
+    mains = list(re.finditer(r'<main id="main"(?: tabindex="-1")?>', html))
+    if len(mains) != 1 or mains[0].start() < end:
         raise ValueError('Expected main content after the header')
     html = html[:end] + '\n' + block + html[end:]
     if html.count(MARKER) != 1 or html.count(END) != 1:

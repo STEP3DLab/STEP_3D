@@ -20,7 +20,7 @@ export function renderPage(html,source) {
   for(const match of external) html=html.replace(match[0],'');
   html=html.replace(/^[ \t]+$/gm,'');
   if(/<script\b[^>]*header-navigation\.js/i.test(html)) throw new Error('Unrecognized header script');
-  const boundary=html.match(/<\/header>\s*(?=<main id="main">)/);
+  const boundary=html.match(/<\/header>\s*(?=<main id="main"(?: tabindex="-1")?>)/);
   if(!boundary)throw new Error('Missing header/main boundary');
   return html.replace(boundary[0],`</header>\n${renderHeaderInline(source)}\n`);
 }

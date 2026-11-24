@@ -90,7 +90,7 @@ test('One synchronous generated controller runs after header and before main; no
  assert.equal((html.match(/<!-- warm-header-navigation:start -->/g)||[]).length,1);
  assert(!/<script[^>]+src\s*=\s*[^>]*header-navigation\.js/.test(html));
  assert(html.indexOf('</header>')<html.indexOf('<!-- warm-header-navigation:start -->'));
- assert(html.indexOf('<!-- warm-header-navigation:end -->')<html.indexOf('<main id="main">'));
+ assert(html.indexOf('<!-- warm-header-navigation:end -->')<html.indexOf('<main id="main" tabindex="-1">'));
  assert.equal(code.trim(),'(() => {\n"use strict";\n'+source.replace('export function initializeHeaderNavigation','function initializeHeaderNavigation').trimEnd()+'\n})();');
  assert.equal(createHash('sha256').update(source).digest('hex'),'76856b1cd84199536df049d3dc3ac505e4eeda6fc27312201959d85155ea6117');
  assert.match(css,/\.header:not\(\.nav-ready\) nav\{display:flex/);
