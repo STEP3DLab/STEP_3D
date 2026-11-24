@@ -5,6 +5,8 @@ import {projects} from '../dist/project-data.js';
 import {portfolioOutputs,casePath} from './render-portfolio-resources.mjs';
 import {createMediaSlot} from '../dist/portfolio-media.js';
 import {initializeLightView,lightPreview} from '../dist/light-view.js';
+import {initializeLightView as initializeWarmLightView,lightPreview as warmLightPreview} from '../../trifoti/warm/light-view.js';
+import {projects as warmProjects} from '../../trifoti/warm/project-data.js';
 import {meetingFrames,meetingRoute,meetingHash,initializeMeeting} from '../dist/meeting.js';
 const root=new URL('../dist/',import.meta.url),read=name=>readFileSync(new URL(name,root),'utf8');
 const outputs=portfolioOutputs();
@@ -263,10 +265,10 @@ test('Meeting skip recalculates the sticky header clearance after responsive ref
  for(height of [78,124.5,62]){f.nodes['meeting-skip'].emit('click');assert.equal(stage.style.scrollMarginTop,(Math.ceil(height)+8)+'px');assert.equal(f.document.activeElement,stage);assert(stage.scrolled);assert.equal(f.window.location.hash,route)}
 });
 
-function lightFixture(hash='#project/mascot/media/white-front'){
- const f=fixture(hash),cards=Object.keys(projects).map(key=>{const card=new Node('article',f.document);card.dataset.lightCase=key;card.gallery=new Node('div',f.document);card.append(card.gallery);return card});
+function lightFixture(hash='#project/mascot/media/white-front',initialize=initializeLightView,collection=projects){
+ const f=fixture(hash),cards=Object.keys(collection).map(key=>{const card=new Node('article',f.document);card.dataset.lightCase=key;card.gallery=new Node('div',f.document);card.append(card.gallery);return card});
  f.document.querySelectorAll=()=>cards;
- const controller=initializeLightView(f);
+ const controller=initialize(f);
  const frame=key=>cards.find(card=>card.dataset.lightCase===key).gallery.children[0];
  return {...f,controller,frame};
 }
@@ -369,4 +371,34 @@ test('Light duplicate history events preserve an in-flight preview retry and foc
  f.emit('popstate');f.emit('hashchange');f.controller.sync(false);
  assert.equal(host.children[0],current);assert.equal(f.document.activeElement,retry);assert.equal(retry.hidden,false);assert.equal(retry.attrs['aria-disabled'],'true');
  current.emit('error');assert.equal(retry.attrs['aria-disabled'],'false');
+});
+
+test('Warm light-view previews stay distinct from originals, including all RED7 photos',()=>{
+ const key='red7-panels',project=warmProjects[key];
+ for(const item of project.media){
+  const small=warmLightPreview(project,item);
+  assert.notEqual(small,item.src);assert.match(small,/red7-preview\/[^/]+\.webp$/);
+  const preview=new URL('../../trifoti/warm/photos/red7-preview/'+small.split('/').at(-1),import.meta.url);
+  const original=new URL('../../trifoti/warm/photos/red7/'+item.src.split('/').at(-1),import.meta.url);
+  assert(readFileSync(preview).length<readFileSync(original).length*.25);
+  assert.deepEqual(readFileSync(preview),readFileSync(new URL(preview.href.replace('/trifoti/warm/','/docs/trifoti/warm/'))));
+ }
+});
+test('Warm light view retries the preview independently and preserves it across duplicate routes',()=>{
+ const key='mascot',f=lightFixture(undefined,initializeWarmLightView,warmProjects),frame=f.frame(key),host=frame.children[1],load=frame.children[4];
+ f.nodes['light-posters'].checked=true;f.nodes['light-posters'].emit('change');
+ const initial=host.children[0];initial.emit('error');
+ const retry=frame.children[5];assert(retry&&!retry.hidden);
+ assert.equal(load.textContent,'Загрузить оригинал фото');
+ retry.focus();retry.emit('click');const second=host.children[0];
+ assert.notEqual(initial,second);assert.equal(second.src,initial.src);assert.equal(retry.attrs['aria-disabled'],'true');retry.emit('click');
+ f.emit('popstate');f.emit('hashchange');assert.equal(host.children[0],second);assert.equal(f.document.activeElement,retry);
+ second.emit('load');assert(retry.hidden);assert.equal(f.document.activeElement,frame);
+ load.emit('click');assert.notEqual(host.children[0].src,initial.src);assert.equal(host.children[0].src,warmProjects[key].media[0].src);
+});
+test('Warm light entry and its source-build pin reference the new preview runtime',()=>{
+ const entry=readFileSync(new URL('../../trifoti/warm/light.html',import.meta.url),'utf8');
+ assert.match(entry,/light-view\.js\?[^"]*preview=20261124/);
+ assert.equal(entry,readFileSync(new URL('../../docs/trifoti/warm/light.html',import.meta.url),'utf8'));
+ assert.equal(readFileSync(new URL('../../trifoti/warm/light-view.js',import.meta.url),'utf8'),readFileSync(new URL('../warm/runtime/light-view.js',import.meta.url),'utf8'));
 });

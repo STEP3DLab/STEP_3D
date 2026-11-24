@@ -23,3 +23,9 @@ def apply(target):
     h=h.replace('\n\n<details class="premium-categories">', '\n<details class="premium-categories">')
     h=h.rstrip()+'\n\n'
     p.write_text(h)
+
+    # Match the module version after the RED7 resource renderer rewrites URLs.
+    light = Path(target) / 'light.html'
+    html = light.read_text()
+    html = re.sub(r'(src="light-view\.js\?v=20261104-red7)(?:&amp;preview=20261124)?(")', r'\1&amp;preview=20261124\2', html)
+    light.write_text(html)
