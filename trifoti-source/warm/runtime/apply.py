@@ -27,5 +27,5 @@ def apply(target):
     # Match the module version after the RED7 resource renderer rewrites URLs.
     light = Path(target) / 'light.html'
     html = light.read_text()
-    html = re.sub(r'(src="light-view\.js\?v=20261104-red7)(?:&amp;preview=20261124)?(")', r'\1&amp;preview=20261124\2', html)
+    html = re.sub(r'(src="light-view\.js\?v=20261104-red7)(?:&amp;preview=20261124)?(?:&amp;original=20261124)?(")', r'\1&amp;preview=20261124&amp;original=20261124\2', html)
     light.write_text(html)

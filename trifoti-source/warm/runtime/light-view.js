@@ -18,20 +18,21 @@ export function initializeLightView({document,window}){
   const controls=el('div',null,'light-controls'),previous=el('button','←'),next=el('button','→'),counter=el('span'),host=el('div',null,'light-media'),caption=el('p',null,'light-caption'),status=el('p',null,'note'),load=el('button'),retry=el('button','Повторить загрузку превью');
   for(const b of [previous,next,load,retry])b.type='button';previous.setAttribute('aria-label','Предыдущий кадр: '+project.title);next.setAttribute('aria-label','Следующий кадр: '+project.title);counter.setAttribute('role','status');status.setAttribute('role','status');status.setAttribute('aria-atomic','true');
   retry.hidden=true;controls.append(previous,counter,next);frame.append(controls,host,caption,status,load,retry);parent.append(frame);
-  let previewing=false,retrying=false;
+  let previewing=false,retrying=false,originalRequested=false;
+  function originalAction(text,locked=false){originalRequested=locked;load.textContent=text;load.setAttribute("aria-disabled",String(locked))}
   function hideRetry(){if(document.activeElement===retry)frame.focus({preventScroll:true});retry.hidden=true;retrying=false;retry.setAttribute('aria-disabled','false')}
-  const slot=createMediaSlot({document,host,status,onReady:()=>{if(previewing)hideRetry()},onError:()=>{
+  const slot=createMediaSlot({document,host,status,onReady:()=>{if(previewing)hideRetry();else if(project.media[index].type!=='video')originalAction('Оригинал загружен',true)},onError:()=>{
    if(previewing){retrying=false;retry.hidden=false;retry.setAttribute('aria-disabled','false');status.textContent='Не удалось загрузить превью. Повторите загрузку превью или откройте оригинал отдельной кнопкой.'}
-   else{load.hidden=false;load.disabled=false;load.textContent='Повторить загрузку'}
+   else originalAction('Повторить загрузку')
   }});slots.push(slot);
   // A preview retry must request only the same small image, never its original.
   function showPreview(){previewing=true;const item=project.media[index];slot.show(item,{preview:true,source:lightPreview(project,item)})}
 
-  function render(){const displaced=host.contains(document.activeElement);const links=modeLinks(key,mediaId(project.media[index]));for(const mode of ['modal','static']){const link=card.querySelector('[data-view-mode="'+mode+'"]');if(link)link.href=links[mode]}slot.clear();hideRetry();previewing=false;load.hidden=false;load.disabled=false;const item=project.media[index];caption.textContent=(item.type==='video'?'Видео. ':'Фото. ')+item.caption;counter.textContent=`${index+1} / ${project.media.length}`;previous.disabled=next.disabled=project.media.length<2;load.textContent=item.type==='video'?'Показать управление видео':'Загрузить оригинал фото';if(mode.checked)showPreview();else status.textContent='Материал не загружен. Можно прочитать подпись или загрузить его вручную.';if(displaced)frame.focus({preventScroll:true});}
+  function render(){const displaced=host.contains(document.activeElement);const links=modeLinks(key,mediaId(project.media[index]));for(const mode of ['modal','static']){const link=card.querySelector('[data-view-mode="'+mode+'"]');if(link)link.href=links[mode]}slot.clear();hideRetry();previewing=false;load.hidden=false;load.disabled=false;const item=project.media[index];caption.textContent=(item.type==='video'?'Видео. ':'Фото. ')+item.caption;counter.textContent=`${index+1} / ${project.media.length}`;previous.disabled=next.disabled=project.media.length<2;originalAction(item.type==='video'?'Показать управление видео':'Загрузить оригинал фото');if(mode.checked)showPreview();else status.textContent='Материал не загружен. Можно прочитать подпись или загрузить его вручную.';if(displaced)frame.focus({preventScroll:true});}
   function step(delta){index=(index+delta+project.media.length)%project.media.length;window.history.replaceState(window.history.state,'',modeLinks(key,mediaId(project.media[index])).light.split('light.html')[1]);render()}
   previous.addEventListener('click',()=>step(-1));next.addEventListener('click',()=>step(1));
   frame.addEventListener('keydown',event=>{const direction=galleryArrow(event);if(direction&&project.media.length>1){event.preventDefault();step(direction)}});
-  load.addEventListener('click',()=>{hideRetry();previewing=false;const item=project.media[index];slot.show(item,{video:item.type==='video'});load.textContent='Повторить загрузку';});
+  load.addEventListener('click',()=>{if(originalRequested)return;hideRetry();previewing=false;const item=project.media[index],video=item.type==='video';originalAction(video?'Управление видео открыто':'Загружается оригинал…',true);slot.show(item,{video});});
   retry.addEventListener('click',()=>{if(retry.hidden||retrying||!previewing)return;retrying=true;retry.setAttribute('aria-disabled','true');showPreview()});
   // History can announce the same route twice. Keep an explicitly loaded resource
   // until the actual frame or poster mode changes.

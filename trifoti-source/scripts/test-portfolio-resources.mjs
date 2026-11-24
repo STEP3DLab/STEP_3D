@@ -279,8 +279,21 @@ for(const [id,type] of [['white-front','IMG'],['clay-turntable','VIDEO']]){
   if(type==='VIDEO')original.focus();else load.focus();const active=f.document.activeElement;
   f.emit('popstate');f.emit('hashchange');f.emit('load');f.controller.sync(false);
   assert.equal(host.children[0],original);assert.equal(f.document.activeElement,active);
-  assert.equal(original.paused,undefined);assert.equal(original.loaded,undefined);assert.equal(load.textContent,'Повторить загрузку');
+  assert.equal(original.paused,undefined);assert.equal(original.loaded,undefined);assert.equal(load.textContent,type==='VIDEO'?'Управление видео открыто':'Загружается оригинал…');
   assert.equal(f.changes.length,0);
+ });
+}
+for(const [id,event,ready] of [['white-front','load','Оригинал загружен'],['clay-turntable','loadeddata','Управление видео открыто']]){
+ test(`Light original cannot re-request ${id} until an explicit failure; focus stays put`,()=>{
+  const f=lightFixture('#project/mascot/media/'+id),frame=f.frame('mascot'),host=frame.children[1],load=frame.children[4];
+  load.focus();load.emit('click');const original=host.children[0];
+  assert.equal(load.attrs['aria-disabled'],'true');
+  load.emit('click');assert.equal(host.children[0],original);
+  original.emit(event);assert.equal(load.textContent,ready);
+  load.emit('click');assert.equal(host.children[0],original);assert.equal(f.document.activeElement,load);
+  original.emit('error');assert.equal(load.textContent,'Повторить загрузку');assert.equal(load.attrs['aria-disabled'],'false');
+  load.emit('click');assert.notEqual(host.children[0],original);assert.equal(f.document.activeElement,load);
+  frame.children[0].children[2].emit('click');assert.equal(load.attrs['aria-disabled'],'false');
  });
 }
 test('Light browser return to an unchanged frame preserves its requested original',()=>{
