@@ -10,17 +10,17 @@ export function initializeInformationPack({document,window}){
  // its native href remains useful when JavaScript is unavailable.
  get('pack-skip')?.addEventListener('click',event=>{if(event.defaultPrevented||event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;event.preventDefault();const main=get('information-pack');main.focus({preventScroll:true});main.scrollIntoView({block:'start'})});
  const cards=[...document.querySelectorAll('[data-pack-case]')],choices=[...document.querySelectorAll('[data-pack-choice]')];
- const allowed=cards.map(card=>card.dataset.packCase),feedback=get('pack-feedback'),fallback=get('pack-copy-fallback'),url=get('pack-url');
+ const allowed=cards.map(card=>card.dataset.packCase),feedback=get('pack-feedback'),fallback=get('pack-copy-fallback'),url=get('pack-url'),chooser=get('pack-chooser'),choiceFeedback=get('pack-choice-feedback');
  let selected=[],revision=0;
- function render(){revision++;fallback.hidden=true;feedback.textContent='';for(const card of cards)card.hidden=!selected.includes(card.dataset.packCase);for(const choice of choices)choice.checked=selected.includes(choice.dataset.packChoice);get('pack-reset').disabled=!selected.length;get('pack-selection-status').textContent=selected.length?`Выбрано работ: ${selected.length} из 3. Состав указан в ссылке этой справки.`:'Работы не выбраны. Можно включить до трёх кейсов с помощью списка выше.';url.value=packetURL(selected)}
+ function render(){revision++;fallback.hidden=true;feedback.textContent='';choiceFeedback.textContent='';for(const card of cards)card.hidden=!selected.includes(card.dataset.packCase);for(const choice of choices)choice.checked=selected.includes(choice.dataset.packChoice);get('pack-reset').disabled=!selected.length;get('pack-selection-status').textContent=selected.length?`Выбрано работ: ${selected.length} из 3. Состав указан в ссылке этой справки.`:'Работы не выбраны. Можно включить до трёх кейсов с помощью списка выше.';url.value=packetURL(selected)}
  function sync(){selected=packetSelection(window.location.hash,allowed);render()}
  function update(){window.history.replaceState(null,'',selected.length?'#cases/'+selected.join(','):window.location.pathname);render()}
- for(const choice of choices)choice.addEventListener('change',()=>{const key=choice.dataset.packChoice;if(choice.checked&&selected.length===3){choice.checked=false;feedback.textContent='Можно включить не больше трёх работ. Сначала снимите один из выбранных пунктов.';return}selected=choice.checked?[...selected,key]:selected.filter(id=>id!==key);update()});
+ for(const choice of choices)choice.addEventListener('change',()=>{const key=choice.dataset.packChoice;if(choice.checked&&selected.length===3){choice.checked=false;choiceFeedback.textContent='Можно включить не больше трёх работ. Сначала снимите один из выбранных пунктов.';return}selected=choice.checked?[...selected,key]:selected.filter(id=>id!==key);update()});
  get('pack-reset').addEventListener('click',()=>{selected=[];update();choices[0]?.focus()});
  get('pack-print').addEventListener('click',()=>window.print());
  get('pack-copy').addEventListener('click',async()=>{const token=++revision,value=packetURL(selected);let copied=false;try{if(window.navigator.clipboard?.writeText){await window.navigator.clipboard.writeText(value);copied=true}}catch{}if(token!==revision)return;feedback.textContent=copied?'Ссылка скопирована. Она содержит только выбранные публичные ID работ.':'Автоматическое копирование недоступно. Скопируйте ссылку из поля ниже.';fallback.hidden=copied;if(!copied){url.value=value;if(document.activeElement===get('pack-copy')){url.focus();url.select()}}});
  window.addEventListener('hashchange',sync);window.addEventListener('popstate',sync);
- sync();get('pack-actions').hidden=false;get('pack-chooser').hidden=false;
+ sync();chooser.open=selected.length===0;get('pack-actions').hidden=false;chooser.hidden=false;
  return {sync};
 }
 if(typeof document!=='undefined'&&typeof window!=='undefined')initializeInformationPack({document,window});

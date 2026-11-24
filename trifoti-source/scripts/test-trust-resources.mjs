@@ -63,14 +63,14 @@ test('Packet parser restricts hashes to existing public IDs and maximum three',(
 function fixture(hash='#cases/mascot,stdAwards'){
  let focus=null,prints=0;const listeners={},history=[];const node=extra=>({hidden:true,disabled:false,textContent:'',checked:false,listeners:{},value:'',addEventListener(type,fn){this.listeners[type]=fn},focus(){focus=this},select(){this.selected=true},scrollIntoView(options){this.scrolled=options},...extra});
  const cards=Object.keys(projects).map(key=>node({dataset:{packCase:key}})),choices=Object.keys(projects).map(key=>node({dataset:{packChoice:key}}));
- const ids=['information-pack','pack-skip','pack-feedback','pack-copy-fallback','pack-url','pack-reset','pack-selection-status','pack-print','pack-copy','pack-actions','pack-chooser'];const nodes=Object.fromEntries(ids.map(id=>[id,node()]));
+ const ids=['information-pack','pack-skip','pack-feedback','pack-copy-fallback','pack-url','pack-reset','pack-selection-status','pack-print','pack-copy','pack-actions','pack-chooser','pack-choice-feedback'];const nodes=Object.fromEntries(ids.map(id=>[id,node()]));
  const document={get activeElement(){return focus},getElementById:id=>nodes[id],querySelectorAll:selector=>selector==='[data-pack-case]'?cards:choices};
  const window={location:{hash,pathname:'/information-pack.html'},history:{replaceState(state,title,hash){history.push(hash);window.location.hash=hash.startsWith('#')?hash:''}},navigator:{},print(){prints++},addEventListener(type,fn){listeners[type]=fn}};
  const controller=initializeInformationPack({document,window});return {document,window,nodes,cards,choices,controller,listeners,history,get prints(){return prints},get focus(){return focus}};
 }
 test('Packet selection, repeat changes, maximum limit, reset and focus keep literal source cards',()=>{
  const f=fixture();assert.deepEqual(f.cards.filter(card=>!card.hidden).map(card=>card.dataset.packCase),['stdAwards','mascot']);assert.equal(f.nodes['pack-chooser'].hidden,false);
- const choose=key=>{const c=f.choices.find(c=>c.dataset.packChoice===key);c.checked=true;c.listeners.change();return c};choose('pink');assert.equal(choose('gesture').checked,false);assert.match(f.nodes['pack-feedback'].textContent,/не больше трёх/);
+ const choose=key=>{const c=f.choices.find(c=>c.dataset.packChoice===key);c.checked=true;c.listeners.change();return c};choose('pink');assert.equal(choose('gesture').checked,false);assert.match(f.nodes['pack-choice-feedback'].textContent,/не больше трёх/);
  assert.equal(f.cards.filter(card=>!card.hidden).length,3);
  f.nodes['pack-reset'].listeners.click();assert.equal(f.cards.filter(card=>!card.hidden).length,0);assert.equal(f.focus,f.choices[0]);assert.equal(f.window.location.hash,'');assert.equal(f.nodes['pack-reset'].disabled,true);
 });
@@ -131,4 +131,13 @@ test('Native skip-link enhancement preserves shared selection/hash/history while
  f.controller.sync();assert.equal(f.cards.filter(card=>!card.hidden).length,2);
  assert.match(packet,/<a class="skip" id="pack-skip" href="#information-pack">/);assert.match(packet,/<main id="information-pack" tabindex="-1">/);
  prevented=false;f.nodes['pack-skip'].listeners.click({button:0,ctrlKey:true,preventDefault(){prevented=true}});assert.equal(prevented,false);
+});
+
+test('Shared packets expose cases immediately, while blank packets open the editor by default',()=>{
+ assert.match(packet,/<details class="pack-chooser" id="pack-chooser" hidden><summary>Изменить подборку работ<\/summary>/);
+ const shared=fixture('#cases/mascot');assert.equal(shared.nodes['pack-chooser'].open,false);
+ assert.equal(shared.cards.filter(card=>!card.hidden).length,1);
+ const blank=fixture('');assert.equal(blank.nodes['pack-chooser'].open,true);
+ const c=blank.choices.find(c=>c.dataset.packChoice==='mascot');c.checked=true;c.listeners.change();
+ assert.equal(blank.nodes['pack-chooser'].open,true);assert.equal(blank.window.location.hash,'#cases/mascot');
 });
