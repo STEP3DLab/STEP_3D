@@ -13,7 +13,15 @@ export function initializeMeeting({document,window}){
  const get=id=>document.getElementById(id),player=get('meeting-player'),empty=get('meeting-empty'),loading=get('meeting-loading'),selection=get('meeting-selection'),skip=get('meeting-skip');
  if(!player||!empty||!loading||!selection||!skip)return null;
  const host=get('meeting-media'),status=get('meeting-media-status'),load=get('meeting-load'),select=get('meeting-case'),exit=get('meeting-exit');
- let ids=[],frames=[],index=0;const slot=createMediaSlot({document,host,status,onError:()=>{load.hidden=false;load.textContent='Повторить загрузку'}});
+ let ids=[],frames=[],index=0,loadState='idle';
+ function loadAction(state,text,hidden=false){
+  loadState=state;load.textContent=text;load.hidden=hidden;
+  if(state==='video'||state==='loading'||state==='image')load.setAttribute('aria-disabled','true');else load.removeAttribute('aria-disabled');
+ }
+ const slot=createMediaSlot({document,host,status,
+  onReady:()=>{if(loadState==='loading')loadAction('image','Изображение загружено')},
+  onError:()=>loadAction('retry','Повторить загрузку')
+ });
  function render(){
   const frame=frames[index];if(!frame)return;const p=projects[frame.key],item=frame.item;
   const active=document.activeElement,prev=get('meeting-prev'),next=get('meeting-next'),singleFrame=frames.length<2;
@@ -25,7 +33,7 @@ export function initializeMeeting({document,window}){
   get('meeting-counter').textContent=`${index+1} / ${frames.length}`;get('meeting-case-link').href='cases/'+frame.key+'.html#media-'+item.src.split('/').pop().replace(/\.[^.]+$/,'');
   const sources=get('meeting-sources');sources.replaceChildren();for(const source of p.sources||[]){const li=document.createElement('li'),a=document.createElement('a');a.href=source.url;a.textContent=source.label;a.target='_blank';a.rel='noopener noreferrer';a.setAttribute('aria-label',source.label+' — новая вкладка');li.append(a);sources.append(li)}
   select.value=frame.key;prev.disabled=next.disabled=singleFrame;
-  load.hidden=item.type!=='video';load.textContent='Показать управление видео';slot.show(item);
+  loadAction('idle','Показать управление видео',item.type!=='video');slot.show(item);
   exit.href='index.html?from=meeting#explore/'+ids.join(',');
   if(displaced)get('meeting-stage').focus({preventScroll:true});
  }
@@ -47,10 +55,16 @@ export function initializeMeeting({document,window}){
   if(leavingEmpty)get('meeting-stage').focus({preventScroll:true});
   else if(leavingPlayer||leavingLoading)exit.focus({preventScroll:true});
  }
- function go(next){if(!frames.length)return;index=(next+frames.length)%frames.length;window.history.replaceState(window.history.state,'',meetingHash(ids,index));render()}
+ function go(next){if(!frames.length)return;const destination=(next+frames.length)%frames.length;if(destination===index)return;index=destination;window.history.replaceState(window.history.state,'',meetingHash(ids,index));render()}
  get('meeting-prev').addEventListener('click',()=>go(index-1));get('meeting-next').addEventListener('click',()=>go(index+1));
  select.addEventListener('change',()=>{const next=frames.findIndex(frame=>frame.key===select.value);if(next>=0)go(next)});
- load.addEventListener('click',()=>{const item=frames[index]?.item;if(!item)return;slot.show(item,{video:item.type==='video'});get('meeting-caption').textContent=(item.type==='video'?'Видео. ':'')+item.caption;load.textContent='Повторить загрузку';});
+ load.addEventListener('click',()=>{
+  const item=frames[index]?.item,video=item?.type==='video';
+  if(!item||(loadState!=='retry'&&!(loadState==='idle'&&video)))return;
+  loadAction(video?'video':'loading',video?'Управление видео открыто':'Загрузка изображения…');
+  get('meeting-caption').textContent=(video?'Видео. ':'')+item.caption;
+  slot.show(item,{video});
+ });
  document.addEventListener('keydown',event=>{
   if(event.defaultPrevented||event.isComposing||event.altKey||event.ctrlKey||event.metaKey||event.shiftKey)return;
   // Browser/assistive shortcuts, native controls and editable fields remain native.

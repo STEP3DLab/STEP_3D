@@ -415,3 +415,22 @@ test('Warm light entry and its source-build pin reference the new preview runtim
  assert.equal(entry,readFileSync(new URL('../../docs/trifoti/warm/light.html',import.meta.url),'utf8'));
  assert.equal(readFileSync(new URL('../../trifoti/warm/light-view.js',import.meta.url),'utf8'),readFileSync(new URL('../warm/runtime/light-view.js',import.meta.url),'utf8'));
 });
+
+test('Meeting keeps opened video controls and only retries a failed resource',()=>{
+ const f=fixture('#show/gesture/0');initializeMeeting(f);
+ const load=f.nodes['meeting-load'],host=f.nodes['meeting-media'];load.focus();load.emit('click');
+ const video=host.children[0];assert.equal(video.tagName,'VIDEO');assert.equal(load.attrs['aria-disabled'],'true');
+ assert.equal(load.textContent,'Управление видео открыто');assert.equal(f.document.activeElement,load);
+ load.emit('click');f.emit('keydown',{key:'ArrowRight'});assert.equal(host.children[0],video);assert.equal(video.paused,undefined);assert.equal(f.changes.length,0);
+ video.emit('error');assert.equal(load.attrs['aria-disabled'],undefined);assert.equal(load.textContent,'Повторить загрузку');
+ load.emit('click');const retry=host.children[0];assert.notEqual(retry,video);assert.equal(retry.tagName,'VIDEO');assert.equal(video.paused,1);
+ assert.equal(load.attrs['aria-disabled'],'true');video.emit('error');assert.equal(load.attrs['aria-disabled'],'true');
+});
+test('Meeting retries a failed photo without replacing a healthy retry',()=>{
+ const f=fixture('#show/pink/0');initializeMeeting(f);
+ const load=f.nodes['meeting-load'],host=f.nodes['meeting-media'];
+ assert(load.hidden);host.children[0].emit('error');assert(!load.hidden);load.emit('click');const retry=host.children[0];
+ assert.equal(load.textContent,'Загрузка изображения…');load.emit('click');assert.equal(host.children[0],retry);
+ retry.emit('load');assert.equal(load.textContent,'Изображение загружено');assert.equal(load.attrs['aria-disabled'],'true');
+ f.nodes['meeting-next'].emit('click');assert(load.hidden);assert.equal(load.attrs['aria-disabled'],undefined);
+});
