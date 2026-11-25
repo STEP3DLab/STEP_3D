@@ -434,3 +434,15 @@ test('Meeting retries a failed photo without replacing a healthy retry',()=>{
  retry.emit('load');assert.equal(load.textContent,'Изображение загружено');assert.equal(load.attrs['aria-disabled'],'true');
  f.nodes['meeting-next'].emit('click');assert(load.hidden);assert.equal(load.attrs['aria-disabled'],undefined);
 });
+
+test('Each full-catalog case link identifies its project in a screen-reader link list',()=>{
+ const label='Полный кейс: все фото, видео и подписи';
+ const links=[...outputs.get('catalog.html').matchAll(/href="([^"]+)"[^>]*>(Полный кейс: все фото, видео и подписи)<span class="sr-only"> — (.+?) — новая вкладка<\/span>/g)];
+ assert.equal(links.length,Object.keys(projects).length);
+ assert.equal(new Set(links.map(([, , ,title])=>title)).size,links.length);
+ for(const [key,project] of Object.entries(projects)){
+  const entry=links.find(([,url])=>url.endsWith('/'+casePath(key)));
+  assert.equal(entry?.[2],label);
+  assert.equal(entry?.[3],project.title.replaceAll('&','&amp;').replaceAll('"','&quot;').replaceAll('<','&lt;').replaceAll('>','&gt;'));
+ }
+});
