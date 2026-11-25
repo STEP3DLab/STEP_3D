@@ -326,3 +326,17 @@ test('Scrolled boundary transitions retain the newly focused frame instead of th
   assert.equal(f.document.activeElement,f.nodes['story-media']);assert.equal(f.dialog.scrollTop,0);
  }
 });
+
+test('Progressive stories reuse the exact module URLs already loaded by the portfolio',()=>{
+ const app=read('app.js'),story=read('category-stories.js'),home=read('index.html');
+ const imports=(text)=>[...text.matchAll(/from '\.\/([^']+)'/g)].map(match=>match[1]);
+ for(const basename of ['dialog-controls.js','gallery-interactions.js']){
+  const matches=(source)=>imports(source).filter(url=>url.split('?')[0]===basename);
+  const shared=matches(app);
+  assert.equal(shared.length,1);
+  assert.deepEqual(matches(story),shared,'Distinct URLs load the same module twice: '+basename);
+ }
+ assert.match(home,/app\.js\?[^"\n]+&amp;storiesdeps=20261125/);
+ assert.match(app,/category-stories\.js\?[^'\n]+&deps=20261125/);
+ assert.match(app,/Карточки открывают страницы проектов или описания направлений/);
+});

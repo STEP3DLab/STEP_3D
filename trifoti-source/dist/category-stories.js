@@ -2,8 +2,8 @@ import {projects} from './project-data.js?v=20261026-directions';
 import {storyCategory,storyFrames,parseStoryRoute} from './category-stories-data.js?v=20261026-legacy-links';
 import {createStoryNavigation} from './category-stories-navigation.js?v=20261026-legacy-links';
 import {createMediaSlot} from './portfolio-media.js';
-import {keepDialogFocus,galleryArrow} from './dialog-controls.js';
-import {mountPhotoSwipe} from './gallery-interactions.js';
+import {keepDialogFocus,galleryArrow} from './dialog-controls.js?v=20261022-gallery';
+import {mountPhotoSwipe} from './gallery-interactions.js?v=20261024-gallery-browse';
 import {visiblePortfolioTarget} from './portfolio-disclosure.js?v=20261026-directions';
 import {keepFocusedReturnVisible} from './gallery-return-focus.js?v=20261106-story-return';
 
