@@ -141,3 +141,17 @@ test('Shared packets expose cases immediately, while blank packets open the edit
  const c=blank.choices.find(c=>c.dataset.packChoice==='mascot');c.checked=true;c.listeners.change();
  assert.equal(blank.nodes['pack-chooser'].open,true);assert.equal(blank.window.location.hash,'#cases/mascot');
 });
+
+test('Share previews use the collective logo and keep the same public URL for every selection',()=>{
+ const head=packet.split('</head>',1)[0];
+ const canonical='https://step3dlab.github.io/STEP_3D/trifoti/information-pack.html';
+ assert(head.includes('<meta name="robots" content="noindex,nofollow">'));
+ assert(head.includes('<link rel="canonical" href="'+canonical+'">'));
+ assert(head.includes('<meta property="og:url" content="'+canonical+'">'));
+ assert(head.includes('<meta property="og:title" content="ТРИФОТИ — справка для пересылки">'));
+ const image=head.match(/<meta property="og:image" content="([^"]+)">/)?.[1];
+ assert.equal(image,new URL('assets/brand/trifoti-logo-transparent.png',canonical).href);
+ assert(existsSync(new URL('../dist/assets/brand/trifoti-logo-transparent.png',import.meta.url)));
+ assert(head.includes('<meta name="twitter:card" content="summary">'));
+ assert.doesNotMatch(head,/pack=|brief=|#|[?&]selection=/);
+});
