@@ -340,3 +340,28 @@ test('Progressive stories reuse the exact module URLs already loaded by the port
  assert.match(app,/category-stories\.js\?[^'\n]+&deps=20261125/);
  assert.match(app,/Карточки открывают страницы проектов или описания направлений/);
 });
+
+test('Three photo cards load sized WebP files without replacing the original case photos',()=>{
+ const home=readFileSync(new URL('../dist/index.html',import.meta.url),'utf8');
+ let originalBytes=0,smallBytes=0,fullBytes=0;
+ for(const key of ['feather-award','vmeste-prize','two-figure-composition']){
+  const original=projects[key].media[0].src,stem=original.replace('assets/projects/','assets/responsive/').replace(/\.jpg$/,'');
+  const width=key==='vmeste-prize'?720:1280;
+  const list=[480,...(width>800?[800]:[]),width];
+  assert(home.includes(`src="${original}" srcset="${list.map(w=>`${stem}-${w}.webp ${w}w`).join(', ')}" sizes="`));
+  const example=readFileSync(new URL(`../dist/cases/${key}.html`,import.meta.url),'utf8');
+  assert(example.includes(`href="../${original}"`));
+  const originalLength=readFileSync(new URL('../dist/'+original,import.meta.url)).length;
+  originalBytes+=originalLength;
+  for(const w of list){
+   const file=readFileSync(new URL(`../dist/${stem}-${w}.webp`,import.meta.url));
+   assert.equal(file.subarray(0,4).toString(),'RIFF');
+   assert.equal(file.subarray(8,12).toString(),'WEBP');
+   assert(file.length<originalLength);
+   if(w===480)smallBytes+=file.length;
+   if(w===width)fullBytes+=file.length;
+  }
+ }
+ assert(smallBytes<originalBytes*0.20);
+ assert(fullBytes<originalBytes*0.60);
+});
