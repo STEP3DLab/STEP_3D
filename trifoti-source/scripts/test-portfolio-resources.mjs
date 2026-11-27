@@ -491,3 +491,17 @@ test('Light mode pauses only the other player when a video starts, preserving bo
  bear.children[0].children[2].emit('click');first.paused=false;first.emit('play');
  assert.equal(second.paused,1,'late events from detached players do not pause current controls');
 });
+
+test('Light mode affords a two-way, keyboard focusable case index without requiring media or scripts',()=>{
+ const html=outputs.get('light.html');
+ const index=html.match(/<nav class="light-index" id="light-work-index" tabindex="-1" aria-label="Работы лёгкого просмотра">(.*?)<\/nav>/)?.[1];
+ assert.ok(index);
+ for(const key of Object.keys(projects)){
+   assert.ok(index.includes(`href="#${key}"`));
+   const article=html.split(`<article class="light-case" id="${key}" tabindex="-1" aria-labelledby="light-title-${key}" data-light-case="${key}">`)[1]?.split('</article>')[0];
+   assert.ok(article,key);
+   assert.ok(article.includes(`<h2 id="light-title-${key}">`),key);
+   assert.ok(article.includes('<a class="light-back" href="#light-work-index">К списку работ</a>'),key);
+ }
+ assert.match(read('portfolio-resources.css'),/\.light-back\{[^}]*min-height:44px/);
+});

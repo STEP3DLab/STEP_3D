@@ -13,3 +13,8 @@
 .catalog-contents h2{font-size:1.3rem;margin:1.5rem 0 .25rem}
 .catalog-back{display:inline-flex;min-height:44px;align-items:center}
 @media print{.catalog-back-row{display:none}.catalog-contents h2{font-size:12pt;margin:3mm 0 1mm}}
+
+/* Return to the native project index from any case in the text-first view. */
+#light-work-index{scroll-margin-block-start:1rem}
+.light-back{display:inline-flex;min-height:44px;align-items:center}
+@media print{.light-back-row{display:none}}
