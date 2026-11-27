@@ -102,7 +102,10 @@ stage.addEventListener('pointerdown',e=>{
 stage.addEventListener('pointermove',e=>{
  if(!dragging||stage.clientWidth<=0)return;
  const dx=e.clientX-lastX;lastX=e.clientX;const duration=video.duration;
- if(duration>0)video.currentTime=(video.currentTime+dx/stage.clientWidth*duration+duration)%duration;
+ if(duration>0){
+  const seek=(video.currentTime+dx/stage.clientWidth*duration)%duration;
+  video.currentTime=seek<0?seek+duration:seek;
+ }
 });
 for(const name of ['pointerup','pointercancel','lostpointercapture'])stage.addEventListener(name,()=>{
  if(!dragging)return;

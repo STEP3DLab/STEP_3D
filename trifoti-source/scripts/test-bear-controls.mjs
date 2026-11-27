@@ -228,3 +228,15 @@ test('warm bear returns to its poster after a failed GIF and only retries explic
  assert.equal(toggle.attrs['aria-pressed'],'true');
  assert.match(s.els['drag-hint'].textContent,/360°/);
 });
+
+test('A fast reverse drag wraps even if one pointer move crosses multiple full turns',()=>{
+ const s=setup(),stage=s.els['bear-stage'];
+ stage.clientWidth=200;s.v.currentTime=1;
+ const pointer={button:0,isPrimary:true,pointerId:1};
+ s.fire(stage,'pointerdown',{...pointer,clientX:500});
+ s.fire(stage,'pointermove',{...pointer,clientX:40});
+ assert.ok(Math.abs(s.v.currentTime-7.16)<.001,`Unexpected frame at ${s.v.currentTime}s`);
+ assert.equal(s.v.paused,true);
+ s.fire(stage,'pointerup',pointer);
+ assert.equal(s.v.paused,false);
+});
