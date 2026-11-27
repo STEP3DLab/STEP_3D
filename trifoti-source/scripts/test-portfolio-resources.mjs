@@ -505,3 +505,13 @@ test('Light mode affords a two-way, keyboard focusable case index without requir
  }
  assert.match(read('portfolio-resources.css'),/\.light-back\{[^}]*min-height:44px/);
 });
+
+test('The three single-photo case pages offer mobile WebP without replacing their original downloads',()=>{
+ for(const [key,stem] of [['feather-award','feather-front'],['vmeste-prize','vmeste-prize'],['two-figure-composition','two-figure-composition']]){
+  const html=outputs.get(casePath(key));
+  assert.ok(html.includes(`<a href="../assets/projects/${key}/${stem}.jpg"`),key);
+  assert.ok(html.includes(`<picture><source media="screen and (max-width: 700px)" type="image/webp" srcset="../assets/responsive/${key}/${stem}-480.webp 480w,`),key);
+  assert.ok(html.includes(`<img src="../assets/projects/${key}/${stem}.jpg"`),key);
+ }
+ assert.doesNotMatch(outputs.get(casePath('mascot')),/<source media="screen and \(max-width: 700px\)"/);
+});
