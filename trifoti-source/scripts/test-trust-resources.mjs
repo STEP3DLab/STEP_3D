@@ -155,3 +155,24 @@ test('Share previews use the collective logo and keep the same public URL for ev
  assert(head.includes('<meta name="twitter:card" content="summary">'));
  assert.doesNotMatch(head,/pack=|brief=|#|[?&]selection=/);
 });
+
+test('Packet equivalent history events keep the manual copy field; real selection changes recover copy focus',async()=>{
+ const f=fixture('#cases/gesture');
+ f.window.navigator.clipboard={writeText(){throw Error('denied')}};
+ f.nodes['pack-copy'].focus();
+ await f.nodes['pack-copy'].listeners.click();
+ const field=f.nodes['pack-url'],copy=f.nodes['pack-copy'];
+ assert.equal(f.nodes['pack-copy-fallback'].hidden,false);
+ assert.equal(f.focus,field);
+ f.window.location.hash='#cases/gesture,invalid,gesture';
+ f.listeners.popstate();f.listeners.hashchange();
+ assert.equal(f.nodes['pack-copy-fallback'].hidden,false);
+ assert.equal(f.focus,field);
+ assert.equal(field.value,packetURL(['gesture']));
+ f.window.location.hash='#cases/pink';
+ f.listeners.popstate();f.listeners.hashchange();
+ assert.equal(f.nodes['pack-copy-fallback'].hidden,true);
+ assert.equal(f.focus,copy);
+ assert.equal(field.value,packetURL(['pink']));
+ assert.equal(f.history.length,0);
+});

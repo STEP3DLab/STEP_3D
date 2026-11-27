@@ -12,8 +12,13 @@ export function initializeInformationPack({document,window}){
  const cards=[...document.querySelectorAll('[data-pack-case]')],choices=[...document.querySelectorAll('[data-pack-choice]')];
  const allowed=cards.map(card=>card.dataset.packCase),feedback=get('pack-feedback'),fallback=get('pack-copy-fallback'),url=get('pack-url'),chooser=get('pack-chooser'),choiceFeedback=get('pack-choice-feedback');
  let selected=[],revision=0;
- function render(){revision++;fallback.hidden=true;feedback.textContent='';choiceFeedback.textContent='';for(const card of cards)card.hidden=!selected.includes(card.dataset.packCase);for(const choice of choices)choice.checked=selected.includes(choice.dataset.packChoice);get('pack-reset').disabled=!selected.length;get('pack-selection-status').textContent=selected.length?`Выбрано работ: ${selected.length} из 3. Состав указан в ссылке этой справки.`:'Работы не выбраны. Можно включить до трёх кейсов с помощью списка выше.';url.value=packetURL(selected)}
- function sync(){selected=packetSelection(window.location.hash,allowed);render()}
+ function render(){revision++;if(!fallback.hidden&&document.activeElement===url)get('pack-copy').focus({preventScroll:true});fallback.hidden=true;feedback.textContent='';choiceFeedback.textContent='';for(const card of cards)card.hidden=!selected.includes(card.dataset.packCase);for(const choice of choices)choice.checked=selected.includes(choice.dataset.packChoice);get('pack-reset').disabled=!selected.length;get('pack-selection-status').textContent=selected.length?`Выбрано работ: ${selected.length} из 3. Состав указан в ссылке этой справки.`:'Работы не выбраны. Можно включить до трёх кейсов с помощью списка выше.';url.value=packetURL(selected)}
+ function sync(){
+  const next=packetSelection(window.location.hash,allowed);
+  // popstate and hashchange can both report the same effective case selection.
+  if(revision&&next.length===selected.length&&next.every((key,index)=>key===selected[index]))return;
+  selected=next;render();
+ }
  function update(){window.history.replaceState(null,'',selected.length?'#cases/'+selected.join(','):window.location.pathname);render()}
  for(const choice of choices)choice.addEventListener('change',()=>{const key=choice.dataset.packChoice;if(choice.checked&&selected.length===3){choice.checked=false;choiceFeedback.textContent='Можно включить не больше трёх работ. Сначала снимите один из выбранных пунктов.';return}selected=choice.checked?[...selected,key]:selected.filter(id=>id!==key);update()});
  get('pack-reset').addEventListener('click',()=>{selected=[];update();choices[0]?.focus()});
