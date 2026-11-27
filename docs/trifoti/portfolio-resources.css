@@ -7,3 +7,9 @@
 /* Exact-frame switches remain links in the static document, including without JS. */
 .static-gallery .frame-mode-links{display:flex;flex-wrap:wrap;gap:10px 20px;margin-top:10px;font-size:12px}.frame-mode-links a{display:inline-flex;align-items:center;min-height:44px;text-decoration:underline}.static-gallery figure:target{outline:2px solid #bf1230;outline-offset:6px;scroll-margin-top:24px}.light-case{scroll-margin-top:24px}
 @media print{.static-gallery .frame-mode-links{display:none}}
+
+/* Native fragment links for the screen catalog, including the no-script view. */
+.catalog-contents,.catalog-case{scroll-margin-block-start:1rem}
+.catalog-contents h2{font-size:1.3rem;margin:1.5rem 0 .25rem}
+.catalog-back{display:inline-flex;min-height:44px;align-items:center}
+@media print{.catalog-back-row{display:none}.catalog-contents h2{font-size:12pt;margin:3mm 0 1mm}}

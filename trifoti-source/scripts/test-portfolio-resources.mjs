@@ -462,3 +462,17 @@ test('Each full-catalog case link identifies its project in a screen-reader link
   assert.equal(entry?.[3],project.title.replaceAll('&','&amp;').replaceAll('"','&quot;').replaceAll('<','&lt;').replaceAll('>','&gt;'));
  }
 });
+
+test('Catalog visitors can return to the contents from every case, without JavaScript or print clutter',()=>{
+ const html=outputs.get('catalog.html');
+ const css=read('portfolio-resources.css');
+ const cases=[...html.matchAll(/<article class="catalog-case"[^>]*>(.*?)<\/article>/g)];
+ assert.equal(cases.length,Object.keys(projects).length);
+ assert.match(html,/<nav class="catalog-contents" id="catalog-toc" tabindex="-1" aria-labelledby="catalog-toc-heading"><h2 id="catalog-toc-heading">Оглавление<\/h2><ol>/);
+ assert.equal((html.match(/id="catalog-toc"/g)||[]).length,1);
+ for(const [,body] of cases){
+   assert.equal((body.match(/<a class="catalog-back" href="#catalog-toc">К оглавлению<\/a>/g)||[]).length,1);
+ }
+ assert.match(css,/@media print\{\.catalog-back-row\{display:none\}/);
+ assert.match(css,/\.catalog-back\{[^}]*min-height:44px/);
+});
