@@ -476,3 +476,18 @@ test('Catalog visitors can return to the contents from every case, without JavaS
  assert.match(css,/@media print\{\.catalog-back-row\{display:none\}/);
  assert.match(css,/\.catalog-back\{[^}]*min-height:44px/);
 });
+
+test('Light mode pauses only the other player when a video starts, preserving both native controls',()=>{
+ const f=lightFixture('#project/mascot/media/clay-turntable'),bear=f.frame('mascot'),gesture=f.frame('gesture');
+ bear.children[4].emit('click');const first=bear.children[1].children[0];first.emit('play');
+ gesture.children[4].emit('click');const second=gesture.children[1].children[0];
+ assert.equal(first.tagName,'VIDEO');assert.equal(second.tagName,'VIDEO');
+ assert.equal(first.paused,undefined,'opening controls does not interrupt existing playback');
+ const href=f.window.location.hash;second.focus();second.emit('play');
+ assert.equal(first.paused,1);assert.equal(second.paused,undefined);assert.equal(first.controls,true);assert.equal(first.preload,'none');
+ assert.equal(bear.children[1].children[0],first);assert.equal(gesture.children[1].children[0],second);
+ assert.equal(f.document.activeElement,second);assert.equal(f.window.location.hash,href);
+ first.paused=false;first.emit('play');assert.equal(second.paused,1,'the earlier player can resume explicitly');
+ bear.children[0].children[2].emit('click');first.paused=false;first.emit('play');
+ assert.equal(second.paused,1,'late events from detached players do not pause current controls');
+});

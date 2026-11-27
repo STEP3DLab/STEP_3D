@@ -28,7 +28,13 @@ export function initializeLightView({document,window}){
   function step(delta){index=(index+delta+project.media.length)%project.media.length;window.history.replaceState(window.history.state,'',modeLinks(key,mediaId(project.media[index])).light.split('light.html')[1]);render()}
   previous.addEventListener('click',()=>step(-1));next.addEventListener('click',()=>step(1));
   frame.addEventListener('keydown',event=>{const direction=galleryArrow(event);if(direction&&project.media.length>1){event.preventDefault();step(direction)}});
-  load.addEventListener('click',()=>{if(originalRequested)return;hideRetry();previewing=false;const item=project.media[index],video=item.type==='video';originalAction(video?'Управление видео открыто':'Загружается оригинал…',true);slot.show(item,{video});});
+  load.addEventListener('click',()=>{if(originalRequested)return;hideRetry();previewing=false;const item=project.media[index],video=item.type==='video';originalAction(video?'Управление видео открыто':'Загружается оригинал…',true);const player=slot.show(item,{video});
+   // Keep controls available without allowing two case videos to play together.
+   if(video)player.addEventListener('play',()=>{
+     if(!host.contains(player)||player.paused)return;
+     for(const other of slots)if(other!==slot)other.pause();
+   });
+  });
   retry.addEventListener('click',()=>{if(retry.hidden||retrying||!previewing)return;retrying=true;retry.setAttribute('aria-disabled','true');showPreview()});
   // History can announce the same route twice. Keep an explicitly loaded resource
   // until the actual frame or poster mode changes.
