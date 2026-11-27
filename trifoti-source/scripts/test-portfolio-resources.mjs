@@ -34,6 +34,22 @@ test('Catalog includes all six cases with exact descriptions, covers, citations 
  const css=read('portfolio-resources.css');assert.match(css,/@page\{size:A4/);assert.match(css,/break-before:page/);assert.match(css,/attr\(href\)/);assert.match(css,/height:auto;max-height:none;overflow:visible/);
  assert.equal(read('catalog.js').match(/window.print\(\)/g).length,1);
 });
+test('Three mobile catalog covers reuse smaller WebP assets without changing desktop or printed originals',()=>{
+ const html=outputs.get('catalog.html');
+ const affected={
+  'feather-award/feather-front':[480,800,1280],
+  'vmeste-prize/vmeste-prize':[480,720],
+  'two-figure-composition/two-figure-composition':[480,800,1280]
+ };
+ const pictures=[...html.matchAll(/<picture><source media="screen and \(max-width: 700px\)" type="image\/webp" srcset="([^"]+)" sizes="92vw"><img src="assets\/projects\/([^"]+)\.jpg"[^>]+><\/picture>/g)];
+ assert.equal(pictures.length,3);
+ for(const [,set,stem] of pictures){
+  assert.deepEqual(set.split(', '),affected[stem].map(w=>`assets/responsive/${stem}-${w}.webp ${w}w`));
+  const image=readFileSync(new URL('assets/projects/'+stem+'.jpg',root));
+  for(const w of affected[stem])assert(readFileSync(new URL(`assets/responsive/${stem}-${w}.webp`,root)).length<image.length);
+ }
+ assert.equal((html.match(/loading="eager"/g)||[]).length,Object.keys(projects).length);
+});
 test('Text-only lightweight markup requests no media, fonts, app or bear and retains 25 original links',()=>{
  const html=outputs.get('light.html');assert.doesNotMatch(html,/<img|<video|<source|preload|app\.js|bear-video/);
  assert.equal((html.match(/data-light-case=/g)||[]).length,Object.keys(projects).length);
