@@ -12,4 +12,21 @@ test('All stories and atlas defer image creation until explicit expansion; reope
 test('Bear paired controls independent and opening targets exact currentframe',()=>{const f=fixture();f.expand(0);const imgs=f.all.filter(n=>n.tag==='img');const red=imgs[1].src;f.all.find(n=>n['aria-label']==='Следующий кадр: Белое исполнение').listeners.click();assert.equal(imgs[0].src,storyMedia('mascot','white-front').src);assert.equal(imgs[1].src,red);const link=f.all.filter(n=>n.tag==='a'&&n.href?.endsWith('/media/white-front')).at(-1);let prevented=false;link.listeners.click({button:0,preventDefault(){prevented=true}});assert(prevented);assert.deepEqual(f.opened[0].slice(0,2),['mascot','white-front']);link.listeners.click({button:0,ctrlKey:true});assert.equal(f.opened.length,1)});
 test('Story wraps manually and preserves confirmed attribution/source links',()=>{const f=fixture();f.expand(2);const prev=f.all.find(n=>n['aria-label']==='Предыдущий кадр: Рассказ в трёх фотографиях');prev.listeners.click();assert.equal(f.all.find(n=>n.tag==='img').src,storyMedia('stdAwards','award-ceremony').src);assert(f.find(projects.stdAwards.attribution));for(const source of projects.stdAwards.sources)assert(f.all.some(n=>n.href===source.url&&n.rel==='noopener noreferrer'))});
 test('Atlas filters by project and type without removing active select, handles empty results',()=>{const f=fixture();f.expand(4);const selects=f.all.filter(n=>n.tag==='select'),grid=f.all.find(n=>n.className==='visual-atlas-grid');assert.equal(grid.children.length,Object.values(projects).flatMap(p=>p.media).length);selects[0].value='gesture';selects[1].value='photo';selects[1].listeners.change();assert.equal(grid.children.length,1);assert.match(grid.children[0].textContent,/нет материалов/);selects[1].value='video';selects[1].listeners.change();assert.equal(grid.children.length,1);assert.equal(f.all.filter(n=>n.tag==='select')[0],selects[0]);assert(f.all.some(n=>n.textContent==='Видео · '+projects.gesture.title));assert.equal(f.all.filter(n=>n.tag==='video').length,0)});
+test('Responsive story frames use real derivatives and retain the original as fallback',()=>{
+ const f=fixture();f.expand(1);
+ const [object,model]=f.all.filter(n=>n.tag==='img');
+ const initial=storyMedia('restoration','initial').src;
+ assert.equal(object.src,initial);
+ assert.match(object.sizes,/^auto, /);
+ assert.equal(object.srcset,'assets/responsive/restoration/initial-480.webp 480w, assets/responsive/restoration/initial-800.webp 800w, '+initial+' 960w');
+ assert.equal(model.srcset,'');
+ f.all.find(n=>n['aria-label']==='Следующий кадр: Скульптурная модель').listeners.click();
+ assert.match(model.srcset,/model-angle-800\.webp 800w/);
+ for(const img of [object,model])for(const source of img.srcset.split(', ')){
+  assert(fs.existsSync(new URL('../dist/'+source.split(' ')[0],import.meta.url)));
+ }
+ f.all.find(n=>n['aria-label']==='Следующий кадр: Скульптурная модель').listeners.click();
+ assert.equal(model.srcset,'');
+ assert.equal(model.src,storyMedia('restoration','model-front').src);
+});
 test('Visual presentation introduces no storage,networkdata,autoplay,HTMLinjection or generated media',()=>{const source=fs.readFileSync(new URL('../dist/visual-stories.js',import.meta.url),'utf8');for(const pattern of [/localStorage/,/sessionStorage/,/fetch\(/,/sendBeacon/,/innerHTML/,/\.play\(/,/setInterval/])assert.doesNotMatch(source,pattern)});

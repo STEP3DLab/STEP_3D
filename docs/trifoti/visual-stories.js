@@ -21,6 +21,23 @@ export function atlasFrames(key='all',kind='all'){
  return Object.entries(projects).flatMap(([projectKey,project])=>project.media.map(item=>({key:projectKey,item})))
   .filter(frame=>(key==='all'||frame.key===key)&&(kind==='all'||(kind==='video')===(frame.item.type==='video')));
 }
+const storyWidths={
+ 'assets/projects/bear/white-front.webp':[480,800,1280],
+ 'assets/projects/bear/red-three-quarter.webp':[480,800,1280],
+ 'assets/projects/restoration/initial.webp':[480,800,960],
+ 'assets/projects/restoration/loss-detail.webp':[480,800,960],
+ 'assets/projects/restoration/result.webp':[480,800,960],
+ 'assets/projects/restoration/result-detail.webp':[480,800,960],
+ 'assets/projects/restoration/model-angle.webp':[480,800,1235],
+ 'assets/projects/std-awards/award-series.webp':[480,800,1536],
+ 'assets/projects/std-awards/award-ceremony.webp':[480,800,1536],
+ 'assets/projects/rto-traveling-cup/trophy.webp':[480,1152]
+};
+function storySrcset(src){
+ const widths=storyWidths[src];if(!widths)return '';
+ const stem=src.replace('/projects/','/responsive/').replace(/\.webp$/,'');
+ return widths.map((w,i)=>`${i===widths.length-1?src:stem+'-'+w+'.webp'} ${w}w`).join(', ');
+}
 export function mountVisualStories({host,document,onOpen,part='all'}){
  const el=(tag,text,cls)=>{const n=document.createElement(tag);if(text)n.textContent=text;if(cls)n.className=cls;return n};
  const region=el('section',null,'visual-stories');region.setAttribute('aria-label',part==='atlas'?'Атлас кадров':'Визуальные истории');region.append(el('h3',part==='atlas'?'Все кадры портфолио':'Рассмотреть подробнее'));
@@ -28,11 +45,11 @@ export function mountVisualStories({host,document,onOpen,part='all'}){
  function disclosure(title,build){const details=el('details'),summary=el('summary',title),body=el('div',null,'visual-story-body');details.append(summary,body);let built=false;details.addEventListener('toggle',()=>{if(details.open&&!built){built=true;build(body)}});region.append(details);return details}
  function attribution(host,key){const project=projects[key];host.append(el('p',project.attribution||project.type,'form-note'));const sources=el('div',null,'visual-story-sources');for(const source of project.sources||[]){const link=el('a',source.label);link.href=source.url;link.target='_blank';link.rel='noopener noreferrer';sources.append(link)}host.append(sources)}
  function frameLink(key,item,text){const link=el('a',text,'visual-frame-link');link.href=exactLink(key,mediaId(item));link.addEventListener('click',event=>{if(event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;event.preventDefault();onOpen(key,mediaId(item),link)});return link}
- function viewer(key,group){const card=el('article',null,'visual-story-card');card.append(el('h4',group.label));const figure=el('figure'),image=el('img'),caption=el('figcaption');image.loading='lazy';image.decoding='async';image.width=640;image.height=640;figure.append(image,caption);card.append(figure);const controls=el('div',null,'exploration-actions'),previous=el('button','←'),next=el('button','→'),counter=el('span');previous.type=next.type='button';previous.setAttribute('aria-label','Предыдущий кадр: '+group.label);next.setAttribute('aria-label','Следующий кадр: '+group.label);counter.setAttribute('role','status');controls.append(previous,counter,next);card.append(controls);const opener=el('div');card.append(opener);let index=0;
-  const update=()=>{const item=storyMedia(key,group.ids[index]);image.src=item.poster||item.src;image.alt=item.caption;caption.textContent=(group.labels?.[index]?group.labels[index]+'. ':'')+item.caption;counter.textContent=`${index+1} / ${group.ids.length}`;opener.replaceChildren(frameLink(key,item,'Открыть этот кадр в галерее'));};
+ function viewer(key,group,paired){const card=el('article',null,'visual-story-card');card.append(el('h4',group.label));const figure=el('figure'),image=el('img'),caption=el('figcaption');image.loading='lazy';image.decoding='async';image.sizes=paired?'auto, (max-width: 650px) 92vw, (max-width: 1240px) 45vw, 560px':'auto, (max-width: 920px) 92vw, 850px';image.width=640;image.height=640;figure.append(image,caption);card.append(figure);const controls=el('div',null,'exploration-actions'),previous=el('button','←'),next=el('button','→'),counter=el('span');previous.type=next.type='button';previous.setAttribute('aria-label','Предыдущий кадр: '+group.label);next.setAttribute('aria-label','Следующий кадр: '+group.label);counter.setAttribute('role','status');controls.append(previous,counter,next);card.append(controls);const opener=el('div');card.append(opener);let index=0;
+  const update=()=>{const item=storyMedia(key,group.ids[index]);const src=item.poster||item.src;image.srcset=storySrcset(src);image.src=src;image.alt=item.caption;caption.textContent=(group.labels?.[index]?group.labels[index]+'. ':'')+item.caption;counter.textContent=`${index+1} / ${group.ids.length}`;opener.replaceChildren(frameLink(key,item,'Открыть этот кадр в галерее'));};
   previous.addEventListener('click',()=>{index=(index+group.ids.length-1)%group.ids.length;update()});next.addEventListener('click',()=>{index=(index+1)%group.ids.length;update()});update();return card;
  }
- if(part!=='atlas')for(const story of visualStories)disclosure(story.title,body=>{body.append(el('p',story.note,'form-note'));const grid=el('div',null,story.groups.length===2?'visual-story-grid':'visual-story-single');for(const group of story.groups)grid.append(viewer(story.key,group));body.append(grid);attribution(body,story.key)});
+ if(part!=='atlas')for(const story of visualStories)disclosure(story.title,body=>{body.append(el('p',story.note,'form-note'));const grid=el('div',null,story.groups.length===2?'visual-story-grid':'visual-story-single');for(const group of story.groups)grid.append(viewer(story.key,group,story.groups.length===2));body.append(grid);attribution(body,story.key)});
  if(part!=='stories'){const atlas=disclosure(`Атлас: ${atlasFrames('all','photo').length} фото и ${atlasFrames('all','video').length} видео`,body=>{
   body.append(el('p','Миниатюры всех кадров: нажмите, чтобы открыть полный кадр с подписью. Видео показаны постерами и запускаются только в галерее по вашему нажатию.','form-note'));
   const filters=el('div',null,'visual-atlas-filters');const projectLabel=el('label','Работа'),projectSelect=el('select'),kindLabel=el('label','Тип материала'),kindSelect=el('select');
