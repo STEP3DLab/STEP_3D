@@ -50,6 +50,21 @@ test('Three mobile catalog covers reuse smaller WebP assets without changing des
  }
  assert.equal((html.match(/loading="eager"/g)||[]).length,Object.keys(projects).length);
 });
+test('Restoration case uses lighter mobile photos while links, desktop and print keep originals',()=>{
+ const html=outputs.get(casePath('restoration'));
+ const pics=[...html.matchAll(/<a href="([^"]+)"[^>]+><picture><source media="screen and \(max-width: 700px\)" type="image\/webp" srcset="([^"]+)" sizes="92vw"><img src="([^"]+)"[^>]+><\/picture><\/a>/g)];
+ assert.equal(pics.length,3);
+ const stems=['initial','loss-detail','result-detail'];
+ pics.forEach(([,link,set,original],i)=>{
+  const stem=stems[i];
+  assert.equal(original,`../assets/projects/restoration/${stem}.webp`);
+  assert.equal(link,original);
+  assert.equal(set,`../assets/responsive/restoration/${stem}-480.webp 480w, ../assets/responsive/restoration/${stem}-800.webp 800w, ${original} 960w`);
+  const full=readFileSync(new URL(original.slice(3),root)).length;
+  for(const w of [480,800])assert(readFileSync(new URL(`assets/responsive/restoration/${stem}-${w}.webp`,root)).length<full);
+ });
+ assert.doesNotMatch(outputs.get('catalog.html'),/restoration\/initial-480/);
+});
 test('Text-only lightweight markup requests no media, fonts, app or bear and retains 25 original links',()=>{
  const html=outputs.get('light.html');assert.doesNotMatch(html,/<img|<video|<source|preload|app\.js|bear-video/);
  assert.equal((html.match(/data-light-case=/g)||[]).length,Object.keys(projects).length);
