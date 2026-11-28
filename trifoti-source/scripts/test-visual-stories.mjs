@@ -30,3 +30,18 @@ test('Responsive story frames use real derivatives and retain the original as fa
  assert.equal(model.src,storyMedia('restoration','model-front').src);
 });
 test('Visual presentation introduces no storage,networkdata,autoplay,HTMLinjection or generated media',()=>{const source=fs.readFileSync(new URL('../dist/visual-stories.js',import.meta.url),'utf8');for(const pattern of [/localStorage/,/sessionStorage/,/fetch\(/,/sendBeacon/,/innerHTML/,/\.play\(/,/setInterval/])assert.doesNotMatch(source,pattern)});
+
+test('Single-photo atlas cards use lighter full-image previews with unchanged exact gallery targets',()=>{
+ const f=fixture();f.expand(4);
+ for(const key of ['vmeste-prize','two-figure-composition']){
+  const [item]=projects[key].media;
+  const source='assets/responsive/'+key+'/'+key+'-480.webp';
+  assert.equal(atlasPreview(key,item),source);
+  assert(fs.statSync(new URL('../dist/'+source,import.meta.url)).size<fs.statSync(new URL('../dist/'+item.src,import.meta.url)).size);
+  assert(f.all.some(n=>n.tag==='img'&&n.src===source&&n.alt===item.caption));
+  const link=f.all.find(n=>n.tag==='a'&&n.children.some(img=>img.src===source));
+  assert.match(link.href,new RegExp('/'+key+'/media/'));
+  link.listeners.click({button:0,preventDefault(){}});
+  assert.deepEqual(f.opened.at(-1).slice(0,2),[key,mediaId(item)]);
+ }
+});

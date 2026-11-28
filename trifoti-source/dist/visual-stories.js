@@ -16,7 +16,13 @@ export const visualStories=[
   {label:'Рассказ в трёх фотографиях',ids:['trophy','ceremony','winners'],labels:['Готовый кубок','Первый обладатель: «Ленком Марка Захарова»','Участники и победители Спартакиады']}]}
 ];
 export function storyMedia(key,id){return projects[key]?.media.find(item=>mediaId(item)===id)}
-export function atlasPreview(key,item){return projects[key].media.length<2?(item.poster||item.src):thumbnailSource(item)}
+const atlasSingles={
+ 'assets/projects/vmeste-prize/vmeste-prize.jpg':'assets/responsive/vmeste-prize/vmeste-prize-480.webp',
+ 'assets/projects/two-figure-composition/two-figure-composition.jpg':'assets/responsive/two-figure-composition/two-figure-composition-480.webp'
+};
+export function atlasPreview(key,item){
+ return atlasSingles[item.src]||(projects[key].media.length<2?(item.poster||item.src):thumbnailSource(item));
+}
 export function atlasFrames(key='all',kind='all'){
  return Object.entries(projects).flatMap(([projectKey,project])=>project.media.map(item=>({key:projectKey,item})))
   .filter(frame=>(key==='all'||frame.key===key)&&(kind==='all'||(kind==='video')===(frame.item.type==='video')));

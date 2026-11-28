@@ -3,7 +3,7 @@ import {projects} from './project-data.js?v=20261026-directions';
 import {caseKeys,selectionIds,selectionRoute,selectionFromHash,PUBLIC_SITE,mediaId,exactLink,relatedWorks,thematicRoutes,technicalNotes,countedNoun} from './exploration-data.js?v=20261026-directions';
 import {copyProjectLink} from './project-navigation.js?v=20261026-directions';
 function element(document,tag,text,className){const node=document.createElement(tag);if(text)node.textContent=text;if(className)node.className=className;return node}
-export function mountExploration({host,document,location,history,onOpen,clipboard,onBrief,loadStories=()=>import('./visual-stories.js?v=20261026-directions&sizes=20261128')}){
+export function mountExploration({host,document,location,history,onOpen,clipboard,onBrief,loadStories=()=>import('./visual-stories.js?v=20261026-directions&sizes=20261128&atlas=20261128')}){
  let selected=[],revision=0,pendingSelection=false;const subscribers=new Set();const el=(tag,text,cls)=>element(document,tag,text,cls);
  const panel=el('details',null,'exploration-panel');panel.id='explore';const summary=el('summary','Исследовать работы · подборка, сравнение, маршруты');panel.append(summary);host.append(panel);
  panel.addEventListener('toggle',()=>{if(!panel.open)revision++});
