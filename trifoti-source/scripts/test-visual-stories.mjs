@@ -38,10 +38,19 @@ test('Single-photo atlas cards use lighter full-image previews with unchanged ex
   const source='assets/responsive/'+key+'/'+key+'-480.webp';
   assert.equal(atlasPreview(key,item),source);
   assert(fs.statSync(new URL('../dist/'+source,import.meta.url)).size<fs.statSync(new URL('../dist/'+item.src,import.meta.url)).size);
-  assert(f.all.some(n=>n.tag==='img'&&n.src===source&&n.alt===item.caption));
+  assert(f.all.some(n=>n.tag==='img'&&n.src===source&&n.alt===item.caption&&n.className==='atlas-full-frame'));
   const link=f.all.find(n=>n.tag==='a'&&n.children.some(img=>img.src===source));
   assert.match(link.href,new RegExp('/'+key+'/media/'));
   link.listeners.click({button:0,preventDefault(){}});
   assert.deepEqual(f.opened.at(-1).slice(0,2),[key,mediaId(item)]);
  }
+});
+
+test('Only the wide and tall atlas cards preserve the whole composition without changing the grid or gallery',()=>{
+ const f=fixture();f.expand(4);
+ const frames=f.all.filter(n=>n.tag==='img'&&n.className==='atlas-full-frame');
+ assert.equal(frames.length,2);
+ const css=fs.readFileSync(new URL('../dist/style.css',import.meta.url),'utf8');
+ assert.match(css,/\.visual-atlas-grid img\.atlas-full-frame\{object-fit:contain;/);
+ assert.match(css,/\.visual-atlas-grid img\{[^}]+object-fit:cover/);
 });
