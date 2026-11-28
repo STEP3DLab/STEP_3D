@@ -14,8 +14,8 @@ test('Three original reading routes reuse two to four existing sources with expl
  for(const route of readingRoutes){assert(route.items.length>=2&&route.items.length<=4);assert.equal(new Set(route.items.map(item=>item.id)).size,route.items.length);for(const item of route.items){const source=publications.find(source=>source.id===item.id);assert(source);assert(item.reason.length>20);assert(trust.includes(source.kind));assert(trust.includes(source.url));}}
  assert.match(trust,/Полные тексты и видео остаются у источников/);
 });
-test('Timeline partitions all 21 sources without inventing precision or creation dates',()=>{
- const {dated,undated}=evidenceTimeline();assert.equal(dated.length,19);assert.equal(undated.length,2);assert.deepEqual(undated.map(item=>item.id),['P20','P08']);
+test('Timeline partitions all 22 sources without inventing precision or creation dates',()=>{
+ const {dated,undated}=evidenceTimeline();assert.equal(dated.length,20);assert.equal(undated.length,2);assert.deepEqual(undated.map(item=>item.id),['P20','P08']);
  assert.equal(new Set([...dated,...undated].map(item=>item.id)).size,publications.length);
  for(let i=1;i<dated.length;i++)assert(dated[i].date.slice(0,4)>=dated[i-1].date.slice(0,4));
  assert.match(trust,/даты публикаций, а не даты создания работ/);assert.match(trust,/октябрь 2019/);assert.doesNotMatch(trust,/2019-10-01|2025-01-01/);

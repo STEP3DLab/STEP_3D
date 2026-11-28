@@ -8,15 +8,15 @@ import {renderPublications,publicationDate,escapeHtml} from './render-publicatio
 const html=readFileSync(new URL('../dist/index.html',import.meta.url),'utf8');
 const app=readFileSync(new URL('../dist/app.js',import.meta.url),'utf8');
 const section=renderPublications();
-const counts={all:21,interviews:5,articles:9,catalogs:4,video:3};
+const counts={all:22,interviews:5,articles:9,catalogs:4,video:4};
 const byId=id=>publications.find(entry=>entry.id===id);
 
-test('Curated catalogue contains 21 unique verified pages and six distinct highlights',()=>{
- assert.equal(publications.length,21);assert.equal(new Set(publications.map(x=>x.id)).size,21);
- assert.equal(new Set(publications.map(x=>x.url)).size,21);
+test('Curated catalogue contains 22 unique verified pages and six distinct highlights',()=>{
+ assert.equal(publications.length,22);assert.equal(new Set(publications.map(x=>x.id)).size,22);
+ assert.equal(new Set(publications.map(x=>x.url)).size,22);
  assert.equal(featuredPublicationIds.length,6);assert.equal(new Set(featuredPublicationIds).size,6);
  for(const id of featuredPublicationIds)assert(byId(id));
- for(const id of ['P13','P18','P21','P22','P23','P24','P25','P26','P27','video-04','video-05'])assert(!byId(id),id);
+ for(const id of ['P13','P18','P21','P22','P23','P24','P25','P26','P27','video-05'])assert(!byId(id),id);
 });
 test('All sources use HTTPS and only the declared publication categories',()=>{
  for(const entry of publications){
@@ -39,14 +39,18 @@ test('Annotations retain the important attribution and project-status qualificat
  assert.match(byId('P04').summary,/не об установленном монументе/);
  assert.match(byId('video-01').summary,/с отцом/);assert.match(byId('video-03').note,/Доступность внешнего видеоплеера/);
  assert(!featuredPublicationIds.includes('video-03'));
+ const art=byId('video-04');
+ assert.equal(art.category,'video');assert.equal(art.date,'2026-04-06');assert.match(art.note,/10:52–13:22/);
+ assert.equal(new URL(art.url).hostname,'www.14kanal.ru');assert(!featuredPublicationIds.includes(art.id));
+ assert.doesNotMatch(art.summary,/ТРИФОТИ/);
 });
 test('Static HTML exactly matches the portable source data',()=>{
  assert(html.includes(section));assert.equal((section.match(/data-publication-highlight=/g)||[]).length,6);
- assert.equal((section.match(/data-publication-id=/g)||[]).length,21);
+ assert.equal((section.match(/data-publication-id=/g)||[]).length,22);
  assert(html.includes('href="#publications">Публикации и интервью'));
 });
 test('Publication links are safe, explicit and present without JavaScript',()=>{
- const anchors=[...section.matchAll(/<a\b([^>]*)>/g)];assert.equal(anchors.length,27);
+ const anchors=[...section.matchAll(/<a\b([^>]*)>/g)];assert.equal(anchors.length,28);
  for(const [,attrs] of anchors){assert(attrs.includes('href="https://'));assert(attrs.includes('target="_blank"'));assert(attrs.includes('rel="noopener noreferrer"'));}
  assert(section.includes('<details class="publication-catalog"'));assert(section.includes('id="publication-filters" role="group" aria-label="Тип публикации" hidden'));
  assert(!/<li[^>]*\bhidden/.test(section));assert(section.includes('а не полный список всех публикаций'));
@@ -75,7 +79,7 @@ function fixture(){
 }
 for(const [key,count] of Object.entries(counts))test(`Catalogue ${key} filter shows ${count} sources without changing link data`,()=>{
  const f=fixture();assert(initializePublicationFilters(f));f.buttons.find(b=>b.dataset.publicationFilter===key).click();
- assert.equal(f.entries.filter(e=>!e.hidden).length,count);assert.equal(f.status.textContent,`Показано: ${count} из 21.`);
+ assert.equal(f.entries.filter(e=>!e.hidden).length,count);assert.equal(f.status.textContent,`Показано: ${count} из 22.`);
  assert.equal(f.buttons.filter(b=>b.attributes['aria-pressed']==='true').length,1);
  assert.equal(f.buttons.find(b=>b.attributes['aria-pressed']==='true').dataset.publicationFilter,key);
  assert.equal(f.controls.hidden,false);
@@ -83,7 +87,7 @@ for(const [key,count] of Object.entries(counts))test(`Catalogue ${key} filter sh
 });
 test('Catalogue initialization is idempotent and preserves an active filter',()=>{
  const f=fixture();initializePublicationFilters(f);f.buttons.find(b=>b.dataset.publicationFilter==='video').click();
- initializePublicationFilters(f);assert(f.buttons.every(b=>b.listeners.length===1));assert.equal(f.status.textContent,'Показано: 3 из 21.');
+ initializePublicationFilters(f);assert(f.buttons.every(b=>b.listeners.length===1));assert.equal(f.status.textContent,'Показано: 4 из 22.');
 });
 for(const missing of ['#publication-catalog','#publication-filters','#publication-count'])test(`Missing optional ${missing} leaves static sources available`,()=>{
  const f=fixture();delete f.nodes[missing];assert.equal(initializePublicationFilters(f),false);assert(f.entries.every(e=>!e.hidden));assert(f.controls.hidden);

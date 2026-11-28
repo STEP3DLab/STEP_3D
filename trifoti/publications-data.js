@@ -57,6 +57,18 @@ export const publications = [
     "format": "page"
   },
   {
+    "id": "video-04",
+    "title": "Фёдор Паршин и «Доброториум» на «Арт Россия»",
+    "publisher": "14 канал",
+    "url": "https://www.14kanal.ru/news/detail/betonnye-kapibary-lopata-spermatozoid-i-edinorog-kak-art-rossiya-2026-udivila-gostinyy-dvor-reportazh/",
+    "date": "2026-04-06",
+    "category": "video",
+    "kind": "Фрагмент телерепортажа",
+    "summary": "Фёдор Паршин рассказывает о проекте «Доброториум» на выставке-ярмарке «Арт Россия» в Гостином дворе.",
+    "note": "Фрагмент: 10:52–13:22. Ссылка ведёт на страницу 14 канала с таймкодами.",
+    "format": "video-page"
+  },
+  {
     "id": "video-01",
     "title": "О скульптуре, памяти и работе с отцом",
     "publisher": "Радио ЗВЕЗДА / Звезда Аналитика",
