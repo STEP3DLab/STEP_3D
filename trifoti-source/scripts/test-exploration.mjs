@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {projects} from '../dist/project-data.js';
 import {caseKeys,mediaId,mediaIndex,parseCaseRoute,selectionIds,selectionRoute,selectionFromHash,PUBLIC_SITE,exactLink,relatedWorks,thematicRoutes,technicalNotes,countedNoun} from '../dist/exploration-data.js';
 import {createProjectNavigation,projectLink} from '../dist/project-navigation.js';
-import {mountExploration} from '../dist/exploration-panel.js';
+import {comparisonSrcset,mountExploration} from '../dist/exploration-panel.js';
 for(const key of caseKeys)test('Exact routes round-trip every stable frame: '+key,()=>{const ids=projects[key].media.map(mediaId);assert.equal(new Set(ids).size,ids.length);for(const [index,id] of ids.entries()){assert.equal(mediaIndex(key,id),index);assert.deepEqual(parseCaseRoute(new URL(exactLink(key,id)).hash),{key,media:id});assert.equal(projectLink('https://private.example/?brief=secret',key,id),exactLink(key,id))}});
 test('Legacy routes and invalid media safely resolve without accepting unknown cases',()=>{assert.deepEqual(parseCaseRoute('#project/mascot'),{key:'mascot',media:null});assert.deepEqual(parseCaseRoute('#project/mascot/media/unknown'),{key:'mascot',media:null});for(const hash of ['#project/__proto__','#project/constructor','#project/missing','#project/mascot/media/%3Cscript%3E','#project/mascot/extra','#project/mascot/media/'+ 'x'.repeat(200)])assert.equal(parseCaseRoute(hash),null)});
 test('Selections bounded, unique, public-only and portable',()=>{assert.deepEqual(selectionIds('mascot,pink,pink,gesture,restoration,secret'),['mascot','pink','gesture']);for(const value of ['__proto__,constructor','%3Cscript%3E','x'.repeat(101)])assert.deepEqual(selectionIds(value),[]);assert.deepEqual(selectionFromHash(selectionRoute(['mascot','stdAwards','rto-traveling-cup'])),['mascot','stdAwards','rto-traveling-cup']);assert.equal(selectionFromHash('#contact'),null)});
@@ -65,4 +65,19 @@ for(const interrupt of ['none','focus','route','close','task'])test(`History rev
  if(interrupt==='task')f.find('Визуальные истории').listeners.click();
  const focused=f.document.activeElement;frames[0]();assert.equal(f.document.activeElement,focused,'Delayed reveal must never refocus');
  assert.equal(!!target.scrolled,interrupt==='none');if(interrupt==='none')assert.deepEqual(target.scrollOptions,{block:'nearest',behavior:'instant'});
+});
+
+test('Comparison uses existing responsive candidates and clears them for unmatched photos and video posters',()=>{
+ const f=fixture('#explore/restoration,gesture');
+ const images=f.all.filter(n=>n.tag==='img'),initial=projects.restoration.media[0].src;
+ assert.equal(images[0].src,initial);assert.match(images[0].sizes,/^auto, /);
+ assert.equal(images[0].srcset,'assets/responsive/restoration/initial-480.webp 480w, assets/responsive/restoration/initial-800.webp 800w, '+initial+' 960w');
+ assert.equal(images[1].srcset,'');
+ assert.deepEqual(comparisonSrcset('assets/projects/vmeste-prize/vmeste-prize.jpg').split(' ').filter(s=>s.endsWith('w')||s.endsWith('w,')),['480w,','720w']);
+ const previous=f.all.find(n=>n['aria-label']==='Предыдущий ракурс: '+projects.restoration.title);
+ previous.listeners.click();assert.match(images[0].srcset,/result-detail-480/);
+ for(let i=0;i<3;i++)previous.listeners.click();
+ assert.equal(images[0].src,projects.restoration.media[2].src);assert.equal(images[0].srcset,'');
+ f.all.find(n=>n.textContent==='Открыть этот ракурс').listeners.click();
+ assert.deepEqual(f.opened[0].slice(0,2),['restoration','model-front']);
 });
