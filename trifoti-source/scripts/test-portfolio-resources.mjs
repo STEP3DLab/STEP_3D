@@ -63,7 +63,14 @@ test('Restoration case uses lighter mobile photos while links, desktop and print
   const full=readFileSync(new URL(original.slice(3),root)).length;
   for(const w of [480,800])assert(readFileSync(new URL(`assets/responsive/restoration/${stem}-${w}.webp`,root)).length<full);
  });
- assert.doesNotMatch(outputs.get('catalog.html'),/restoration\/initial-480/);
+});
+test('Catalog uses the verified restoration cover variants only for mobile screens',()=>{
+ const html=outputs.get('catalog.html');
+ const original='assets/projects/restoration/initial.webp';
+ const set='assets/responsive/restoration/initial-480.webp 480w, assets/responsive/restoration/initial-800.webp 800w, '+original+' 960w';
+ const pic='<picture><source media="screen and (max-width: 700px)" type="image/webp" srcset="'+set+'" sizes="92vw"><img src="'+original+'" width="960" height="1280"';
+ assert.equal(html.split(pic).length,2);
+ assert.match(html,/<meta property="og:url" content="https:\/\/step3dlab.github.io\/STEP_3D\/trifoti\/catalog.html">/);
 });
 test('Text-only lightweight markup requests no media, fonts, app or bear and retains 25 original links',()=>{
  const html=outputs.get('light.html');assert.doesNotMatch(html,/<img|<video|<source|preload|app\.js|bear-video/);

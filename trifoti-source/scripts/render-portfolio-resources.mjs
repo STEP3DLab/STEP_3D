@@ -36,7 +36,7 @@ function casePhoto(src,image,prefix=''){
 }
 function catalogCover(m){
  const src=m.poster||m.src;
- return screenPhoto(src,`<img src="${src}"${responsive(src)}${dims(src)} alt="${e(m.caption)}" loading="eager" decoding="async">`);
+ return casePhoto(src,`<img src="${src}"${responsive(src)}${dims(src)} alt="${e(m.caption)}" loading="eager" decoding="async">`);
 }
 export function metadata({title,description,path,image='assets/brand/trifoti-logo-transparent.png',alt='Логотип ТРИФОТИ: красно-белый медведь в чёрном контуре дома'}){
  const d=sizes.find(v=>v.src===image)||dimensions[image],width=d?.width||(image.endsWith('.png')?1254:null),height=d?.height||(image.endsWith('.png')?1254:null);
