@@ -81,3 +81,16 @@ test('Comparison uses existing responsive candidates and clears them for unmatch
  f.all.find(n=>n.textContent==='Открыть этот ракурс').listeners.click();
  assert.deepEqual(f.opened[0].slice(0,2),['restoration','model-front']);
 });
+
+test('A failed comparison thumbnail retries its original once and leaves the next frame responsive',()=>{
+ const f=fixture('#explore/restoration,vmeste-prize');
+ const [a,b]=f.all.filter(n=>n.tag==='img');
+ let removed=0;
+ a.removeAttribute=key=>{assert.equal(key,'srcset');a.srcset='';removed++};
+ a.currentSrc=a.src; a.listeners.error(); assert.equal(removed,0);
+ a.currentSrc='https://example.test/initial-480.webp';a.naturalWidth=10;a.listeners.error();assert.equal(removed,0);
+ a.naturalWidth=0; const alt=a.alt; a.listeners.error();a.listeners.error();
+ assert.equal(a.src,projects.restoration.media[0].src);assert.equal(removed,1);assert.equal(a.alt,alt);assert(b.srcset);
+ f.all.find(n=>n['aria-label']==='Следующий ракурс: '+projects.restoration.title).listeners.click();
+ assert(a.srcset);assert.notEqual(a.alt,alt);
+});
